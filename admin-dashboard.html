@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Panel de Administración</h1>
+                <p class="content-description">Bienvenido al sistema AsistNet</p>
+            </div>
+
+            <!-- Botón Volver (Visible para roles específicos) -->
+            <div id="btn-volver-dashboard" style="display: none; margin-bottom: 20px;">
+                <button onclick="window.location.href='admin-bienestar-dashboard.html'" class="btn-primary"
+                    style="background: #64748b; padding: 10px 20px;">
+                    <i class="fas fa-arrow-left"></i> Volver a Bienestar
+                </button>
+            </div>
+
+            <!-- Tarjetas de Resumen Administrativo (Director/Admin) -->
+            <div id="dashboard-admin-cards"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="card" style="text-align: center; padding: 30px; cursor: pointer;"
+                    onclick="window.location.href='admin-usuarios.html'">
+                    <div style="font-size: 3rem; color: #39A900; margin-bottom: 15px;"><i class="fas fa-users"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Usuarios</h3>
+                    <div id="dashTotalUsuarios"
+                        style="font-size: 2rem; font-weight: bold; color: #333; margin-bottom: 10px;">--</div>
+                    <p style="color: #666; margin: 0;">Gestionar usuarios del sistema</p>
+                </div>
+                <div class="card" style="text-align: center; padding: 30px; cursor: pointer;"
+                    onclick="window.location.href='admin-aprendices.html'">
+                    <div style="font-size: 3rem; color: #00324D; margin-bottom: 15px;"><i
+                            class="fas fa-user-graduate"></i></div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Aprendices</h3>
+                    <div id="dashTotalAprendices"
+                        style="font-size: 2rem; font-weight: bold; color: #333; margin-bottom: 10px;">--</div>
+                    <p style="color: #666; margin: 0;">Gestionar aprendices matriculados</p>
+                </div>
+                <div class="card" style="text-align: center; padding: 30px; cursor: pointer;"
+                    onclick="window.location.href='admin-programas.html'">
+                    <div style="font-size: 3rem; color: #00324D; margin-bottom: 15px;"><i class="fas fa-book"></i></div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Programas</h3>
+                    <div id="dashTotalProgramas"
+                        style="font-size: 2rem; font-weight: bold; color: #333; margin-bottom: 10px;">--</div>
+                    <p style="color: #666; margin: 0;">Gestionar programas de formación</p>
+                </div>
+                <div class="card" style="text-align: center; padding: 30px; cursor: pointer;"
+                    onclick="window.location.href='admin-fichas.html'">
+                    <div style="font-size: 3rem; color: #39A900; margin-bottom: 15px;"><i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Fichas</h3>
+                    <div id="dashTotalFichas"
+                        style="font-size: 2rem; font-weight: bold; color: #333; margin-bottom: 10px;">--</div>
+                    <p style="color: #666; margin: 0;">Gestionar fichas de formación</p>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Resumen Bienestar (Específicas por Población) -->
+            <div id="dashboard-bienestar-cards"
+                style="display: none; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="card"
+                    style="text-align: center; padding: 30px; cursor: pointer; border-bottom: 4px solid #a855f7;"
+                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    <div style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"><i class="fas fa-female"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Mujeres</h3>
+                    <div id="dashStatMujer" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                    <p style="color: #666; margin: 0;">Población Femenina</p>
+                </div>
+                <div class="card"
+                    style="text-align: center; padding: 30px; cursor: pointer; border-bottom: 4px solid #84cc16;"
+                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    <div style="font-size: 3rem; color: #84cc16; margin-bottom: 15px;"><i class="fas fa-seedling"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">Indígenas</h3>
+                    <div id="dashStatIndigena" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                    <p style="color: #666; margin: 0;">Población Étnica</p>
+                </div>
+                <div class="card"
+                    style="text-align: center; padding: 30px; cursor: pointer; border-bottom: 4px solid #dc2626;"
+                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    <div
+                        style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <img src="afrodedescendientes.png" alt="NARP" style="height: 50px; width: auto;">
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">NARP</h3>
+                    <div id="dashStatNarp" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                    <p style="color: #666; margin: 0;">Población Afro</p>
+                </div>
+                <div class="card"
+                    style="text-align: center; padding: 30px; cursor: pointer; border-bottom: 4px solid #E91E63;"
+                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    <div
+                        style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <img src="LGBTI.png" alt="LGBTIQ+" style="height: 50px; width: auto;">
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #333;">LGBTIQ+</h3>
+                    <div id="dashStatLgbtiq" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                    <p style="color: #666; margin: 0;">Diversidad Sexual</p>
+                </div>
+                <div class="card"
+                    style="text-align: center; padding: 30px; cursor: pointer; background: #00324D; color: white;"
+                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    <div style="font-size: 3rem; color: #39A900; margin-bottom: 15px;"><i
+                            class="fas fa-user-graduate"></i></div>
+                    <h3 style="margin: 0 0 10px 0; color: #fff;">Total Vulnerable</h3>
+                    <div id="dashStatTotal" style="font-size: 2.5rem; font-weight: bold; color: #fff;">0</div>
+                    <p style="color: #ccc; margin: 0;">General Población</p>
+                </div>
+            </div>
+
+            <!-- Panel de Estadísticas de Población (Solo Jefe de Bienestar) -->
+            <div id="panel-estadisticas-poblacion" class="card" style="display: none; margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3 class="card-title">Distribución de Población Vulnerable (Total Aprendices)</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; padding: 30px;">
+                    <div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #a855f7;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">MUJER</div>
+                                <div id="stat-mujer" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0
+                                </div>
+                            </div>
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #84cc16;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">INDÍGENA</div>
+                                <div id="stat-indigena" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0
+                                </div>
+                            </div>
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #dc2626;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">NARP</div>
+                                <div id="stat-narp" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0</div>
+                            </div>
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #6B8E23;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">CAMPESINO</div>
+                                <div id="stat-campesino" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0
+                                </div>
+                            </div>
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #ef4444;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">LGBTIQ+</div>
+                                <div id="stat-lgbtiq" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0
+                                </div>
+                            </div>
+                            <div
+                                style="background: #f8fafc; padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #4A90E2;">
+                                <div style="color: #64748b; font-size: 0.8rem; font-weight: 600;">DISCAPACIDAD</div>
+                                <div id="stat-discapacidad"
+                                    style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">0</div>
+                            </div>
+                        </div>
+                        <div
+                            style="background: #00324D; color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="opacity: 0.8; font-size: 0.9rem; font-weight: 600;">TOTAL POBLACIÓN VULNERABLE
+                            </div>
+                            <div id="stat-total-poblacion" style="font-size: 2.5rem; font-weight: 800;">0</div>
+                        </div>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="chartPoblacionDash"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos Rápidos -->
+            <div class="card" id="accesos-rapidos-container">
+                <div class="card-header">
+                    <h3 class="card-title">Accesos Rápidos</h3>
+                </div>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+                    <button onclick="window.location.href='admin-bienestar-historico.html'" class="btn-primary"
+                        style="padding: 15px; background: #39A900;">
+                        <i class="fas fa-users"></i> Asistencia Reuniones (Voceros)
+                    </button>
+                    <button onclick="window.location.href='admin-asistencias.html'" class="btn-primary"
+                        style="padding: 15px;">
+                        <i class="fas fa-check-circle"></i> Asistencia por Fichas
+                    </button>
+                    <button onclick="window.location.href='admin-reportes.html'" class="btn-primary"
+                        style="padding: 15px; background: #00324D;">
+                        <i class="fas fa-chart-bar"></i> Reportes Generales
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin/dashboard.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+
+        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+            window.location.href = 'login.html';
+        }
+
+        // Mostrar nombre del usuario
+        if (user) {
+            document.querySelector('.content-description').textContent = `Bienvenido, ${user.nombre} ${user.apellido}`;
+        }
+    </script>
+</body>
+
+</html>

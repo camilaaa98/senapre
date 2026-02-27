@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenApre - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-info">
+            <div class="info-content">
+                <h2>Sistema de Gestión<br>SenApre</h2>
+                <p>Centro de Teleinformática y Producción Industrial</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Gestión de Asistencia</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Control Biométrico</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Reportes en Tiempo Real</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-form-section">
+            <div class="login-card">
+                <div class="logo-container">
+                    <img src="assets/img/logosena.png" alt="SENA Logo" class="login-logo">
+                </div>
+
+                <h1 class="logo-text">SenApre</h1>
+                <p class="login-subtitle">Ingrese sus credenciales para continuar</p>
+
+                <div id="alertBox" class="alert alert-danger"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="correo" class="form-label">Correo Institucional</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="correo" name="correo" class="form-control"
+                                placeholder="usuario@soy.sena.edu.co" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="#" class="forgot-password">¿Olvidó su contraseña?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        Ingresar
+                    </button>
+                </form>
+
+                <div class="footer-text">
+                    &copy; 2025 SENA - CTPI
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const correoInput = document.getElementById('correo');
+            const passwordInput = document.getElementById('password');
+            const correo = correoInput.value.trim();
+            const password = passwordInput.value.trim(); // Passwords usually shouldn't be trimmed but for this specific "admin123" case it helps if copy-paste adds space
+
+            const alertBox = document.getElementById('alertBox');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Reset alert
+            alertBox.style.display = 'none';
+            alertBox.textContent = '';
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
+
+            // Detectar si estamos en localhost normal o en Live Server/otro puerto
+            // Si no estamos en el puerto 80 (WAMP por defecto), forzamos la ruta completa a WAMP
+            const isWamp = window.location.port === '' || window.location.port === '80';
+            const API_BASE_URL = isWamp ? 'api' : 'http://localhost/YanguasEjercicios/senapre/api';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ correo, password })
+                });
+
+                const text = await response.text();
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch (err) {
+                    throw new Error('Error de comunicación con el servidor');
+                }
+
+                if (data.success) {
+                    // Store user data
+                    localStorage.setItem('user', JSON.stringify(data.data));
+
+                    // Roles administrativos que van al dashboard de admin
+                    const rolesAdmin = ['admin', 'administrador', 'director', 'coordinador', 'administrativo', 'vocero'];
+                    const userRol = data.data.rol.toLowerCase();
+
+                    // Redirect based on role
+                    if (rolesAdmin.includes(userRol)) {
+                        window.location.href = 'admin-dashboard.html';
+                    } else if (userRol === 'instructor') {
+                        window.location.href = 'instructor-dashboard.html';
+                    } else {
+                        throw new Error('Rol de usuario no reconocido: ' + data.data.rol);
+                    }
+                } else {
+                    throw new Error(data.message || 'Credenciales inválidas');
+                }
+
+            } catch (error) {
+                console.error('Login Error:', error);
+                // Mostrar respuesta raw si es posible, o mensaje de error
+                alertBox.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                alertBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    </script>
+</body>
+
+</html>

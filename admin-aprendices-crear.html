@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Aprendices - SenApre SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin-aprendices.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+                <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu open">
+                    <a href="#" class="menu-link active" onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu show" id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Agregar Nuevo Aprendiz</h1>
+                <p class="content-description">Registre la información de un nuevo aprendiz en el sistema.</p>
+            </div>
+
+            <div class="card" style="max-width: 800px; margin: 0 auto; padding: 30px;">
+                <form id="formAprendizPage" onsubmit="guardarAprendizDesdePagina(event)">
+                    <!-- Campos Hidden -->
+                    <input type="hidden" id="aprendizId">
+
+                    <!-- Tipo y Documento -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label" style="display: block; margin-bottom: 8px; font-weight: 500;">Tipo
+                                de Identificación *</label>
+                            <select id="tipoIdentificacion" class="form-control" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                <option value="CC">Cédula de Ciudadanía</option>
+                                <option value="TI">Tarjeta de Identidad</option>
+                                <option value="CE">Cédula de Extranjería</option>
+                                <option value="PEP">PEP</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Número de Documento
+                                *</label>
+                            <input type="text" id="documento" class="form-control" required
+                                placeholder="Número sin puntos" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <!-- Nombres y Apellidos -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Nombres *</label>
+                            <input type="text" id="nombres" class="form-control" required
+                                placeholder="Nombres completos"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Apellidos *</label>
+                            <input type="text" id="apellidos" class="form-control" required
+                                placeholder="Apellidos completos"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <!-- Contacto -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Correo Electrónico
+                                *</label>
+                            <input type="email" id="correo" class="form-control" required
+                                placeholder="ejemplo@correo.com"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Celular</label>
+                            <input type="tel" id="celular" class="form-control" placeholder="3001234567" maxlength="10"
+                                pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <!-- Ficha y Estado -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Ficha *</label>
+                            <select id="numeroFicha" class="form-control" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                <option value="">Cargando fichas...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"
+                                style="display: block; margin-bottom: 8px; font-weight: 500;">Estado *</label>
+                            <select id="estado" class="form-control" required
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                                <option value="EN FORMACION" selected>EN FORMACION</option>
+                                <option value="INDUCCION">INDUCCION</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="RETIRADO">RETIRADO</option>
+                                <option value="POR CERTIFICAR">POR CERTIFICAR</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Población -->
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label class="form-label" style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de
+                            Población (Selección Múltiple)</label>
+                        <div id="containerPoblacion"
+                            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #f9fafb;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Mujer"> Mujer</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Indígena"> Indígena</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Afrodescendiente">
+                                Afrodescendiente</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Víctima"> Víctima del Conflicto</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Campesina"> Campesina</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Discapacidad"> Discapacidad</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="N.A.P"> N.A.P</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="LGBTI"> LGBTI</label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input
+                                    type="checkbox" name="poblacion[]" value="Otro"> Otro</label>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                        <a href="admin-aprendices.html" class="btn-secondary"
+                            style="padding: 12px 25px; text-decoration: none; border: 1px solid #ddd; border-radius: 6px; color: #555; background: #fff;">Cancelar</a>
+                        <button type="submit" class="btn-primary"
+                            style="padding: 12px 25px; border-radius: 6px; font-weight: 600;">Guardar Aprendiz</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin/dashboard.js"></script> <!-- Si se necesita -->
+    <script src="js/admin/aprendices.js"></script>
+</body>
+
+<!-- Placeholders para otras secciones -->
+<!-- SECCIÓN: EXCUSAS -->
+<div id="seccion-excusas" class="content-section">
+    <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="card-title">Gestión de Excusas</h3>
+            <div class="header-actions">
+                <button onclick="cargarExcusasPendientes()" class="btn-icon" title="Actualizar"
+                    style="background: none; border: none; cursor: pointer; color: #39A900; font-size: 1.2rem;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros Excusas -->
+        <div
+            style="padding: 15px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 15px; flex-wrap: wrap; background: #f9fafb;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Ficha:</label>
+                <select id="filtroExcusasFicha" class="form-control form-control-sm"
+                    onchange="cargarExcusasPendientes()">
+                    <option value="">Todas las fichas</option>
+                </select>
+            </div>
+            <div style="width: 150px;">
+                <label style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Desde:</label>
+                <input type="date" id="filtroExcusasInicio" class="form-control form-control-sm"
+                    onchange="cargarExcusasPendientes()">
+            </div>
+            <div style="width: 150px;">
+                <label style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Hasta:</label>
+                <input type="date" id="filtroExcusasFin" class="form-control form-control-sm"
+                    onchange="cargarExcusasPendientes()">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button onclick="limpiarFiltrosExcusas()" class="btn-secondary"
+                    style="padding: 6px 12px; font-size: 0.9rem;">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container" style="border-bottom: 1px solid #e5e7eb; margin-bottom: 20px;">
+            <button onclick="cambiarTabExcusas('INASISTENCIA')" id="tab-inasistencia" class="tab-btn active"
+                style="padding: 10px 20px; background: none; border: none; border-bottom: 2px solid #39A900; color: #39A900; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-user-times"></i> Excusas por Inasistencia
+            </button>
+            <button onclick="cambiarTabExcusas('LLEGADA_TARDE')" id="tab-llegada-tarde" class="tab-btn"
+                style="padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-clock"></i> Excusas por Llegada Tarde
+            </button>
+        </div>
+
+        <!-- Panel Inasistencia -->
+        <div id="panel-inasistencia" class="tab-panel">
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha Falta</th>
+                            <th>Aprendiz</th>
+                            <th>Ficha</th>
+                            <th>Motivo</th>
+                            <th>Soporte</th>
+                            <th>Estado</th>
+                            <th>Viabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaExcusasInasistencia">
+                        <tr>
+                            <td colspan="7" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Llegada Tarde -->
+        <div id="panel-llegada-tarde" class="tab-panel" style="display: none;">
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha Falta</th>
+                            <th>Aprendiz</th>
+                            <th>Ficha</th>
+                            <th>Motivo</th>
+                            <th>Soporte</th>
+                            <th>Estado</th>
+                            <th>Viabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaExcusasLlegadaTarde">
+                        <tr>
+                            <td colspan="7" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="seccion-planes" class="content-section">
+    <h3>Planes de Mejoramiento (En construcción)</h3>
+</div>
+<div id="seccion-inasistencias" class="content-section">
+    <h3>Reporte de Inasistencias (En construcción)</h3>
+</div>
+<div id="seccion-retardos" class="content-section">
+    <h3>Reporte de Retardos (En construcción)</h3>
+</div>
+
+</main>
+</div>
+
+<!-- Modal Nuevo/Editar Aprendiz -->
+<div class="modal-overlay" id="modalAprendiz">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitulo">Nuevo Aprendiz</h2>
+            <button class="modal-close" onclick="cerrarModal()">&times;</button>
+        </div>
+        <form id="formAprendiz" onsubmit="guardarAprendiz(event)">
+            <input type="hidden" id="aprendizId">
+
+            <div class="form-group">
+                <label class="form-label">Tipo de Identificación *</label>
+                <select id="tipoIdentificacion" class="form-control" required>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="PEP">PEP</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Número de Documento *</label>
+                <input type="text" id="documento" class="form-control" required placeholder="Número sin puntos ni comas"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label class="form-label">Nombres *</label>
+                    <input type="text" id="nombres" class="form-control" required placeholder="Nombres del aprendiz">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Apellidos *</label>
+                    <input type="text" id="apellidos" class="form-control" required
+                        placeholder="Apellidos del aprendiz">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Correo Electrónico *</label>
+                <input type="email" id="correo" class="form-control" required placeholder="ejemplo@correo.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Celular</label>
+                <input type="tel" id="celular" class="form-control" placeholder="Solo números, máx 10 dígitos"
+                    maxlength="10" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label class="form-label">Ficha *</label>
+                    <select id="numeroFicha" class="form-control" required>
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado *</label>
+                    <select id="estado" class="form-control" required>
+                        <option value="INDUCCION">INDUCCION</option>
+                        <option value="EN FORMACION">EN FORMACION</option>
+                        <option value="CANCELADO">CANCELADO</option>
+                        <option value="RETIRADO">RETIRADO</option>
+                        <option value="POR CERTIFICAR">POR CERTIFICAR</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- NUEVO CAMPO: TIPO DE POBLACIÓN (CHECKBOXES) -->
+            <div class="form-group">
+                <label class="form-label" style="display: block; margin-bottom: 10px;">Tipo de Población (Seleccione
+                    una o varias)</label>
+                <div id="containerPoblacion"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; max-height: 150px; overflow-y: auto;">
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Mujer"> Mujer</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Indígena"> Indígena</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Afrodescendiente"> Afrodescendiente</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Víctima"> Víctima del Conflicto</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Campesina"> Pob. Campesina</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Rap"> RAP</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Discapacidad"> Discapacidad</label>
+                    <label style="display: flex; align-items: center; gap: 5px;"><input type="checkbox"
+                            name="poblacion[]" value="Otro"> Otro</label>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="cerrarModal()" class="btn-primary"
+                    style="background: #666;">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
+<script>
+    window.addEventListener('load', function () {
+        if (typeof Human === 'undefined') {
+            console.error('ERROR: Human.js no se cargó desde el CDN');
+        } else {
+            console.log('✓ Human.js cargado correctamente desde CDN');
+        }
+    });
+</script>
+<script src="js/human-config.js"></script>
+<script src="js/facial-recognition.js"></script>
+<script src="js/facial-landmarks-draw.js"></script>
+<!-- Scripts de aplicación -->
+<!-- Modal Evaluación Excusa -->
+<div class="modal-overlay" id="modalEvaluacion" style="z-index: 10001; display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 class="modal-title">Evaluar Excusa</h2>
+            <button class="modal-close" onclick="cerrarModalEvaluacion()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="infoEvaluacion"
+                style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+                <!-- Info dinámica -->
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Decisión *</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button type="button" onclick="setDecision('APROBADA')" id="btnAprobar" class="btn-decision"
+                        style="padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i> Aprobar
+                    </button>
+                    <button type="button" onclick="setDecision('RECHAZADA')" id="btnRechazar" class="btn-decision"
+                        style="padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-times-circle" style="color: #ef4444;"></i> Rechazar
+                    </button>
+                </div>
+                <input type="hidden" id="decisionEvaluacion">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Observaciones *</label>
+                <textarea id="observacionesEvaluacion" class="form-control" rows="3"
+                    placeholder="Justifique la decisión..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="cerrarModalEvaluacion()" class="btn-secondary">Cancelar</button>
+            <button onclick="confirmarEvaluacion()" class="btn-primary" id="btnConfirmarEval"
+                disabled>Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/admin/excusas.js?v=1.0.1"></script>
+<script src="js/admin/aprendices.js"></script>
+<script>
+    // Verificar autenticación
+    const user = authSystem.getCurrentUser();
+    if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+        window.location.href = 'login.html';
+    }
+</script>
+</body>
+
+</html>
+

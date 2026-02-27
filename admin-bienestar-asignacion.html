@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Responsable Bienestar - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Bienestar del Aprendiz</h1>
+                <p class="content-description">Asignación de responsable para Voceros y Representantes</p>
+            </div>
+
+            <div class="card animate-slide-in" style="max-width: 800px; margin: 0 auto;">
+                <div class="card-header" style="background: var(--sena-green); color: white;">
+                    <h3 class="card-title" style="color: white;"><i class="fas fa-user-shield"></i> Delegar Responsable
+                        de Área</h3>
+                </div>
+                <div class="card-body" style="padding: 30px;">
+                    <div
+                        style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
+                        <p style="margin: 0; color: #166534; font-size: 0.95rem;">
+                            <i class="fas fa-info-circle"></i> Seleccione el funcionario administrativo que se encargará
+                            de gestionar las reuniones, asistencia biométrica y comunicaciones masivas con los voceros y
+                            representantes.
+                        </p>
+                    </div>
+
+                    <form id="formAsignacion" onsubmit="guardarAsignacion(event)">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label class="form-label"
+                                style="font-weight: bold; display: block; margin-bottom: 8px;">Funcionario
+                                Administrativo *</label>
+                            <select id="id_usuario" class="form-control" required
+                                style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                                <option value="">Cargando administradores...</option>
+                            </select>
+                        </div>
+
+                        <div id="responsableActual"
+                            style="display: none; margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <h4
+                                style="margin: 0 0 10px 0; color: #475569; font-size: 0.9rem; text-transform: uppercase;">
+                                Responsable Actual:</h4>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div
+                                    style="width: 45px; height: 45px; background: #39A900; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div>
+                                    <p id="nombreActual" style="margin: 0; font-weight: bold; color: #1e293b;"></p>
+                                    <p id="correoActual" style="margin: 0; font-size: 0.85rem; color: #64748b;"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px;">
+                            <button type="submit" class="btn-primary"
+                                style="padding: 12px 30px; background: var(--sena-green); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; transition: all 0.3s;">
+                                <i class="fas fa-save"></i> Guardar Asignación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const areaActual = urlParams.get('area') || 'voceros_y_representantes';
+
+        const nombresAreas = {
+            'jefe_bienestar': 'Jefe de Bienestar',
+            'voceros_y_representantes': 'Voceros y Representantes',
+            'enfermeria': 'Enfermería',
+            'deporte': 'Deporte',
+            'arte': 'Arte',
+            'apoyos': 'Apoyos Económicos'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const areaLabel = nombresAreas[areaActual] || areaActual;
+            document.querySelector('.content-description').textContent = `Asignación de responsable para ${areaLabel}`;
+
+            cargarAdministradores();
+            consultarResponsable();
+        });
+
+        async function cargarAdministradores() {
+            try {
+                // Ahora filtramos por todos los roles administrativos habilitados
+                const response = await fetch('api/usuarios.php?rol=director,administrativo,coordinador&limit=-1');
+                const result = await response.json();
+                const select = document.getElementById('id_usuario');
+
+                if (result.success) {
+                    select.innerHTML = '<option value="">Seleccione un funcionario...</option>';
+                    result.data.forEach(u => {
+                        const rolBadge = u.rol.toUpperCase();
+                        select.innerHTML += `<option value="${u.id_usuario}">${u.nombre} ${u.apellido} - ${rolBadge} (${u.correo})</option>`;
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function consultarResponsable() {
+            try {
+                const response = await fetch(`api/bienestar.php?action=getResponsable&area=${areaActual}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const resp = result.data;
+                    document.getElementById('responsableActual').style.display = 'block';
+                    document.getElementById('nombreActual').textContent = `${resp.nombre} ${resp.apellido}`;
+                    document.getElementById('correoActual').textContent = resp.correo;
+                    document.getElementById('id_usuario').value = resp.id_usuario;
+                } else {
+                    document.getElementById('responsableActual').style.display = 'none';
+                    document.getElementById('id_usuario').value = '';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function guardarAsignacion(event) {
+            event.preventDefault();
+            const id_usuario = document.getElementById('id_usuario').value;
+
+            if (!id_usuario) return;
+
+            try {
+                const response = await fetch('api/bienestar.php?action=setResponsable', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_usuario, area: areaActual })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Responsable asignado exitosamente para ' + (nombresAreas[areaActual] || areaActual));
+                    consultarResponsable();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error técnico al guardar la asignación');
+            }
+        }
+    </script>
+</body>
+
+</html>

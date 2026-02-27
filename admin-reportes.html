@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - AsistNet SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+                        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Reportes y Estadísticas</h1>
+                <p class="content-description">Visión general del estado del sistema</p>
+            </div>
+
+            <!-- Cards Resumen -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="card" style="text-align: center; padding: 20px;">
+                    <div style="font-size: 2rem; color: #39A900; margin-bottom: 10px;"><i
+                            class="fas fa-user-graduate"></i></div>
+                    <h3 style="margin: 0; color: #666;">Total Aprendices</h3>
+                    <div id="totalAprendices" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                </div>
+                <div class="card" style="text-align: center; padding: 20px;">
+                    <div style="font-size: 2rem; color: #00324D; margin-bottom: 10px;"><i class="fas fa-chalkboard"></i>
+                    </div>
+                    <h3 style="margin: 0; color: #666;">Total Fichas</h3>
+                    <div id="totalFichas" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                </div>
+                <div class="card" style="text-align: center; padding: 20px;">
+                    <div style="font-size: 2rem; color: #fc7323; margin-bottom: 10px;"><i
+                            class="fas fa-chalkboard-teacher"></i></div>
+                    <h3 style="margin: 0; color: #666;">Instructores</h3>
+                    <div id="totalInstructores" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                </div>
+            </div>
+
+            <!-- Gráficas -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Aprendices por Estado</h3>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chartEstados"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Fichas por Programa (Top 8)</h3>
+                    </div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="chartProgramas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/admin/reportes.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+
+        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>
+

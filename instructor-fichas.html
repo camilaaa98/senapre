@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AsistNet - Mis Fichas</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>AsistNet</h3>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="instructor-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-fichas.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span>Mis Fichas</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role">Instructor</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title">Mis Fichas Asignadas</h1>
+                <div class="date-display" id="currentDate"></div>
+            </header>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ficha</th>
+                            <th>Programa de Formación</th>
+                            <th>Jornada</th>
+                            <th>Aprendices</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fichasTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Cargando fichas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/instructor/fichas.js"></script>
+</body>
+
+</html>

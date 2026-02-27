@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Aprendices - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin-aprendices.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu open">
+                    <a href="#" class="menu-link active" onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu show" id="submenu-aprendices">
+                        <li><a href="#lista" onclick="mostrarSeccion(event, 'lista')"><i class="fas fa-list"></i> Lista
+                                de Aprendices</a></li>
+                        <li><a href="#poblacion" onclick="mostrarSeccion(event, 'poblacion')"><i
+                                    class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="#excusas" onclick="mostrarSeccion(event, 'excusas')"><i
+                                    class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="#planes" onclick="mostrarSeccion(event, 'planes')"><i
+                                    class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="#inasistencias" onclick="mostrarSeccion(event, 'inasistencias')"><i
+                                    class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="#retardos" onclick="mostrarSeccion(event, 'retardos')"><i class="fas fa-clock"></i>
+                                Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- SECCIÓN: LISTA DE APRENDICES -->
+            <div id="seccion-lista" class="content-section active">
+                <div class="content-header">
+                    <h1 class="content-title">Gestión de Aprendices</h1>
+                    <p class="content-description">Administración completa de aprendices matriculados</p>
+                </div>
+                <!-- Filtros de Búsqueda -->
+                <div class="card card-filtros">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros</h3>
+                    </div>
+                    <div class="filtros-container">
+                        <div class="filtro-item">
+                            <input type="text" id="filtroSearch" class="form-control"
+                                placeholder="Nombre, documento o correo...">
+                        </div>
+                        <div class="filtro-item-fixed">
+                            <select id="filtroFicha" class="form-control">
+                                <option value="">Todas las Fichas</option>
+                            </select>
+                        </div>
+                        <div class="filtro-item-fixed">
+                            <select id="filtroEstado" class="form-control">
+                                <option value="">TODOS LOS ESTADOS</option>
+                                <option value="INDUCCION">INDUCCION</option>
+                                <option value="LECTIVA">LECTIVA</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="RETIRADO">RETIRADO</option>
+                                <option value="POR CERTIFICAR">POR CERTIFICAR</option>
+                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="TRASLADO">TRASLADO</option>
+                                <option value="APLAZADO">APLAZADO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="table-container animate-slide-in">
+                    <div class="table-header-custom">
+                        <h2 class="table-title">Lista de Aprendices</h2>
+                        <div class="table-actions">
+                            <button onclick="nuevoAprendiz()" class="btn-primary btn-nuevo btn-flex-center">
+                                + Agregar Aprendiz
+                            </button>
+                            <button onclick="exportarAprendices()" class="btn-primary btn-exportar">📊 Exportar
+                                Excel</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper table-scroll">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Población</th>
+                                    <th>Correo</th>
+                                    <th>Celular</th>
+                                    <th>Ficha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAprendices">
+                                <!-- Datos cargados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="paginacion" class="pagination-container pagination-wrapper">
+                        <!-- Paginación cargada por JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECCIÓN: TIPO DE POBLACIÓN (Estadísticas y Filtros) -->
+            <div id="seccion-poblacion" class="content-section">
+                <div class="content-header">
+                    <h1 class="content-title">Distribución de Población</h1>
+                    <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
+                </div>
+                <div class="chart-section-grid">
+                    <!-- Tarjetas de Estadística -->
+                    <div class="card">
+                        <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
+                            <h3 class="card-title">DISTRIBUCIÓN POR TIPO DE POBLACIÓN</h3>
+
+                        </div>
+                        <div class="grid-stats-poblacion">
+                            <div class="stat-card bg-mujer" onclick="filtrarPorPoblacion('mujer')">
+                                <div class="stat-icon"><i class="fas fa-female"></i></div>
+                                <div class="stat-info">
+                                    <h3>MUJER</h3>
+                                    <p id="count-mujer">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card bg-indigena" onclick="filtrarPorPoblacion('indigena')">
+                                <div class="stat-icon"><i class="fas fa-mountain"></i></div>
+                                <div class="stat-info">
+                                    <h3>INDÍGENA</h3>
+                                    <p id="count-indigena">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card bg-afro" onclick="filtrarPorPoblacion('narp')">
+                                <div class="stat-icon"><img src="afrodedescendientes.png" alt="NARP"
+                                        style="height: 40px; width: auto;"></div>
+                                <div class="stat-info">
+                                    <h3>NARP</h3>
+                                    <p id="count-narp">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card bg-campesina" onclick="filtrarPorPoblacion('campesino')">
+                                <div class="stat-icon"><i class="fas fa-seedling"></i></div>
+                                <div class="stat-info">
+                                    <h3>CAMPESINO</h3>
+                                    <p id="count-campesino">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card bg-lgbti" onclick="filtrarPorPoblacion('lgbtiq')">
+                                <div class="stat-icon"><img src="LGBTI.png" alt="LGBTIQ+"
+                                        style="height: 40px; width: auto;"></div>
+                                <div class="stat-info">
+                                    <h3>LGBTIQ+</h3>
+                                    <p id="count-lgbtiq">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card bg-discapacidad"
+                                onclick="window.location.href='admin-poblacion-detalle.html?tipo=discapacidad'">
+                                <div class="stat-icon"><i class="fas fa-wheelchair"></i></div>
+                                <div class="stat-info">
+                                    <h3>DISCAPACIDAD</h3>
+                                    <p id="count-discapacidad">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card" onclick="mostrarGestionPoblacion()"
+                                style="background: #39A900; color: white;">
+                                <div class="stat-icon"><i class="fas fa-plus-circle"></i></div>
+                                <div class="stat-info">
+                                    <h3>AGREGAR</h3>
+                                    <p style="font-size: 0.9rem; font-weight: normal;">Gestionar Tipos</p>
+                                </div>
+                            </div>
+                            <div class="stat-card" onclick="mostrarModalVoceroEnfoque()"
+                                style="background: #2563eb; color: white;">
+                                <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                                <div class="stat-info">
+                                    <h3>VOCERO</h3>
+                                    <p style="font-size: 0.9rem; font-weight: normal;">ENFOQUE DIFERENCIAL</p>
+                                </div>
+                            </div>
+                            <div class="stat-card" onclick="mostrarModalRepresentantes()"
+                                style="background: #ea580c; color: white;">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div class="stat-info">
+                                    <h3>REPRESENTANTES</h3>
+                                    <p style="font-size: 0.9rem; font-weight: normal;">DIURNA / MIXTA</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica -->
+                    <div class="chart-container-wrapper">
+                        <div class="card-header" style="width: 100%; text-align: center; margin-bottom: 10px;">
+                            <h3 class="card-title">Gráfica de Distribución</h3>
+                        </div>
+                        <div class="chart-canvas-container">
+                            <canvas id="chartPoblacion"></canvas>
+                        </div>
+                        <!-- Leyenda Personalizada HTML -->
+                        <div id="chartLegend" class="chart-legend"></div>
+                    </div>
+                </div>
+
+                <!-- Nueva Tabla de Detalles para Población -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header"
+                        style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title" id="poblacion-detalle-titulo">Detalle de Aprendices</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="abrirModalAnexarPoblacion()" class="btn-primary"
+                                style="padding: 8px 15px; font-size: 0.9rem; background-color: #3b82f6;">
+                                <i class="fas fa-plus"></i> Anexar Aprendiz
+                            </button>
+                            <button onclick="descargarPDFPoblacion()" class="btn-primary"
+                                style="padding: 8px 15px; font-size: 0.9rem; background-color: #ef4444;">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Correo</th>
+                                    <th>Celular</th>
+                                    <th>Ficha</th>
+                                    <th>Tipo Formación</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaDetallePoblacion">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #999; padding: 20px;">
+                                        Seleccione una categoría de población para ver los detalles
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: GESTIÓN DE TIPOS DE POBLACIÓN (Vista AGREGAR) -->
+            <div id="seccion-gestion-poblacion" class="content-section">
+                <div class="content-header">
+                    <h1 class="content-title">Tipo de Población</h1>
+                    <p class="content-description">Mujer, Indígena, Afro, Víctima, Campesina, N.A.P, LGBTI, Discapacidad
+                    </p>
+                </div>
+
+                <!-- Filtros de Búsqueda (Copia de la lista principal) -->
+                <div class="card card-filtros">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros</h3>
+                    </div>
+                    <div class="filtros-container">
+                        <div class="filtro-item">
+                            <input type="text" id="filtroSearchGP" class="form-control"
+                                placeholder="Nombre, documento o correo...">
+                        </div>
+                        <div class="filtro-item-fixed">
+                            <select id="filtroFichaGP" class="form-control">
+                                <option value="">Todas las Fichas</option>
+                            </select>
+                        </div>
+                        <div class="filtro-item-fixed">
+                            <select id="filtroEstadoGP" class="form-control">
+                                <option value="">TODOS LOS ESTADOS</option>
+                                <option value="INDUCCION">INDUCCION</option>
+                                <option value="LECTIVA" selected>LECTIVA</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="RETIRADO">RETIRADO</option>
+                                <option value="POR CERTIFICAR">POR CERTIFICAR</option>
+                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="TRASLADO">TRASLADO</option>
+                                <option value="APLAZADO">APLAZADO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Resultados (Sin botones de Agregar/Exportar) -->
+                <div class="table-container animate-slide-in">
+                    <div class="table-header-custom">
+                        <h2 class="table-title">Lista de Aprendices</h2>
+                    </div>
+                    <div class="table-wrapper table-scroll">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th class="text-center">Mujer</th>
+                                    <th class="text-center">Indígena</th>
+                                    <th class="text-center">NARP</th>
+                                    <th class="text-center">Campesino</th>
+                                    <th class="text-center">LGBTIQ+</th>
+                                    <th class="text-center">Discapacidad</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaGP">
+                                <!-- Datos cargados por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="paginacionGP" class="pagination-container pagination-wrapper">
+                        <!-- Paginación cargada por JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: EXCUSAS -->
+            <div id="seccion-excusas" class="content-section" style="display:none;">
+                <div class="card">
+                    <div class="card-header"
+                        style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="card-title">Gestión de Excusas</h3>
+                        <div class="header-actions">
+                            <button onclick="cargarExcusasPendientes()" class="btn-icon" title="Actualizar"
+                                style="background: none; border: none; cursor: pointer; color: #39A900; font-size: 1.2rem;">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Excusas -->
+                    <div
+                        style="padding: 15px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 15px; flex-wrap: wrap; background: #f9fafb;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label
+                                style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Ficha:</label>
+                            <select id="filtroExcusasFicha" class="form-control form-control-sm"
+                                onchange="cargarExcusasPendientes()">
+                                <option value="">Todas las fichas</option>
+                            </select>
+                        </div>
+                        <div style="width: 150px;">
+                            <label
+                                style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Desde:</label>
+                            <input type="date" id="filtroExcusasInicio" class="form-control form-control-sm"
+                                onchange="cargarExcusasPendientes()">
+                        </div>
+                        <div style="width: 150px;">
+                            <label
+                                style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 4px;">Hasta:</label>
+                            <input type="date" id="filtroExcusasFin" class="form-control form-control-sm"
+                                onchange="cargarExcusasPendientes()">
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button onclick="limpiarFiltrosExcusas()" class="btn-secondary"
+                                style="padding: 6px 12px; font-size: 0.9rem;">Limpiar</button>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs-container" style="border-bottom: 1px solid #e5e7eb; margin-bottom: 20px;">
+                        <button onclick="cambiarTabExcusas('INASISTENCIA')" id="tab-inasistencia" class="tab-btn active"
+                            style="padding: 10px 20px; background: none; border: none; border-bottom: 2px solid #39A900; color: #39A900; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-user-times"></i> Excusas por Inasistencia
+                        </button>
+                        <button onclick="cambiarTabExcusas('LLEGADA_TARDE')" id="tab-llegada-tarde" class="tab-btn"
+                            style="padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-clock"></i> Excusas por Llegada Tarde
+                        </button>
+                    </div>
+
+                    <!-- Panel Inasistencia -->
+                    <div id="panel-inasistencia" class="tab-panel">
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha Falta</th>
+                                        <th>Aprendiz</th>
+                                        <th>Ficha</th>
+                                        <th>Motivo</th>
+                                        <th>Soporte</th>
+                                        <th>Estado</th>
+                                        <th>Viabilidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaExcusasInasistencia">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Cargando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginacionExcusasInasistencia"></div>
+                    </div>
+
+                    <!-- Panel Llegada Tarde -->
+                    <div id="panel-llegada-tarde" class="tab-panel" style="display: none;">
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha Falta</th>
+                                        <th>Aprendiz</th>
+                                        <th>Ficha</th>
+                                        <th>Motivo</th>
+                                        <th>Soporte</th>
+                                        <th>Estado</th>
+                                        <th>Viabilidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaExcusasLlegadaTarde">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Cargando...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginacionExcusasLlegadaTarde"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PLANES DE MEJORAMIENTO -->
+            <div id="seccion-planes" class="content-section" style="display:none;">
+                <div class="content-header">
+                    <h1 class="content-title">Planes de Mejoramiento</h1>
+                    <p class="content-description">Esta funcionalidad estará disponible próximamente.</p>
+                </div>
+                <div class="card" style="padding: 60px; text-align: center; color: #9ca3af;">
+                    <i class="fas fa-clipboard-list" style="font-size: 4rem; margin-bottom: 20px; color: #d1d5db;"></i>
+                    <h3>Módulo en construcción</h3>
+                    <p>Los planes de mejoramiento estarán disponibles en una próxima actualización.</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: INASISTENCIAS -->
+            <div id="seccion-inasistencias" class="content-section" style="display:none;">
+                <div class="content-header">
+                    <h1 class="content-title">Reporte de Inasistencias</h1>
+                    <p class="content-description">Esta funcionalidad estará disponible próximamente.</p>
+                </div>
+                <div class="card" style="padding: 60px; text-align: center; color: #9ca3af;">
+                    <i class="fas fa-exclamation-triangle"
+                        style="font-size: 4rem; margin-bottom: 20px; color: #d1d5db;"></i>
+                    <h3>Módulo en construcción</h3>
+                    <p>El reporte de inasistencias estará disponible en una próxima actualización.</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: RETARDOS -->
+            <div id="seccion-retardos" class="content-section" style="display:none;">
+                <div class="content-header">
+                    <h1 class="content-title">Reporte de Retardos</h1>
+                    <p class="content-description">Esta funcionalidad estará disponible próximamente.</p>
+                </div>
+                <div class="card" style="padding: 60px; text-align: center; color: #9ca3af;">
+                    <i class="fas fa-clock" style="font-size: 4rem; margin-bottom: 20px; color: #d1d5db;"></i>
+                    <h3>Módulo en construcción</h3>
+                    <p>El reporte de retardos estará disponible en una próxima actualización.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal Nuevo/Editar Aprendiz -->
+    <div class="modal-overlay" id="modalAprendiz">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitulo">Nuevo Aprendiz</h2>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <form id="formAprendiz" onsubmit="guardarAprendiz(event)">
+                <input type="hidden" id="aprendizId">
+
+                <div class="form-group">
+                    <label class="form-label">Tipo de Identificación *</label>
+                    <select id="tipoIdentificacion" class="form-control" required>
+                        <option value="CC">Cédula de Ciudadanía</option>
+                        <option value="TI">Tarjeta de Identidad</option>
+                        <option value="CE">Cédula de Extranjería</option>
+                        <option value="PEP">PEP</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Número de Documento *</label>
+                    <input type="text" id="documento" class="form-control" required
+                        placeholder="Número sin puntos ni comas"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Nombres *</label>
+                        <input type="text" id="nombres" class="form-control" required placeholder="Nombres del aprendiz"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '')">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apellidos *</label>
+                        <input type="text" id="apellidos" class="form-control" required
+                            placeholder="Apellidos del aprendiz"
+                            oninput="this.value = this.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '')">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico *</label>
+                    <input type="email" id="correo" class="form-control" required placeholder="ejemplo@correo.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Celular</label>
+                    <input type="tel" id="celular" class="form-control" placeholder="Solo números, máx 10 dígitos"
+                        maxlength="10" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Ficha *</label>
+                        <select id="numeroFicha" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label class="form-label">Estado *</label>
+                            <select id="estado" class="form-control" required>
+                                <option value="INDUCCION">INDUCCION</option>
+                                <option value="LECTIVA">LECTIVA</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                                <option value="RETIRADO">RETIRADO</option>
+                                <option value="POR CERTIFICAR">POR CERTIFICAR</option>
+                                <option value="FINALIZADO">FINALIZADO</option>
+                                <option value="TRASLADO">TRASLADO</option>
+                                <option value="APLAZADO">APLAZADO</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Instructor Líder</label>
+                            <select id="id_instructor_lider" class="form-control">
+                                <option value="">Seleccione un instructor...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label class="form-label">Tipo de Población (Opcional)</label>
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="Mujer"> Mujer
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="Indígena"> Indígena
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="NARP"> NARP
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="Campesino"> Campesino
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="LGBTIQ+"> LGBTIQ+
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
+                                <input type="checkbox" name="poblacion[]" value="Discapacidad"> Discapacidad
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer"
+                        style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button type="button" onclick="cerrarModal()" class="btn-primary"
+                            style="background: #666;">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
+    <script src="js/main.js"></script>
+    <script src="js/human-config.js"></script>
+    <script src="js/facial-recognition.js"></script>
+    <script src="js/facial-landmarks-draw.js"></script>
+    <script src="js/admin/dashboard.js"></script>
+    <script src="js/admin/excusas.js?v=1.0.1"></script>
+    <script src="js/admin/aprendices.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

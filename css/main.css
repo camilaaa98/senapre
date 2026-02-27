@@ -1,0 +1,1012 @@
+:root {
+    --sena-green: #39A900;
+    --sena-dark-green: #2d8600;
+    --sena-blue: #00324D;
+    --text-color: #333;
+    --bg-light: #f4f6f9;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Login Styles */
+.login-page {
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--white);
+}
+
+.login-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Left Side - Info Section */
+.login-info {
+    width: 45%;
+    background: linear-gradient(135deg, var(--sena-blue) 0%, #001f30 100%);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://www.sena.edu.co/Style%20Library/alcaldia/images/bg-pattern.png');
+    /* Pattern overlay if available, or just opacity */
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.info-content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+}
+
+.info-content h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.info-content p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.feature-list {
+    margin-top: 40px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.feature-item i {
+    color: var(--sena-green);
+    margin-right: 15px;
+    font-size: 1.4rem;
+}
+
+/* Right Side - Form Section */
+.login-form-section {
+    width: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--white);
+    padding: 40px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    /* No shadow/border for clean look on white bg, removing "card" feel for a "page" feel */
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    width: 100px;
+    height: auto;
+}
+
+.logo-text {
+    font-size: 2.5rem;
+    color: var(--sena-blue);
+    text-align: center;
+    margin-bottom: 5px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--sena-blue);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none;
+    transition: color 0.3s;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    /* Space for icon */
+    border: 2px solid #eee;
+    background-color: #f9f9f9;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: all 0.3s;
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    border-color: var(--sena-green);
+    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
+}
+
+.form-control:focus+.input-icon,
+/* This selector won't work because icon is before input in HTML. Adjusted HTML relative to this assumption or fix selector? */
+.input-group:focus-within .input-icon {
+    /* Better selector */
+    color: var(--sena-green);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+}
+
+.forgot-password {
+    color: var(--sena-blue);
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: var(--sena-green);
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background-color: var(--sena-green);
+    color: var(--white);
+    border: none;
+    padding: 16px;
+    width: 100%;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary:hover {
+    background-color: var(--sena-dark-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(57, 169, 0, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.alert {
+    padding: 15px;
+    border-radius: var(--radius);
+    margin-bottom: 30px;
+    display: none;
+    font-size: 0.9rem;
+    border-left: 4px solid;
+}
+
+.alert-danger {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border-color: #e53e3e;
+    border: 1px solid rgba(229, 62, 62, 0.2);
+    border-left: 4px solid #e53e3e;
+}
+
+.footer-text {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* Estados (Fichas y Aprendices) */
+.badge-induccion {
+    background-color: #ff8c00;
+    color: white !important;
+}
+
+.badge-lectiva {
+    background-color: #6c757d;
+    color: white !important;
+}
+
+.badge-productiva {
+    background-color: #ffc107;
+    color: black !important;
+}
+
+.badge-finalizada {
+    background-color: #dc3545;
+    color: white !important;
+}
+
+.badge-retiro {
+    background-color: #dc3545;
+    color: white !important;
+}
+
+.badge-cancelada {
+    background-color: #dc3545;
+    color: white !important;
+}
+
+.badge-por-certificar {
+    background-color: #0d6efd;
+    color: white !important;
+}
+
+.badge-certificado {
+    background-color: #198754;
+    color: white !important;
+}
+
+.badge-traslado {
+    background-color: #6366f1;
+    color: white !important;
+}
+
+.badge-aplazado {
+    background-color: #f59e0b;
+    color: white !important;
+}
+
+/* Status Select Styles */
+.status-select {
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+}
+
+.status-induccion {
+    background-color: #ff8c00;
+    color: white;
+}
+
+.status-lectiva {
+    background-color: #6c757d;
+    color: white;
+}
+
+.status-productiva {
+    background-color: #ffc107;
+    color: black;
+}
+
+.status-finalizada {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-retiro {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-cancelada {
+    background-color: #dc3545;
+    color: white;
+}
+
+.status-por-certificar {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.status-certificado {
+    background-color: #198754;
+    color: white;
+}
+
+.status-traslado {
+    background-color: #6366f1;
+    color: white;
+}
+
+.status-aplazado {
+    background-color: #f59e0b;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-info {
+        display: none;
+        /* Hide info on small screens to focus on login */
+    }
+
+    .login-form-section {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .login-card {
+        padding: 0;
+    }
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--sena-blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.menu-link:hover,
+.menu-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border-left: 4px solid var(--sena-green);
+}
+
+.menu-icon {
+    width: 24px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.user-profile {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--sena-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.user-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.main-content {
+    margin-left: 250px;
+    flex-grow: 1;
+    padding: 30px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    color: var(--sena-blue);
+    text-align: center;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--sena-blue);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--sena-green);
+}
+
+.table-container {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.table th {
+    background-color: var(--sena-green);
+    font-weight: 600;
+    color: white;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #def7ec;
+    color: #03543f;
+}
+
+.badge-warning {
+    background-color: #fdf6b2;
+    color: #723b13;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: #666;
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--sena-blue);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.menu-link:hover,
+.menu-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border-left: 4px solid var(--sena-green);
+}
+
+.menu-icon {
+    width: 24px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.user-profile {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--sena-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.user-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.main-content {
+    margin-left: 250px;
+    flex-grow: 1;
+    padding: 30px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    color: var(--sena-blue);
+    text-align: center;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--sena-blue);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--sena-green);
+}
+
+.table-container {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--sena-blue);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #def7ec;
+    color: #03543f;
+}
+
+.badge-warning {
+    background-color: #fdf6b2;
+    color: #723b13;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.logout-btn:hover {
+    color: #ff4d4d;
+}
+
+/* Sidebar Footer Logo */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-footer-logo {
+    width: 150px;
+    max-width: 100%;
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.sidebar-footer-logo:hover {
+    opacity: 1;
+}
+
+/* Estilos para Submenús Desplegables */
+.menu-item.has-submenu {
+    position: relative;
+}
+
+.menu-item.has-submenu>.menu-link {
+    justify-content: space-between;
+}
+
+.submenu-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.menu-item.has-submenu.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.2);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.submenu.show {
+    max-height: 600px;
+    padding: 8px 0;
+}
+
+.submenu li {
+    padding: 0;
+    margin: 0;
+}
+
+.submenu li a {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 50px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.submenu li a::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.submenu li a:hover,
+.submenu li a.active {
+    background: rgba(57, 181, 74, 0.15);
+    color: #39b54a;
+    padding-left: 55px;
+    border-left: 3px solid #39b54a;
+}
+
+.submenu li a:hover::before,
+.submenu li a.active::before {
+    background: #39b54a;
+    width: 6px;
+    height: 6px;
+}
+
+.submenu li a i {
+    margin-right: 10px;
+    font-size: 0.85rem;
+    width: 16px;
+    text-align: center;
+}
+
+/* Secciones de Contenido */
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Colores personalizados Asistencia */
+.badge-temprano {
+    background-color: rgba(126, 211, 33, 0.15);
+    /* Fondo suave */
+    color: #4da00a;
+    /* Verde biche oscuro */
+    border: 1px solid rgba(126, 211, 33, 0.3);
+}
+
+.badge-retardo {
+    background-color: rgba(192, 86, 33, 0.15);
+    /* Fondo suave */
+    color: #c05621;
+    /* Naranja oscuro */
+    border: 1px solid rgba(192, 86, 33, 0.3);
+}
+
+.badge-ausente {
+    background-color: rgba(229, 62, 62, 0.15);
+    color: #e53e3e;
+    /* Rojo */
+    border: 1px solid rgba(229, 62, 62, 0.3);
+}
+
+/* --- Paginación Compartida --- */
+.pagination-wrapper {
+    margin-top: 30px;
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-pagination {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #4b5563;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-pagination:hover:not(:disabled) {
+    border-color: #39A900;
+    color: white;
+    background: #39A900;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(57, 169, 0, 0.2);
+}
+
+.btn-pagination.active {
+    background: #ea580c;
+    /* Naranja SENA */
+    border-color: #ea580c;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.3);
+}
+
+.btn-pagination:disabled {
+    background: #f3f4f6;
+    color: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+    padding: 0 5px;
+}

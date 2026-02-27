@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Asistencias - AsistNet SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>AsistNet</h3>
+                <div class="sidebar-subtitle"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Instructor</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="instructor-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Panel Principal</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-asistencia.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <span>Registrar Asistencia</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-consultar.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-reportes.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Consultar Asistencias</h1>
+                <p class="content-description">Histórico y búsqueda de registros</p>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Filtros de Búsqueda</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="form-group">
+                        <label for="filtroFicha" class="form-label">Ficha</label>
+                        <select id="filtroFicha" class="form-control">
+                            <option value="">Todas las fichas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filtroFechaInicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" id="filtroFechaInicio" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtroFechaFin" class="form-label">Fecha Fin</label>
+                        <input type="date" id="filtroFechaFin" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtroBuscar" class="form-label">Buscar</label>
+                        <input type="text" id="filtroBuscar" class="form-control" placeholder="Nombre o documento...">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                        <button onclick="consultarAsistencias()" class="btn-primary" style="flex: 1;">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <button onclick="limpiarFiltros()" class="btn-primary" style="flex: 1; background: #6b7280;">
+                            <i class="fas fa-eraser"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen -->
+            <div id="resumenContainer" class="stats-grid"
+                style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div class="card" style="padding: 20px; text-align: center;">
+                    <div style="color: #10b981; font-size: 2rem; font-weight: bold;" id="totalPresentes">-</div>
+                    <div style="color: #666; margin-top: 5px;">Registros Presentes</div>
+                </div>
+                <div class="card" style="padding: 20px; text-align: center;">
+                    <div style="color: #ef4444; font-size: 2rem; font-weight: bold;" id="totalAusentes">-</div>
+                    <div style="color: #666; margin-top: 5px;">Registros Ausentes</div>
+                </div>
+                <div class="card" style="padding: 20px; text-align: center;">
+                    <div style="color: #f59e0b; font-size: 2rem; font-weight: bold;" id="totalJustificados">-</div>
+                    <div style="color: #666; margin-top: 5px;">Reg. Justificados</div>
+                </div>
+                <div class="card" style="padding: 20px; text-align: center;">
+                    <div style="color: var(--sena-green); font-size: 2rem; font-weight: bold;"
+                        id="porcentajeAsistencia">-</div>
+                    <div style="color: #666; margin-top: 5px;">% Asistencia</div>
+                </div>
+            </div>
+
+            <!-- Tabla de Resultados -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="card-title">Resultados</h3>
+                    <button onclick="exportarExcel()" class="btn-primary"
+                        style="padding: 8px 15px; background: #2d8600;">
+                        <i class="fas fa-file-excel"></i> Exportar Excel
+                    </button>
+                </div>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>FECHA</th>
+                                <th>FICHA</th>
+                                <th>DOCUMENTO</th>
+                                <th>APELLIDOS Y NOMBRES</th>
+                                <th>ESTADO</th>
+                                <th>HORA DE LLEGADA</th>
+                                <th>EXCUSA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultados">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                                    Seleccione filtros y haga clic en Buscar
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginacion" style="padding: 20px; text-align: center;"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Subir Excusa -->
+    <div id="modalExcusa"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; position: relative;">
+            <button onclick="cerrarModalExcusa()"
+                style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+
+            <h3 style="margin-top: 0; text-align: center; color: #333;">Subir Excusa</h3>
+            <p id="infoAprendizExcusa" style="text-align: center; color: #666; margin-bottom: 20px;"></p>
+            <p id="tipoExcusaInfo" style="text-align: center; font-weight: bold; margin-bottom: 20px;"></p>
+
+            <div class="form-group">
+                <label class="form-label">Motivo *</label>
+                <textarea id="motivoExcusa" class="form-control" rows="3" placeholder="Describa el motivo..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Archivo Soporte (PDF) *</label>
+                <input type="file" id="archivoExcusa" class="form-control" accept=".pdf" required>
+                <small style="color: #666;">Máximo 5MB. Solo formato PDF.</small>
+            </div>
+
+            <div id="mensajeValidacion" style="text-align: center; margin-bottom: 15px; font-weight: bold;"></div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="subirExcusa()" class="btn-primary" style="width: 100%;" id="btnSubirExcusa">
+                    <i class="fas fa-upload"></i> Subir Excusa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js?v=6"></script>
+    <script src="js/instructor/consultar.js?v=6"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

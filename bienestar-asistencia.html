@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia Biométrica Bienestar - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>Bienestar</h3>
+                <div class="sidebar-subtitle"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Asistencia</div>
+            </div>
+            <nav class="sidebar-menu">
+                <li class="menu-item"><a href="bienestar-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-arrow-left"></i></div><span>Volver al Panel</span>
+                    </a></li>
+                <li class="menu-item"><a href="#" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-camera"></i></div><span>Asistencia Facial</span>
+                    </a></li>
+            </nav>
+            <div class="sidebar-footer" style="margin-top: auto; padding: 20px; text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px; position: relative;">
+                <button onclick="window.history.back()" class="btn-primary"
+                    style="position: absolute; left: 0; top: 0; background: #64748b; padding: 8px 15px;">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1 class="content-title">Toma de Asistencia Biométrica</h1>
+                <p class="content-description">Reconocimiento facial exclusivo para Voceros y Representantes</p>
+            </div>
+
+            <!-- Resumen de líderes autorizados -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header" style="background: #f0fdf4; border-left: 4px solid #16a34a;">
+                    <h4 class="card-title" style="margin: 0; color: #166534;">
+                        <i class="fas fa-shield-alt"></i> Solo se registra asistencia de los siguientes roles:
+                    </h4>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px;">
+                    <div
+                        style="text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-user-tie" style="color: #39A900; font-size: 1.3rem;"></i>
+                        <div style="font-size: 0.8rem; font-weight: 600; margin-top: 5px;">Voceros Principales</div>
+                        <div id="count-principales" style="font-size: 1.2rem; font-weight: bold; color: #39A900;">0
+                        </div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-user-friends" style="color: #2563eb; font-size: 1.3rem;"></i>
+                        <div style="font-size: 0.8rem; font-weight: 600; margin-top: 5px;">Voceros Suplentes</div>
+                        <div id="count-suplentes" style="font-size: 1.2rem; font-weight: bold; color: #2563eb;">0</div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-users" style="color: #7c3aed; font-size: 1.3rem;"></i>
+                        <div style="font-size: 0.8rem; font-weight: 600; margin-top: 5px;">Enfoque Diferencial</div>
+                        <div id="count-enfoque" style="font-size: 1.2rem; font-weight: bold; color: #7c3aed;">0</div>
+                    </div>
+                    <div
+                        style="text-align: center; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <i class="fas fa-id-badge" style="color: #ea580c; font-size: 1.3rem;"></i>
+                        <div style="font-size: 0.8rem; font-weight: 600; margin-top: 5px;">Representantes</div>
+                        <div id="count-representantes" style="font-size: 1.2rem; font-weight: bold; color: #ea580c;">0
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 25px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label class="form-label">Seleccione la Reunión / Jornada</label>
+                        <select id="selectReunion" class="form-control" onchange="cambiarReunion()">
+                            <option value="">-- Seleccione una reunión activa --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Filtro Población (Opcional)</label>
+                        <select id="filtroPoblacionReunion" class="form-control"
+                            onchange="filtrarLideresPorPoblacion()">
+                            <option value="todos">Cualquier Población (General)</option>
+                            <option value="mujer">Solo Mujeres</option>
+                            <option value="indigena">Solo Indígenas</option>
+                            <option value="narp">Solo NARP (Afro)</option>
+                            <option value="campesino">Solo Campesinos</option>
+                            <option value="lgbtiq">Solo LGBTIQ+</option>
+                            <option value="discapacidad">Solo Discapacidad</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="tomarAsistenciaMasiva()" class="btn-primary"
+                            style="background: #00324D; flex: 1;">
+                            <i class="fas fa-users"></i> Asistencia Masiva
+                        </button>
+                        <button onclick="descargarPDFAsistencia()" class="btn-secondary" style="flex: 1;">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                </div>
+                <div id="alertaPoblacion"
+                    style="display: none; margin-top: 10px; padding: 10px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 8px; color: #9a3412; font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i> <strong>Aviso:</strong> El escaneo facial solo registrará a
+                    personas de la población seleccionada.
+                </div>
+            </div>
+
+            <div id="areaCaptura" style="display: none;" class="animate-slide-in">
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                    <!-- LADO IZQUIERDO: CÁMARA -->
+                    <div class="card"
+                        style="text-align: center; background: #000; border-radius: 12px; position: relative; overflow: hidden; height: 500px;">
+                        <video id="videoAsistencia" autoplay playsinline
+                            style="width: 100%; height: 100%; object-fit: cover;"></video>
+                        <canvas id="canvasAsistencia"
+                            style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
+
+                        <!-- Overlay Guía -->
+                        <div
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                             width: 280px; height: 350px; border: 4px dashed rgba(255,255,255,0.5); border-radius: 50%; pointer-events:none;">
+                        </div>
+
+                        <div id="feedbackCaptura"
+                            style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                             background: rgba(0,0,0,0.7); color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold;">
+                            Escaneando...
+                        </div>
+                    </div>
+
+                    <!-- LADO DERECHO: RESULTADOS Y LISTA -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card" id="resultadoEscaneo"
+                            style="border-left: 5px solid #6b7280; min-height: 180px;">
+                            <div class="card-header">
+                                <h4 class="card-title">Resultado del Escaneo</h4>
+                            </div>
+                            <div id="infoAprendizDetectado" style="padding: 15px; text-align: center;">
+                                <p style="color: #666;">Esperando detección de rostro...</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                            <div class="card-header"
+                                style="background: #f8fafc; display: flex; justify-content: space-between; align-items: center;">
+                                <h4 class="card-title" style="margin:0;">Asistentes de la Sesión</h4>
+                                <span id="asistentesCount" class="badge"
+                                    style="background: var(--sena-green); color: white;">0</span>
+                            </div>
+                            <div id="listaAsistentes" style="flex: 1; overflow-y: auto; padding: 10px;">
+                                <!-- Se llenará dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="soundError" src="https://assets.mixkit.co/active_storage/sfx/2001/2001-preview.mp3"></audio>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        let streamActivo = null;
+        let humanInstance = null;
+        let ultimaDeteccionGlobal = 0;
+        let aprendicesProcesadosRecientemente = new Map(); // ID => timestamp
+        let lideresAutorizados = [];
+        let lideresFiltrados = [];
+        let estaEscaneando = false;
+        let asistentesSesion = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = authSystem.getCurrentUser();
+            await cargarLideresAutorizados();
+            await cargarReuniones();
+
+            // Inicializar Human.js una sola vez
+            try {
+                humanInstance = await getHuman();
+                console.log("Human.js listo para asistencia masiva");
+            } catch (e) {
+                console.error("Error inicializando biometría:", e);
+            }
+        });
+
+        async function cargarLideresAutorizados() {
+            try {
+                const response = await fetch('api/bienestar.php?action=getLideres&filtro=todos');
+                const result = await response.json();
+                if (result.success && Array.isArray(result.data)) {
+                    lideresAutorizados = result.data;
+                    document.getElementById('count-principales').textContent = lideresAutorizados.filter(l => l.tipo === 'Vocero Principal').length;
+                    document.getElementById('count-suplentes').textContent = lideresAutorizados.filter(l => l.tipo === 'Vocero Suplente').length;
+                    document.getElementById('count-enfoque').textContent = lideresAutorizados.filter(l => l.tipo === 'Vocero Enfoque').length;
+                    document.getElementById('count-representantes').textContent = lideresAutorizados.filter(l => l.tipo === 'Representante').length;
+
+                    // Inicialmente todos son filtrables
+                    lideresFiltrados = [...lideresAutorizados];
+                }
+            } catch (error) { console.error('Error líderes:', error); }
+        }
+
+        async function cargarReuniones() {
+            const select = document.getElementById('selectReunion');
+            try {
+                const res = await fetch('api/bienestar.php?action=getReuniones');
+                const result = await res.json();
+                if (result.success) {
+                    select.innerHTML = '<option value="">-- Seleccione una reunión activa --</option>';
+                    result.data.forEach(r => {
+                        select.innerHTML += `<option value="${r.id}">${r.titulo} (${r.fecha})</option>`;
+                    });
+                }
+            } catch (e) {
+                // Fallback si falla
+                select.innerHTML += '<option value="1">Reunión General - ' + new Date().toLocaleDateString() + '</option>';
+            }
+        }
+
+        function cambiarReunion() {
+            actualizarInterfazCaptura();
+            document.getElementById('listaAsistentes').innerHTML = '';
+            asistentesSesion = [];
+            document.getElementById('asistentesCount').textContent = '0';
+        }
+
+        function filtrarLideresPorPoblacion() {
+            const user = authSystem.getCurrentUser();
+            let filtro = document.getElementById('filtroPoblacionReunion').value;
+            const alerta = document.getElementById('alertaPoblacion');
+            const select = document.getElementById('filtroPoblacionReunion');
+
+            // AUTO-RESTRICCIÓN PARA VOCEROS DE ENFOQUE
+            if (user && user.rol === 'vocero' && user.vocero_scope && user.vocero_scope.tipo === 'enfoque') {
+                filtro = user.vocero_scope.poblacion.toLowerCase();
+                select.value = filtro;
+                select.disabled = true; // No puede cambiarlo
+            }
+
+            if (filtro === 'todos') {
+                lideresFiltrados = [...lideresAutorizados];
+                alerta.style.display = 'none';
+            } else {
+                lideresFiltrados = lideresAutorizados.filter(l => {
+                    const pob = (l.poblacion || '').toLowerCase();
+                    return pob.includes(filtro);
+                });
+                alerta.style.display = 'block';
+            }
+        }
+
+        // Llamar inicialmente para aplicar restricciones si existen
+        setTimeout(filtrarLideresPorPoblacion, 1000);
+
+        async function actualizarInterfazCaptura() {
+            const reId = document.getElementById('selectReunion').value;
+            if (reId) {
+                document.getElementById('areaCaptura').style.display = 'grid';
+                iniciarCamara();
+            } else {
+                document.getElementById('areaCaptura').style.display = 'none';
+                detenerCamara();
+            }
+        }
+
+        async function iniciarCamara() {
+            if (streamActivo) return;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                const video = document.getElementById('videoAsistencia');
+                video.srcObject = stream;
+                streamActivo = stream;
+                estaEscaneando = true;
+                procesarFrames();
+            } catch (error) {
+                alert('No se pudo acceder a la cámara. Verifique los permisos.');
+            }
+        }
+
+        function detenerCamara() {
+            estaEscaneando = false;
+            if (streamActivo) {
+                streamActivo.getTracks().forEach(t => t.stop());
+                streamActivo = null;
+            }
+        }
+
+        async function procesarFrames() {
+            if (!estaEscaneando || !streamActivo) return;
+            const video = document.getElementById('videoAsistencia');
+            const canvas = document.getElementById('canvasAsistencia');
+            if (!video || !canvas || !humanInstance) {
+                requestAnimationFrame(procesarFrames);
+                return;
+            }
+            if (canvas.width !== video.videoWidth) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+            }
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            try {
+                const result = await humanInstance.detect(video);
+                if (result.face && result.face.length > 0) {
+                    for (const face of result.face) {
+                        const score = face.faceScore || face.boxScore || 0;
+                        if (face.mesh) dibujarLandmarksFaciales(canvas, face.mesh, score);
+                        if (score > 0.75 && face.embedding) {
+                            await intentarIdentificarMasivo(face.embedding, score);
+                        }
+                    }
+                }
+            } catch (e) { console.error(e); }
+            requestAnimationFrame(procesarFrames);
+        }
+
+        async function intentarIdentificarMasivo(embedding, score) {
+            const ahora = Date.now();
+            if (ahora - ultimaDeteccionGlobal < 1500) return;
+
+            try {
+                const response = await fetch('api/biometria.php?action=identificar_grupo', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ embedding: Array.from(embedding) })
+                });
+                const result = await response.json();
+
+                if (result.success && result.match && result.data.similitud > 0.72) {
+                    const doc = result.data.documento;
+                    if (aprendicesProcesadosRecientemente.has(doc)) return;
+
+                    // VALIDAR SI ESTÁ EN LOS FILTRADOS
+                    const lider = lideresFiltrados.find(l => l.documento == doc);
+                    if (lider) {
+                        ultimaDeteccionGlobal = ahora;
+                        aprendicesProcesadosRecientemente.set(doc, ahora);
+                        document.getElementById('soundSuccess').play();
+                        registrarAsistenciaBienestar(result, lider);
+                    } else {
+                        // Podría estar en autorizados generales pero no en el filtro de población
+                        const esGral = lideresAutorizados.find(l => l.documento == doc);
+                        if (esGral) {
+                            document.getElementById('soundError').play();
+                            mostrarFeedbackDenegado("Población no requerida en esta sesión");
+                        }
+                    }
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        function mostrarFeedbackDenegado(msg) {
+            const info = document.getElementById('infoAprendizDetectado');
+            info.innerHTML = `<div style="color: #ef4444; font-weight: bold;"><i class="fas fa-times-circle"></i> ${msg}</div>`;
+            setTimeout(() => { if (estaEscaneando) info.innerHTML = '<p style="color: #666;">Escaneando rostros...</p>'; }, 2000);
+        }
+
+        async function registrarAsistenciaBienestar(result, lider) {
+            const info = document.getElementById('infoAprendizDetectado');
+            const card = document.getElementById('resultadoEscaneo');
+            const idReunion = document.getElementById('selectReunion').value;
+
+            const colores = { 'Vocero Principal': '#39A900', 'Vocero Suplente': '#2563eb', 'Vocero Enfoque': '#7c3aed', 'Representante': '#ea580c' };
+            const color = colores[lider.tipo] || '#39A900';
+
+            card.style.borderColor = color;
+            info.innerHTML = `
+                <div style="font-size: 1.2rem; font-weight: bold; color: ${color};">¡IDENTIFICADO!</div>
+                <div style="margin: 8px 0; font-size: 1.1rem;">${result.data.nombre} ${result.data.apellido}</div>
+                <div style="color: #666; font-size: 0.9rem;">${lider.tipo}</div>
+                <div style="margin-top: 5px; color: ${color}; font-weight: bold;"><i class="fas fa-check-double"></i> ASISTENCIA REGISTRADA</div>
+            `;
+
+            try {
+                const res = await fetch('api/bienestar.php?action=registrarAsistencia', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_reunion: idReunion, id_aprendiz: lider.documento, estado: 'asistio' })
+                });
+                const r = await res.json();
+
+                if (r.alerta_fallas) {
+                    alert(`¡ATENCIÓN! El aprendiz ${result.data.nombre} ha acumulado ${r.total_fallas} fallas y ha perdido su rol de líder.`);
+                    await cargarLideresAutorizados(); // Recargar para quitarlo de autorizados
+                }
+
+                agregarAListaRecientes(result.data, lider);
+            } catch (err) { console.error(err); }
+
+            setTimeout(() => {
+                if (Date.now() - ultimaDeteccionGlobal >= 4000) {
+                    card.style.borderColor = '#6b7280';
+                    info.innerHTML = '<p style="color: #666;">Escaneando rostros...</p>';
+                }
+            }, 4000);
+        }
+
+        function agregarAListaRecientes(p, lider) {
+            if (asistentesSesion.some(a => a.documento === p.documento)) return;
+            asistentesSesion.push({ ...p, tipo: lider.tipo, hora: new Date().toLocaleTimeString() });
+
+            document.getElementById('asistentesCount').textContent = asistentesSesion.length;
+            const lista = document.getElementById('listaAsistentes');
+            const colores = { 'Vocero Principal': '#39A900', 'Vocero Suplente': '#2563eb', 'Vocero Enfoque': '#7c3aed', 'Representante': '#ea580c' };
+            const color = colores[lider.tipo] || '#39A900';
+
+            const item = document.createElement('div');
+            item.className = 'animate-slide-in';
+            item.style.cssText = 'padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px;';
+            item.innerHTML = `
+                <div style="width: 35px; height: 35px; background: ${color}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; font-size: 0.9rem;">${p.nombre} ${p.apellido}</div>
+                    <div style="font-size: 0.7rem; color: #666;"><span class="badge" style="background:${color}; color:white;">${lider.tipo}</span> ${new Date().toLocaleTimeString()}</div>
+                </div>
+            `;
+            lista.prepend(item);
+        }
+
+        async function tomarAsistenciaMasiva() {
+            const reId = document.getElementById('selectReunion').value;
+            if (!reId) { alert("Seleccione una reunión primero"); return; }
+            if (!confirm(`¿Desea marcar asistencia para los ${lideresFiltrados.length} líderes filtrados actualmente?`)) return;
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+            try {
+                for (const lider of lideresFiltrados) {
+                    await fetch('api/bienestar.php?action=registrarAsistencia', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_reunion: reId, id_aprendiz: lider.documento, estado: 'asistio' })
+                    });
+                    agregarAListaRecientes({ documento: lider.documento, nombre: lider.nombre, apellido: lider.apellido }, lider);
+                }
+                alert("Asistencia masiva completada con éxito");
+            } catch (e) { alert("Error en el proceso masivo"); }
+            finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-users"></i> Asistencia Masiva'; }
+        }
+
+        async function descargarPDFAsistencia() {
+            const reId = document.getElementById('selectReunion').value;
+            if (!reId) { alert("Seleccione una reunión"); return; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const reunionTxt = document.getElementById('selectReunion').options[document.getElementById('selectReunion').selectedIndex].text;
+
+            doc.setFontSize(18);
+            doc.setTextColor(57, 169, 0);
+            doc.text("REPORTE DE ASISTENCIA - BIENESTAR", 105, 15, { align: 'center' });
+
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Reunión: ${reunionTxt}`, 20, 25);
+            doc.text(`Fecha de Reporte: ${new Date().toLocaleString()}`, 20, 30);
+            doc.text(`Total Asistentes: ${asistentesSesion.length}`, 20, 35);
+
+            const rows = asistentesSesion.map(a => [a.documento, `${a.nombre} ${a.apellido}`, a.tipo, a.hora]);
+
+            doc.autoTable({
+                startY: 45,
+                head: [['Documento', 'Aprendiz', 'Cargo', 'Hora Registro']],
+                body: rows,
+                headStyles: { fillColor: [57, 169, 0] },
+                alternateRowStyles: { fillColor: [240, 240, 240] }
+            });
+
+            doc.save(`Asistencia_Bienestar_${reId}.pdf`);
+        }
+    </script>
+</body>
+
+</html>

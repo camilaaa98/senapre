@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Asistencia - AsistNet SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>AsistNet</h3>
+                <div class="sidebar-subtitle"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Instructor</div>
+                <div id="userInfo" style="margin-top: 10px; font-size: 0.9rem; color: #e0e0e0; text-align: center;">
+                    <!-- Usuario cargado dinámicamente -->
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="instructor-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Panel Principal</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-asistencia.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <span>Registrar Asistencia</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-consultar.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-reportes.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Registrar Asistencia</h1>
+                <p class="content-description">Marque la asistencia de sus aprendices</p>
+
+                <!-- Área de Mensajes de Error Visibles (Emergencia) -->
+                <div id="debugErrorDisplay"
+                    style="display:none; background:#fee2e2; border:1px solid #ef4444; color:#991b1b; padding:10px; margin: 10px auto; max-width:800px; border-radius:8px; text-align:left;">
+                    <strong>Estado del Sistema:</strong>
+                </div>
+            </div>
+
+            <!-- Selección de Ficha y Fecha -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Configuración de Asistencia</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label for="fichaSelect" class="form-label">Ficha *</label>
+                        <select id="fichaSelect" class="form-control" required>
+                            <option value="">Seleccione una ficha...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaAsistencia" class="form-label">Fecha *</label>
+                        <input type="date" id="fechaAsistencia" class="form-control" readonly
+                            style="background-color: #f3f4f6; cursor: not-allowed;">
+                    </div>
+                    <button onclick="cargarAprendices()" class="btn-primary" style="height: 45px;">
+                        <i class="fas fa-search"></i> Cargar Aprendices
+                    </button>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div id="accionesRapidas" style="display: none; margin-bottom: 20px;">
+                <div class="card">
+                    <div
+                        style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center;">
+
+                        <!-- Botón Reconocimiento Grupal -->
+                        <button onclick="iniciarReconocimientoGrupal()" class="btn-primary"
+                            style="background: #3b82f6; flex: 1; max-width: 300px; padding: 15px;">
+                            <i class="fas fa-users-viewfinder"></i> Reconocimiento Grupal
+                        </button>
+
+                        <!-- Botón Tomar Asistencia (Individual) -->
+                        <button onclick="tomarAsistenciaIndividual()" class="btn-primary"
+                            style="background: #10b981; flex: 1; max-width: 300px; padding: 15px;">
+                            <i class="fas fa-user-check"></i> Tomar Asistencia
+                        </button>
+
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <input type="text" id="buscarAprendiz" placeholder="Buscar aprendiz..." class="form-control"
+                            style="width: 100%;" oninput="filtrarAprendices()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Aprendices -->
+            <div id="listaAprendices" class="card" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title">Lista de Aprendices</h3>
+                    <span id="contadorAprendices" class="badge"
+                        style="background: var(--sena-green); color: white; padding: 5px 10px; border-radius: 20px;">0
+                        aprendices</span>
+                </div>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>DOCUMENTO</th>
+                                <th>NOMBRE COMPLETO</th>
+                                <!-- Columna ASISTENCIA eliminada -->
+                                <th style="width: 300px;">OBSERVACIONES</th>
+                                <th style="width: 100px; text-align: center;">ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAprendices">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    Seleccione una ficha y fecha para cargar los aprendices
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding: 20px; text-align: center; border-top: 1px solid #eee;">
+                    <button onclick="guardarAsistencia()" class="btn-primary"
+                        style="padding: 12px 40px; font-size: 1.1rem;">
+                        <i class="fas fa-save"></i> Guardar Asistencia
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts con Cache Busting para forzar recarga -->
+    <script>
+        // Función de emergencia para mostrar errores visiblemente
+        window.onerror = function (msg, url, line) {
+            const errDiv = document.getElementById('debugErrorDisplay');
+            if (errDiv) {
+                errDiv.style.display = 'block';
+                errDiv.innerHTML += `<div>❌ Error JS: ${msg} <br><small>(${url}:${line})</small></div>`;
+            }
+        };
+    </script>
+    <script src="js/main.js?v=8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/human/dist/human.js"></script>
+    <script src="js/human-config.js?v=8"></script>
+    <script src="js/facial-recognition.js?v=8"></script>
+    <script src="js/instructor/asistencia.js?v=8"></script>
+
+    <!-- Modal de Captura Facial -->
+    <div id="modalBiometria"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; padding: 20px; border-radius: 12px; max-width: 600px; width: 90%; position: relative;">
+            <button onclick="cerrarModalBiometria()"
+                style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+
+            <h3 id="tituloModalBio" style="margin-top: 0; text-align: center;">Reconocimiento Facial</h3>
+            <p id="instruccionModalBio" style="text-align: center; color: #666;">Por favor mire a la cámara</p>
+
+            <div
+                style="position: relative; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 15px;">
+                <video id="videoBiometria" autoplay playsinline
+                    style="width: 100%; height: 400px; object-fit: cover;"></video>
+            </div>
+
+            <div id="mensajeCaptura"
+                style="text-align: center; margin-bottom: 15px; font-weight: bold; min-height: 24px;"></div>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="btnCapturar" onclick="capturarRostroAsistencia()" class="btn-primary"
+                    style="background: #10b981; width: 100%;">
+                    <i class="fas fa-camera"></i> Capturar / Verificar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        // Verificar autenticación y mostrar usuario
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('userInfo').textContent = `${user.nombre} ${user.apellido}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Fichas - AsistNet SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+                        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Gestión de Fichas</h1>
+                <p class="content-description">Administración de fichas de formación</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Filtros</h3>
+                </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="filtroSearch" class="form-control"
+                            placeholder="Buscar por número de ficha...">
+                    </div>
+                    <div style="width: 250px;">
+                        <select id="filtroPrograma" class="form-control">
+                            <option value="">Todos los Programas</option>
+                        </select>
+                    </div>
+                    <div style="width: 200px;">
+                        <select id="filtroEstado" class="form-control">
+                            <option value="">Todos los Estados</option>
+                            <option value="Activa">Activa</option>
+                            <option value="Finalizada">Finalizada</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container animate-slide-in">
+                <div class="table-header"
+                    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
+                    <h2 class="table-title" style="margin: 0;">Lista de Fichas</h2>
+                    <div class="table-actions" style="display: flex; gap: 10px;">
+                        <button onclick="nuevaFicha()" class="btn-primary" style="width: auto; padding: 8px 15px;">+
+                            Nueva Ficha</button>
+                        <button onclick="exportarFichas()" class="btn-primary"
+                            style="width: auto; padding: 8px 15px; background: #2d8600;">📊 Exportar Excel</button>
+                    </div>
+                </div>
+                <div class="table-wrapper" style="overflow-x: auto;">
+                    <table class="table">
+                        <thead
+                            style="position: sticky; top: 0; z-index: 10; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                            <tr>
+                                <th>NÚMERO FICHA</th>
+                                <th>PROGRAMA</th>
+                                <th>TIPO FORMACIÓN</th>
+                                <th>JORNADA</th>
+                                <th>INSTRUCTOR LÍDER</th>
+                                <th style="min-width: 200px;">VOCERO PRINCIPAL</th>
+                                <th style="min-width: 200px;">VOCERO SUPLENTE</th>
+                                <th>ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaFichas">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginacion" style="padding: 20px; display: flex; justify-content: center;"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalFicha" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h3 id="modalTitle">Nueva Ficha</h3>
+                <button onclick="cerrarModal()" class="btn-close"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form id="formFicha" onsubmit="guardarFicha(event)">
+                <div class="form-group">
+                    <label for="numeroFicha" class="form-label">Número de Ficha *</label>
+                    <input type="number" id="numeroFicha" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipoFormacionSelect" class="form-label">Tipo Formación *</label>
+                    <select id="tipoFormacionSelect" class="form-control" required>
+                        <option value="">Cargando tipos...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="programa" class="form-label">Programa de Formación *</label>
+                    <select id="programa" class="form-control" required>
+                        <option value="">Cargando programas...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jornada" class="form-label">Jornada *</label>
+                    <select id="jornada" class="form-control" required>
+                        <option value="Diurna">Diurna</option>
+                        <option value="Nocturna">Nocturna</option>
+                        <option value="Mixta">Mixta</option>
+                        <option value="Fin de semana">Fin de semana</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estadoFicha" class="form-label">Estado *</label>
+                    <select id="estadoFicha" class="form-control" required>
+                        <option value="LECTIVA">LECTIVA</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="instructorLider" class="form-label">Instructor Líder *</label>
+                    <select id="instructorLider" class="form-control" required>
+                        <option value="">Cargando instructores...</option>
+                    </select>
+                </div>
+                <div class="modal-footer"
+                    style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="cerrarModal()" class="btn-primary"
+                        style="background: #666;">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/admin/fichas.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>
+

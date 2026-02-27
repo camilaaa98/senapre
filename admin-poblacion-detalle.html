@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle Población - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin-aprendices.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .poblacion-header {
+            background: linear-gradient(135deg, #39A900 0%, #2e8b00 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(57, 169, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vocero-info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border-left: 6px solid #39A900;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .vocero-avatar {
+            width: 70px;
+            height: 70px;
+            background: #e9f5e1;
+            color: #39A900;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-custom {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-pdf {
+            background: #e11d48;
+        }
+
+        .btn-prop {
+            background: #2563eb;
+        }
+
+        .btn-stats {
+            background: #ea580c;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Modales */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-body {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 850px;
+            max-width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar alineada al proyecto -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu open">
+                    <a href="#" class="menu-link active" onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu show" id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="poblacion-header">
+                <div style="flex: 1; text-align: center;">
+                    <h1 id="page-title" style="margin: 0; font-size: 1.8rem;">DETALLE POBLACIÓN</h1>
+                    <span id="poblacion-label"
+                        style="font-weight: 500; opacity: 0.9; display: block;">Cargando...</span>
+                </div>
+                <button onclick="window.location.href='admin-aprendices.html'" class="btn-custom"
+                    style="background: rgba(255,255,255,0.15); position: absolute; right: 2rem;">
+                    <i class="fas fa-arrow-left"></i> Volver a Aprendices
+                </button>
+            </div>
+
+            <div class="vocero-info-card" id="vocero-container">
+                <div class="vocero-avatar"><i class="fas fa-user-tie"></i></div>
+                <div id="vocero-data">
+                    <h3 style="margin: 0;">Vocero Oficial</h3>
+                    <p style="color: #666; margin: 4px 0;">Cargando información del líder...</p>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button onclick="descargarPDF()" class="btn-custom btn-pdf"><i class="fas fa-file-pdf"></i> PDF
+                    LISTADO</button>
+                <button onclick="mostrarPropuestas()" class="btn-custom btn-prop"><i class="fas fa-lightbulb"></i>
+                    PROPUESTAS</button>
+                <button onclick="mostrarEstadisticas()" class="btn-custom btn-stats"><i class="fas fa-chart-bar"></i>
+                    ESTADÍSTICAS</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="padding: 1.5rem; border-bottom: 1px solid #eee;">
+                    <h2 style="margin: 0; font-size: 1.3rem; color: #333;">Integrantes Registrados</h2>
+                </div>
+                <div class="table-container" style="padding: 1rem; overflow-x: auto;">
+                    <table class="admin-table" id="tabla-integrantes" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 1rem;">Documento</th>
+                                <th style="padding: 1rem;">Nombres</th>
+                                <th style="padding: 1rem; width: 150px;">Usuario</th>
+                                <th style="padding: 1rem; width: 150px;">Contraseña</th>
+                                <th style="padding: 1rem;">Ficha</th>
+                                <th style="padding: 1rem;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-poblacion">
+                            <tr>
+                                <td colspan="6" style="padding: 2rem; text-align: center; color: #666;">Cargando
+                                    integrantes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales Rediseñados -->
+    <div id="modalStats" class="custom-modal">
+        <div class="modal-body">
+            <span class="close-modal" onclick="CerrarModal('modalStats')">&times;</span>
+            <h2 style="color: #ea580c; margin-bottom: 1.5rem;"><i class="fas fa-chart-pie"></i> Distribución por
+                Programa</h2>
+            <div style="height: 450px;"><canvas id="chartStats"></canvas></div>
+        </div>
+    </div>
+
+    <div id="modalPropuestas" class="custom-modal">
+        <div class="modal-body">
+            <span class="close-modal" onclick="CerrarModal('modalPropuestas')">&times;</span>
+            <h2 style="color: #2563eb; margin-bottom: 1.5rem;"><i class="fas fa-lightbulb"></i> Banco de Propuestas</h2>
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <textarea id="nueva-propuesta" placeholder="Describa la nueva propuesta aquí..."
+                    style="flex: 1; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 10px; font-family: inherit;"></textarea>
+                <button onclick="guardarPropuesta()" class="btn-custom btn-prop">Añadir</button>
+            </div>
+            <div id="lista-propuestas"></div>
+        </div>
+    </div>
+
+    <script src="js/admin/poblacion-detalle.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Reportes - AsistNet SENA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <h3>AsistNet</h3>
+                <div class="sidebar-subtitle"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Instructor</div>
+            </div>
+            <nav class="sidebar-menu">
+                <li class="menu-item"><a href="instructor-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div><span>Panel Principal</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-asistencia.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div><span>Registrar
+                            Asistencia</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-consultar.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div><span>Consultar Asistencias</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-reportes.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div><span>Generar Reportes</span>
+                    </a></li>
+                <li class="menu-item"><a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div><span>Cerrar Sesión</span>
+                    </a></li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 class="content-title">Generación de Reportes</h1>
+                <p class="content-description">Exportar datos de asistencia en múltiples formatos</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Reporte por Ficha</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label class="form-label">Ficha</label>
+                        <select id="reporteFichaSelect" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" id="reporteFechaInicio1" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" id="reporteFechaFin1" class="form-control">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button onclick="generarReporteFicha('excel')" class="btn-primary" style="background: #2d8600;"><i
+                            class="fas fa-file-excel"></i> Excel</button>
+                    <button onclick="generarReporteFicha('pdf')" class="btn-primary" style="background: #dc2626;"><i
+                            class="fas fa-file-pdf"></i> PDF</button>
+                    <button onclick="generarReporteFicha('csv')" class="btn-primary" style="background: #2563eb;"><i
+                            class="fas fa-file-csv"></i> CSV</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/instructor/reportes.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>

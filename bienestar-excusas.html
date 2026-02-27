@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Excusas Bienestar - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Excusas</div>
+            </div>
+            <nav class="sidebar-menu">
+                <li class="menu-item"><a href="bienestar-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-arrow-left"></i></div><span>Volver al Panel</span>
+                    </a></li>
+                <li class="menu-item"><a href="#" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-file-medical"></i></div><span>Validar Excusas</span>
+                    </a></li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="text-align: center; margin-bottom: 30px; position: relative;">
+                <button onclick="window.location.href='bienestar-dashboard.html'" class="btn-primary"
+                    style="position: absolute; left: 0; top: 0; background: #64748b; padding: 8px 15px;">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <h1 class="content-title">Validación de Excusas</h1>
+                <p class="content-description">Gestione las justificaciones de inasistencia a reuniones</p>
+            </div>
+
+            <div class="table-container animate-slide-in">
+                <div class="table-header"
+                    style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="table-title" style="margin: 0;">Excusas Pendientes</h2>
+                    <div class="badge" style="background: #f59e0b; color: white;">Pendientes de Revisión</div>
+                </div>
+
+                <table class="table" style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Fecha</th>
+                            <th style="width: 250px;">Líder</th>
+                            <th>Reunión</th>
+                            <th style="width: 200px;">Soporte / Archivo</th>
+                            <th style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyExcusas">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px;">Cargando excusas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card" style="margin-top: 25px;">
+                <div class="card-header">
+                    <h3 class="card-title">Historial de Decisiones</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha Decisión</th>
+                                <th>Líder</th>
+                                <th>Resultado</th>
+                                <th>Comentarios</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialExcusas">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Procesar Excusa -->
+    <div id="modalExcusa" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
+            <h3>Procesar Excusa</h3>
+            <p id="infoResumenExcusa"
+                style="background: #f8fafc; padding: 10px; border-radius: 8px; font-size: 0.9rem;"></p>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label class="form-label">Comentarios del Administrador</label>
+                <textarea id="comentariosExcusa" class="form-control" rows="4"
+                    placeholder="Indique la razón de la aprobación o rechazo..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="procesarDecision('rechazada')" class="btn-primary"
+                    style="background: #ef4444; flex: 1;">
+                    <i class="fas fa-times"></i> Rechazar
+                </button>
+                <button onclick="procesarDecision('validada')" class="btn-primary"
+                    style="background: #10b981; flex: 1;">
+                    <i class="fas fa-check"></i> Aprobar (Justificar)
+                </button>
+            </div>
+            <button onclick="cerrarModalExcusa()"
+                style="width: 100%; margin-top: 10px; background: none; border: 1px solid #ddd; padding: 8px; border-radius: 8px; cursor: pointer;">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        let excusaActual = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarExcusas();
+        });
+
+        async function cargarExcusas() {
+            // NOTA: Implementaríamos GET bienestar.php?action=getExcusas
+            // Simulación para renderizado inicial
+            const tbody = document.getElementById('tbodyExcusas');
+            tbody.innerHTML = `
+                <tr>
+                    <td>20/02/2026</td>
+                    <td>
+                        <div style="line-height: 1.4;">
+                            <strong style="display: block; color: var(--sena-blue);">${ex.nombre}</strong>
+                            <small style="color: #666; font-size: 0.8rem;">Vocero Principal - ADSO</small>
+                        </div>
+                    </td>
+                    <td><div style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;">Reunión General de Voceros (Febrero)</div></td>
+                    <td>
+                        <a href="#" class="btn-sm" style="color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 5px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 8px; background: #fff; width: fit-content;">
+                            <i class="fas fa-file-pdf"></i> incapacidad.pdf
+                        </a>
+                    </td>
+                    <td>
+                        <button onclick="abrirModalExcusa({id: 1, nombre: 'Juan Pérez'})" class="btn-primary" style="padding: 8px 15px; font-size: 0.85rem; width: 100%;">
+                            <i class="fas fa-gavel"></i> Evaluar
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function abrirModalExcusa(ex) {
+            excusaActual = ex;
+            document.getElementById('infoResumenExcusa').textContent = `Aprendiz: ${ex.nombre} | Motivo: Inasistencia a Reunión de Voceros`;
+            document.getElementById('modalExcusa').style.display = 'flex';
+        }
+
+        function cerrarModalExcusa() {
+            document.getElementById('modalExcusa').style.display = 'none';
+        }
+
+        async function procesarDecision(estado) {
+            const comentarios = document.getElementById('comentariosExcusa').value;
+            if (!comentarios) {
+                alert('Debe añadir un comentario sobre su decisión');
+                return;
+            }
+
+            try {
+                // NOTA: POST api/bienestar.php?action=procesarExcusa
+                alert(`Excusa ${estado === 'validada' ? 'APROBADA' : 'RECHAZADA'} correctamente.`);
+                cerrarModalExcusa();
+                cargarExcusas();
+            } catch (err) {
+                alert('Error al procesar la decisión');
+            }
+        }
+    </script>
+</body>
+
+</html>

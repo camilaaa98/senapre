@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienestar del Aprendiz - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .bienestar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .area-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border-top: 5px solid var(--sena-green);
+        }
+
+        .area-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .area-icon {
+            width: 50px;
+            height: 50px;
+            background: #f0fdf4;
+            color: var(--sena-green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .area-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .area-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .responsable-info {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .responsable-info i {
+            color: #94a3b8;
+        }
+
+        .responsable-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            margin: 0;
+        }
+
+        .btn-assign {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-assign:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-module {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--sena-green);
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes.html" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1 class="content-title">Bienestar del Aprendiz</h1>
+                    <p class="content-description">Gestión integral de áreas y responsables de bienestar institucional
+                    </p>
+                </div>
+            </div>
+
+            <div class="bienestar-grid">
+                <!-- Área: Jefe de Bienestar (NUEVO) -->
+                <div class="area-card" style="border-top-color: #00324D; grid-column: span 1 / -1;">
+                    <div style="display: flex; align-items: flex-start; gap: 20px;">
+                        <div class="area-icon" style="background: #e0f2fe; color: #00324D; width: 60px; height: 60px;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div style="flex-grow: 1;">
+                            <div class="area-title" style="font-size: 1.5rem;">Jefe de Bienestar del Aprendiz</div>
+                            <div class="area-desc">Responsable principal de la coordinación de todas las sub-áreas de
+                                bienestar institucional. Supervisa a los responsables de área.</div>
+                        </div>
+                        <div style="width: 300px;">
+                            <div class="responsable-info" id="info-jefe-bienestar">
+                                <i class="fas fa-id-card"></i>
+                                <p class="responsable-name">Cargando jefe...</p>
+                            </div>
+                            <!-- Botón de delegación removido en este panel -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Área: Reuniones y Liderazgo -->
+                <div class="area-card" style="border-top-color: #3b82f6;">
+                    <div class="area-icon" style="background: #eff6ff; color: #3b82f6;"><i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="area-title">Voceros y Representantes</div>
+                    <div class="area-desc">Gestión de líderes, reuniones masivas y comunicaciones institucionales.</div>
+                    <div class="responsable-info" id="info-reuniones">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Cargando...</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('voceros_y_representantes')">
+                        <i class="fas fa-user-edit"></i> Delegar Responsable
+                    </button>
+                    <button class="btn-module" onclick="window.location.href='bienestar-dashboard.html'">
+                        Acceder al Módulo
+                    </button>
+                </div>
+
+                <!-- Área: Enfermería -->
+                <div class="area-card" style="border-top-color: #ef4444;">
+                    <div class="area-icon" style="background: #fef2f2; color: #ef4444;"><i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="area-title">Enfermería</div>
+                    <div class="area-desc">Atención primaria, seguimiento de salud y prevención para aprendices.</div>
+                    <div class="responsable-info" id="info-enfermeria">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Sin asignar</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('enfermeria')">
+                        <i class="fas fa-user-plus"></i> Asignar Área
+                    </button>
+                </div>
+
+                <!-- Área: Deporte -->
+                <div class="area-card" style="border-top-color: #f59e0b;">
+                    <div class="area-icon" style="background: #fffbeb; color: #f59e0b;"><i class="fas fa-running"></i>
+                    </div>
+                    <div class="area-title">Deporte y Recreación</div>
+                    <div class="area-desc">Actividades físicas, torneos y aprovechamiento del tiempo libre.</div>
+                    <div class="responsable-info" id="info-deporte">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Sin asignar</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('deporte')">
+                        <i class="fas fa-user-plus"></i> Asignar Área
+                    </button>
+                </div>
+
+                <!-- Área: Arte -->
+                <div class="area-card" style="border-top-color: #8b5cf6;">
+                    <div class="area-icon" style="background: #f5f3ff; color: #8b5cf6;"><i class="fas fa-palette"></i>
+                    </div>
+                    <div class="area-title">Cultura y Arte</div>
+                    <div class="area-desc">Expresiones artísticas, talleres culturales y eventos creativos.</div>
+                    <div class="responsable-info" id="info-arte">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Sin asignar</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('arte')">
+                        <i class="fas fa-user-plus"></i> Asignar Área
+                    </button>
+                </div>
+
+                <!-- Área: Apoyos -->
+                <div class="area-card" style="border-top-color: #10b981;">
+                    <div class="area-icon" style="background: #ecfdf5; color: #10b981;"><i
+                            class="fas fa-hand-holding-usd"></i></div>
+                    <div class="area-title">Apoyos Económicos</div>
+                    <div class="area-desc">Gestión de monitorías, sostenimiento, alimentación y transporte.</div>
+                    <div class="responsable-info" id="info-apoyos">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Sin asignar</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('apoyos')">
+                        <i class="fas fa-user-plus"></i> Asignar Área
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const areas = ['jefe_bienestar', 'voceros_y_representantes', 'enfermeria', 'deporte', 'arte', 'apoyos'];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            areas.forEach(area => cargarResponsable(area));
+        });
+
+        async function cargarResponsable(area) {
+            const shortArea = area.split('_')[0]; // para el ID del DOM si es largo
+            const targetId = `info-${area.replace(/_y_/, '-')}`;
+            // Simplificamos mapeo de IDs para evitar errores
+            const domMap = {
+                'jefe_bienestar': 'info-jefe-bienestar',
+                'voceros_y_representantes': 'info-reuniones',
+                'enfermeria': 'info-enfermeria',
+                'deporte': 'info-deporte',
+                'arte': 'info-arte',
+                'apoyos': 'info-apoyos'
+            };
+
+            const element = document.getElementById(domMap[area]).querySelector('.responsable-name');
+
+            try {
+                const response = await fetch(`api/bienestar.php?action=getResponsable&area=${area}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span style="font-size: 0.75rem; color: #64748b;">${result.data.correo}</span>`;
+                    element.closest('.area-card').querySelector('.btn-assign').innerHTML = '<i class="fas fa-user-edit"></i> Cambiar Responsable';
+                } else {
+                    element.textContent = 'Sin asignar';
+                }
+            } catch (error) {
+                element.textContent = 'Error al cargar';
+            }
+        }
+
+        function irAAsignacion(area) {
+            window.location.href = `admin-bienestar-asignacion.html?area=${area}`;
+        }
+    </script>
+</body>
+
+</html>

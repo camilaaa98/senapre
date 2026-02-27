@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reuniones y Asistencias - SenApre</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- El sidebar se inyectará o usará el estándar -->
+        <aside class="sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="ASI Logo"
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                <h3>SenApre</h3>
+                <div id="user-role-display"
+                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Bienestar</div>
+            </div>
+            <nav class="sidebar-menu" id="sidebar-menu-content">
+                <!-- Se llenará dinámicamente o por main.js -->
+            </nav>
+            <div class="sidebar-footer"
+                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Consultar Asistencias de Líderes</h1>
+                <p class="content-description">Historial de reuniones de Voceros y Representantes</p>
+                <button onclick="window.history.back()" class="btn-primary"
+                    style="background: #64748b; margin-top: 10px;">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+            </div>
+
+            <!-- Resumen Estadístico (Reportes) -->
+            <div id="seccion-reportes" class="card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3 class="card-title">Estadísticas de Asistencia por Rol</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 20px;">
+                    <div style="height: 300px;">
+                        <canvas id="chartAsistenciaRoles"></canvas>
+                    </div>
+                    <div id="metricas-resumen"
+                        style="display: flex; flex-direction: column; justify-content: center; gap: 15px;">
+                        <!-- Métricas dinámicas -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buscador y Filtros -->
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3 class="card-title">Historial de Reuniones</h3>
+                </div>
+                <div style="padding: 20px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label class="form-label">Seleccionar Reunión</label>
+                        <select id="selectReunion" class="form-control" onchange="cargarDetalleAsistencia()">
+                            <option value="">Seleccione una reunión...</option>
+                        </select>
+                    </div>
+                    <div style="width: 200px;">
+                        <label class="form-label">Filtrar por Rol</label>
+                        <select id="filtroRol" class="form-control" onchange="filtrarDetalle()">
+                            <option value="todos">Todos los Roles</option>
+                            <option value="Vocero Principal">Voceros Principales</option>
+                            <option value="Vocero Suplente">Voceros Suplentes</option>
+                            <option value="Vocero Enfoque">Voceros Enfoque</option>
+                            <option value="Representante">Representantes</option>
+                        </select>
+                    </div>
+                    <button onclick="descargarPDFAsistencia()" class="btn-primary" style="background: #ef4444;">
+                        <i class="fas fa-file-pdf"></i> Descargar PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de Resultados -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title" id="titulo-asistencia">Detalle de Asistencia</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>APRENDIZ</th>
+                                <th>ROL</th>
+                                <th>FICHA/DETALLE</th>
+                                <th>ESTADO</th>
+                                <th>FECHA REGISTRO</th>
+                                <th>ASISTENCIA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAsistenciaCuerpo">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
+                                    Seleccione una reunión para ver los detalles
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/admin/bienestar-historico.js"></script>
+</body>
+
+</html>
