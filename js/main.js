@@ -226,7 +226,7 @@ function aplicarRestriccionesDeRol() {
         if (user.bienestar_data && user.bienestar_data.length > 0) {
             const areaMap = {
                 'jefe_bienestar': 'Jefe de Bienestar',
-                'voceros_y_representantes': 'Resp. Liderazgo',
+                'voceros_y_representantes': 'Liderazgo',
                 'enfermeria': 'Bienestar (Enfermería)',
                 'deporte': 'Bienestar (Deporte)',
                 'arte': 'Bienestar (Cultura)',
