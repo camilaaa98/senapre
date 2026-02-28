@@ -66,8 +66,12 @@ function sync() {
             $created++;
             echo "Created: $doc ($correo)\n";
         } else {
-            $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor WHERE id_usuario = :id")
-                 ->execute([':cor' => $correo, ':id' => $doc]);
+            $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor, password_hash = :pass WHERE id_usuario = :id")
+                 ->execute([
+                     ':cor' => $correo, 
+                     ':pass' => $passHash,
+                     ':id' => $doc
+                 ]);
             $updated++;
         }
     }
