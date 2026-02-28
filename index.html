@@ -130,15 +130,19 @@
                     // Store user data
                     localStorage.setItem('user', JSON.stringify(data.data));
 
-                    // Roles administrativos que van al dashboard de admin
-                    const rolesAdmin = ['admin', 'administrador', 'director', 'coordinador', 'administrativo', 'vocero'];
-                    const userRol = data.data.rol.toLowerCase();
-
                     // Redirect based on role
-                    if (rolesAdmin.includes(userRol)) {
-                        window.location.href = 'admin-dashboard.html';
+                    if (userRol === 'vocero') {
+                        window.location.href = 'bienestar-dashboard.html';
                     } else if (userRol === 'instructor') {
                         window.location.href = 'instructor-dashboard.html';
+                    } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
+                        // Si es Jefe de Bienestar (podemos verificar en bienestar_data si existe esa lógica, o simplemente dirigir al dashboard de bienestar si es administrativo)
+                        const isBienestar = data.data.bienestar_data && data.data.bienestar_data.includes('jefe_bienestar');
+                        if (isBienestar && userRol !== 'director') {
+                            window.location.href = 'jefe-bienestar-dashboard.html';
+                        } else {
+                            window.location.href = 'admin-dashboard.html';
+                        }
                     } else {
                         throw new Error('Rol de usuario no reconocido: ' + data.data.rol);
                     }
