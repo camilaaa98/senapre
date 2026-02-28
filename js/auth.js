@@ -94,7 +94,7 @@ class AuthSystem {
             this.currentUser = null;
             localStorage.removeItem(this.storageKey);
             sessionStorage.clear();
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }
     }
 
@@ -108,7 +108,7 @@ class AuthSystem {
 
     redirectToDashboard() {
         if (!this.currentUser) return;
-        
+
         const rol = this.currentUser.rol.toLowerCase();
         if (rol === 'admin' || rol === 'administrador') {
             window.location.href = 'admin-dashboard.html';

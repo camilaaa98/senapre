@@ -18,14 +18,15 @@ try {
         
         if ($action === 'getResponsable') {
             $area = $_GET['area'] ?? 'liderazgo';
-            $sql = "SELECT ar.*, u.nombre, u.apellido, u.correo 
+            $sql = "SELECT ar.id_usuario, u.nombre, u.apellido, u.correo 
                     FROM area_responsables ar
                     JOIN usuarios u ON ar.id_usuario = u.id_usuario
                     WHERE ar.area = :area
-                    ORDER BY ar.fecha_asignacion DESC LIMIT 1";
+                    ORDER BY ar.id DESC LIMIT 1";
             $stmt = $conn->prepare($sql);
             $stmt->execute([':area' => $area]);
-            echo json_encode(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC)]);
+            $resp = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'data' => $resp]);
             exit;
         }
 
@@ -119,19 +120,6 @@ try {
             exit;
         }
 
-        // Obtener responsable de un área (Legacy fix - unificado arriba pero mantenido por compatibilidad)
-        if ($action === 'getResponsable') {
-            $area = $_GET['area'] ?? 'liderazgo';
-            $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.correo 
-                    FROM area_responsables ar
-                    JOIN usuarios u ON ar.id_usuario = u.id_usuario
-                    WHERE ar.area = :area
-                    ORDER BY ar.id DESC LIMIT 1";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([':area' => $area]);
-            echo json_encode(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC)]);
-            exit;
-        }
 
         // Obtener lista de reuniones
         if ($action === 'getReuniones') {

@@ -95,7 +95,7 @@ class AuthSystem {
             this.currentUser = null;
             localStorage.removeItem(this.storageKey);
             sessionStorage.clear();
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }
     }
 
