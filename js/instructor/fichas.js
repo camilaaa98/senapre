@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Auth Check
     const userStr = localStorage.getItem('user');
     if (!userStr) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
     const user = JSON.parse(userStr);
     if (user.rol !== 'instructor') {
         alert('Acceso no autorizado');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         });
     }
 

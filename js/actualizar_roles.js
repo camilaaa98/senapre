@@ -3,7 +3,7 @@ const path = require('path');
 
 // Archivos a actualizar
 const files = [
-    'login.html',
+    'index.html',
     'admin-aprendices.html',
     'admin-asistencias.html',
     'admin-dashboard.html',
@@ -26,8 +26,8 @@ files.forEach(file => {
     let content = fs.readFileSync(filePath, 'utf8');
     let modified = false;
 
-    // Reemplazar en login.html
-    if (file === 'login.html') {
+    // Reemplazar en index.html
+    if (file === 'index.html') {
         const oldPattern = /if \(data\.data\.rol === 'admin'\)/g;
         const newPattern = "if (data.data.rol === 'admin' || data.data.rol === 'administrador')";
         if (content.match(oldPattern)) {

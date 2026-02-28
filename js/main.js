@@ -130,7 +130,7 @@ function initGlobalNavigation() {
     document.addEventListener('DOMContentLoaded', () => {
         const header = document.querySelector('.content-header') || document.querySelector('.page-header');
         const isDashboard = window.location.pathname.includes('dashboard.html');
-        const isLogin = window.location.pathname.includes('login.html');
+        const isLogin = window.location.pathname.includes('index.html');
 
         if (header && !isDashboard && !isLogin) {
             // Verificar si ya existe un botón de volver para no duplicar
