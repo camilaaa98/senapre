@@ -306,6 +306,19 @@ function filtrarDashboardParaVocero(scope) {
     if (!window.location.pathname.includes('admin-dashboard.html')) return;
 
     const cards = document.querySelectorAll('.main-content .card');
+    const title = document.querySelector('.content-title');
+    const desc = document.querySelector('.content-description');
+
+    if (title && scope) {
+        if (scope.tipo === 'principal' || scope.tipo === 'suplente') {
+            title.textContent = `Panel Vocería - Ficha ${scope.ficha}`;
+            if (desc) desc.textContent = 'Gestión y seguimiento de aprendices asignados';
+        } else if (scope.tipo === 'enfoque') {
+            title.textContent = `Panel Enfoque - ${scope.poblacion}`;
+            if (desc) desc.textContent = `Gestión de aprendices en la población ${scope.poblacion}`;
+        }
+    }
+
     cards.forEach(card => {
         const text = card.innerText.toLowerCase();
 
