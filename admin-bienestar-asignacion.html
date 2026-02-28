@@ -103,7 +103,7 @@
         <main class="main-content">
             <div class="content-header" style="text-align: center; margin-bottom: 30px;">
                 <h1 class="content-title">Bienestar del Aprendiz</h1>
-                <p class="content-description">Asignación de responsable para Voceros y Representantes</p>
+                <p class="content-description">Asignación de responsable para Liderazgo</p>
             </div>
 
             <div class="card animate-slide-in" style="max-width: 800px; margin: 0 auto;">
@@ -116,8 +116,8 @@
                         style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
                         <p style="margin: 0; color: #166534; font-size: 0.95rem;">
                             <i class="fas fa-info-circle"></i> Seleccione el funcionario administrativo que se encargará
-                            de gestionar las reuniones, asistencia biométrica y comunicaciones masivas con los voceros y
-                            representantes.
+                            de gestionar las reuniones, asistencia biométrica y comunicaciones masivas para el área de
+                            Liderazgo.
                         </p>
                     </div>
 
@@ -164,11 +164,11 @@
     <script src="js/main.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const areaActual = urlParams.get('area') || 'voceros_y_representantes';
+        const areaActual = urlParams.get('area') || 'liderazgo';
 
         const nombresAreas = {
             'jefe_bienestar': 'Jefe de Bienestar',
-            'voceros_y_representantes': 'Voceros y Representantes',
+            'liderazgo': 'Liderazgo',
             'enfermeria': 'Enfermería',
             'deporte': 'Deporte',
             'arte': 'Arte',

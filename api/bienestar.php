@@ -17,7 +17,7 @@ try {
     if ($method === 'GET') {
         
         if ($action === 'getResponsable') {
-            $area = $_GET['area'] ?? 'voceros_y_representantes';
+            $area = $_GET['area'] ?? 'liderazgo';
             $sql = "SELECT ar.*, u.nombre, u.apellido, u.correo 
                     FROM area_responsables ar
                     JOIN usuarios u ON ar.id_usuario = u.id_usuario
@@ -29,7 +29,7 @@ try {
             exit;
         }
 
-        // Obtener consolidado de líderes (Voceros y Representantes)
+        // Obtener consolidado de líderes (Liderazgo)
         if ($action === 'getLideres') {
             $filtro = $_GET['filtro'] ?? 'todos'; // principales, suplentes, enfoque, representantes
             
@@ -119,13 +119,12 @@ try {
             exit;
         }
 
-        // Obtener responsable de un área
+        // Obtener responsable de un área (Legacy fix - unificado arriba pero mantenido por compatibilidad)
         if ($action === 'getResponsable') {
-            $area = $_GET['area'] ?? 'voceros_y_representantes';
-            $sql = "SELECT a.id_usuario, a.nombres as nombre, a.apellidos as apellido, u.correo 
+            $area = $_GET['area'] ?? 'liderazgo';
+            $sql = "SELECT u.id_usuario, u.nombre, u.apellido, u.correo 
                     FROM area_responsables ar
-                    JOIN administrador a ON ar.id_usuario = a.id_usuario
-                    JOIN usuarios u ON a.id_usuario = u.id_usuario
+                    JOIN usuarios u ON ar.id_usuario = u.id_usuario
                     WHERE ar.area = :area
                     ORDER BY ar.id DESC LIMIT 1";
             $stmt = $conn->prepare($sql);
@@ -164,7 +163,7 @@ try {
             
             $sql = "INSERT INTO area_responsables (id_usuario, area) VALUES (:user, :area)";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([':user' => $data['id_usuario'], ':area' => $data['area'] ?? 'voceros_y_representantes']);
+            $stmt->execute([':user' => $data['id_usuario'], ':area' => $data['area'] ?? 'liderazgo']);
             
             echo json_encode(['success' => true, 'message' => 'Responsable asignado']);
             exit;
