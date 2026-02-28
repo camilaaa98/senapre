@@ -7,10 +7,9 @@ function sync() {
     $conn = $db->getConnection();
     // Use a long timeout only for SQLite
     if (!getenv('DATABASE_URL')) {
-    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA busy_timeout = 60000"); }
+        $conn->exec("PRAGMA busy_timeout = 60000");
     }
 
-    $passHash = password_hash('123456', PASSWORD_DEFAULT);
     $created = 0;
     $updated = 0;
     $errors = [];
@@ -55,13 +54,10 @@ function sync() {
         $check->execute([':id' => $doc]);
         $user = $check->fetch();
 
-        // Solo resetear password si:
-        // 1. Es un usuario nuevo
-        // 2. El usuario actual no tiene password (hash vacío)
-        // 3. Se pasa el parámetro ?force_reset=1 en la URL
         $shouldUpdatePass = isset($_GET['force_reset']) && $_GET['force_reset'] == '1';
 
         if (!$user) {
+            $passHash = password_hash($doc, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("INSERT INTO usuarios (id_usuario, nombre, apellido, correo, password_hash, rol, estado) 
                                     VALUES (:id, :nom, :ape, :cor, :pass, 'vocero', 'activo')");
             $stmt->execute([
@@ -72,16 +68,17 @@ function sync() {
                 ':pass' => $passHash
             ]);
             $created++;
-            echo "Created: $doc ($correo)\n";
+            echo "Created: $doc ($correo) - Password set to document number\n";
         } else {
             if (empty($user['password_hash']) || $shouldUpdatePass) {
+                $passHash = password_hash($doc, PASSWORD_DEFAULT);
                 $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor, password_hash = :pass WHERE id_usuario = :id")
                      ->execute([
                          ':cor' => $correo, 
                          ':pass' => $passHash,
                          ':id' => $doc
                      ]);
-                echo "Updated (with pass reset): $doc\n";
+                echo "Updated (with pass reset to document): $doc\n";
             } else {
                 $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor WHERE id_usuario = :id")
                      ->execute([
