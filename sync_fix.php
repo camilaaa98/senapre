@@ -49,9 +49,15 @@ function sync() {
             $correo = $doc . "@senapre.edu.co"; // Usar alternativo si el principal está duplicado
         }
 
-        $check = $conn->prepare("SELECT id_usuario FROM usuarios WHERE id_usuario = :id");
+        $check = $conn->prepare("SELECT id_usuario, password_hash FROM usuarios WHERE id_usuario = :id");
         $check->execute([':id' => $doc]);
         $user = $check->fetch();
+
+        // Solo resetear password si:
+        // 1. Es un usuario nuevo
+        // 2. El usuario actual no tiene password (hash vacío)
+        // 3. Se pasa el parámetro ?force_reset=1 en la URL
+        $shouldUpdatePass = isset($_GET['force_reset']) && $_GET['force_reset'] == '1';
 
         if (!$user) {
             $stmt = $conn->prepare("INSERT INTO usuarios (id_usuario, nombre, apellido, correo, password_hash, rol, estado) 
@@ -66,12 +72,22 @@ function sync() {
             $created++;
             echo "Created: $doc ($correo)\n";
         } else {
-            $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor, password_hash = :pass WHERE id_usuario = :id")
-                 ->execute([
-                     ':cor' => $correo, 
-                     ':pass' => $passHash,
-                     ':id' => $doc
-                 ]);
+            if (empty($user['password_hash']) || $shouldUpdatePass) {
+                $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor, password_hash = :pass WHERE id_usuario = :id")
+                     ->execute([
+                         ':cor' => $correo, 
+                         ':pass' => $passHash,
+                         ':id' => $doc
+                     ]);
+                echo "Updated (with pass reset): $doc\n";
+            } else {
+                $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor WHERE id_usuario = :id")
+                     ->execute([
+                         ':cor' => $correo,
+                         ':id' => $doc
+                     ]);
+                echo "Updated (role/email only): $doc\n";
+            }
             $updated++;
         }
     }
