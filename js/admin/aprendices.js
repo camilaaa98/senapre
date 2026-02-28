@@ -234,12 +234,18 @@ async function cargarAprendices(pagina = 1) {
         if (user && user.rol === 'vocero' && scopes.length > 0) {
             const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
             const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
-            const esVistaPoblacion = document.getElementById('seccion-poblacion')?.classList.contains('active');
+            const esVistaPoblacion = document.getElementById('seccion-poblacion')?.style.display === 'block';
 
             if (esVistaPoblacion && scopeEnfoque) {
                 urlPoblacion = `&tabla_poblacion=${scopeEnfoque.poblacion}`;
             } else if (scopeFicha) {
                 ficha = scopeFicha.ficha;
+                // Bloquear el filtro visualmente
+                const selFicha = document.getElementById('filtroFicha');
+                if (selFicha) {
+                    selFicha.value = ficha;
+                    selFicha.disabled = true;
+                }
             } else if (scopeEnfoque) {
                 urlPoblacion = `&tabla_poblacion=${scopeEnfoque.poblacion}`;
             }
@@ -258,10 +264,10 @@ async function cargarAprendices(pagina = 1) {
             todosAprendices = result.data;
             paginaActual = result.pagination.page;
             totalPaginas = result.pagination.pages;
-            mostrarAprendices(todosAprendices); // Usará la nueva lógica de checkboxes
+            mostrarAprendices(todosAprendices);
             actualizarPaginacion(result.pagination);
         } else {
-            document.getElementById('tablaAprendices').innerHTML = '<tr><td colspan="7" class="text-center">No datos</td></tr>';
+            document.getElementById('tablaAprendices').innerHTML = '<tr><td colspan="9" class="text-center">No se encontraron datos</td></tr>';
         }
     } catch (e) {
         console.error(e);
@@ -789,44 +795,105 @@ function cargarEstadisticasPoblacion() {
     fetch(url).then(r => r.json()).then(d => {
         if (!d.success) return;
 
-        // Si es vocero de enfoque, posicionarse automáticamente en su categoría
-        if (user && user.rol === 'vocero' && scopeEnfoque) {
+        const data = d.data;
+
+        // Si es vocero de enfoque, filtrar los datos base por su población para las estadísticas
+        let filteredData = data;
+        if (scopeEnfoque) {
             const miPob = scopeEnfoque.poblacion.toLowerCase();
             setTimeout(() => {
                 filtrarPorPoblacion(miPob);
             }, 500);
         }
 
-        // ACTUALIZAR ARRAY GLOBAL: Esto soluciona el problema de que no aparezcan en el detalle
-        // si no están en la primera página de la lista principal.
-        todosAprendices = d.data;
+        // Conteos básicos
+        const stats = {
+            mujer: data.filter(a => a.mujer == 1).length,
+            indigena: data.filter(a => a.indigena == 1).length,
+            narp: data.filter(a => a.narp == 1).length,
+            campesino: data.filter(a => a.campesino == 1).length,
+            lgbtiq: data.filter(a => a.lgbtiq == 1).length,
+            discapacidad: data.filter(a => a.discapacidad == 1).length
+        };
 
-        // Inicializar contadores para las 6 categorías oficiales
-        const c = { mujer: 0, indigena: 0, narp: 0, campesino: 0, lgbtiq: 0, discapacidad: 0 };
-
-        d.data.forEach(a => {
-            const estado = (a.estado || '').toUpperCase().trim();
-            const estadosInactivos = ['RETIRO', 'CANCELADO', 'RETIRADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'CANCELADA', 'FINALIZADA'];
-
-            // Si es un estado inactivo, no contar
-            if (estadosInactivos.includes(estado)) return;
-            if (!estado) return;
-
-            if (a.mujer == 1) c.mujer++;
-            if (a.indigena == 1) c.indigena++;
-            if (a.narp == 1) c.narp++;
-            if (a.campesino == 1) c.campesino++;
-            if (a.lgbtiq == 1) c.lgbtiq++;
-            if (a.discapacidad == 1) c.discapacidad++;
-        });
-
-        // Actualizar tarjetas de contador en el DOM
-        Object.keys(c).forEach(k => {
+        // Actualizar UI
+        Object.keys(stats).forEach(k => {
             const el = document.getElementById(`count-${k}`);
-            if (el) el.textContent = c[k];
+            if (el) el.textContent = stats[k];
         });
 
-        renderizarGraficaPoblacion(c);
+        // Gráfica por Formaciones (Solicitud especial: mayor/menor población)
+        const formacionesCont = {};
+        data.forEach(a => {
+            const f = a.nombre_programa || 'Sin Programa';
+            formacionesCont[f] = (formacionesCont[f] || 0) + 1;
+        });
+
+        const labels = Object.keys(formacionesCont);
+        const values = Object.values(formacionesCont);
+
+        // Identificar mayor y menor
+        if (labels.length > 0) {
+            const sorted = Object.entries(formacionesCont).sort((a, b) => b[1] - a[1]);
+            const mayor = sorted[0];
+            const menor = sorted[sorted.length - 1];
+
+            // Si hay un contenedor de info extra, mostrarlo
+            let infoExtra = document.getElementById('info-extra-poblacion');
+            if (!infoExtra) {
+                const wrapper = document.querySelector('.chart-container-wrapper');
+                if (wrapper) {
+                    infoExtra = document.createElement('div');
+                    infoExtra.id = 'info-extra-poblacion';
+                    infoExtra.style.cssText = 'margin-top: 15px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #39A900; font-size: 0.9rem;';
+                    wrapper.appendChild(infoExtra);
+                }
+            }
+
+            if (infoExtra) {
+                infoExtra.innerHTML = `
+                    <div style="margin-bottom: 5px;"><strong>Resumen de Formaciones:</strong></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px;">
+                        <span><i class="fas fa-arrow-up" style="color:#39A900;"></i> Mayor: <b>${mayor[0]}</b> (${mayor[1]})</span>
+                        <span><i class="fas fa-arrow-down" style="color:#ef4444;"></i> Menor: <b>${menor[0]}</b> (${menor[1]})</span>
+                    </div>
+                `;
+            }
+        }
+
+        renderChartPoblacion(labels, values);
+    });
+}
+
+function renderChartPoblacion(labels, values) {
+    const ctx = document.getElementById('chartPoblacion')?.getContext('2d');
+    if (!ctx) return;
+
+    if (chartPoblacionInstance) chartPoblacionInstance.destroy();
+
+    chartPoblacionInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Aprendices',
+                data: values,
+                backgroundColor: '#39A900',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+// si no están en la primera página de la lista principal.
+todosAprendices = data;
     });
 }
 
