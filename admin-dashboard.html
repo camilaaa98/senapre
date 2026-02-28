@@ -18,7 +18,7 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="ASI Logo"
-                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50%;">
+                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
                 <h3>SenApre</h3>
                 <div class="sidebar-subtitle" id="user-role-display"
                     style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
@@ -304,8 +304,8 @@
             window.location.href = 'index.html';
         }
 
-        // Mostrar nombre del usuario
-        if (user) {
+        // Mostrar nombre del usuario (Solo si no ha sido dinamizado para voceros en main.js)
+        if (user && !document.querySelector('.content-description').textContent.includes('Ficha')) {
             document.querySelector('.content-description').textContent = `Bienvenido, ${user.nombre} ${user.apellido}`;
         }
     </script>

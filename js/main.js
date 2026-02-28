@@ -358,6 +358,8 @@ function ocultarMenusVocero(scope) {
 
         if (!permitido) {
             item.style.display = 'none';
+        } else {
+            item.style.display = 'block';
         }
 
         // Si es el menú de aprendices, filtrar submenú
@@ -451,6 +453,8 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
 
         if (!permitido) {
             item.style.display = 'none';
+        } else {
+            item.style.display = 'block';
         }
 
         // Filtrar submenús de aprendices para que solo vea población

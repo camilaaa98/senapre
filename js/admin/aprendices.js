@@ -242,9 +242,10 @@ async function cargarAprendices(pagina = 1) {
         const estado = document.getElementById('filtroEstado')?.value || '';
         let urlPoblacion = '';
 
+        const rol = (user.rol || '').toLowerCase();
         // Restricción automática para Voceros
         const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
-        if (user && user.rol === 'vocero' && scopes.length > 0) {
+        if (user && rol === 'vocero' && scopes.length > 0) {
             const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
             const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
             const esVistaPoblacion = document.getElementById('seccion-poblacion')?.style.display === 'block';
