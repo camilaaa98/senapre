@@ -216,170 +216,115 @@ try {
         }
 
         $conn->beginTransaction();
-        
-        // Deshabilitar foreign keys temporalmente para permitir cambio de id_usuario
-        $conn->exec('PRAGMA foreign_keys = OFF');
-        
+
         try {
-            // 1. Preparar query para tabla usuarios
-            $updateFields = [
-                'nombre = :nombre',
-                'apellido = :apellido',
-                'correo = :correo',
-                'estado = :estado'
-            ];
-            
-            $params = [
-                ':nombre' => $data['nombre'],
-                ':apellido' => $data['apellido'],
-                ':correo' => $data['correo'],
-                ':estado' => $data['estado'],
-                ':id' => $id
-            ];
+            $nuevoDocumento = !empty($data['documento']) && $data['documento'] != $id ? $data['documento'] : null;
 
-            // Si viene contraseña, agregarla
-            if (!empty($data['password'])) {
-                $updateFields[] = 'password_hash = :password';
-                $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-            }
-            
-            // Si viene documento y es diferente al ID actual (Cambio de ID)
-            if (!empty($data['documento']) && $data['documento'] != $id) {
-                // Verificar si el nuevo ID ya existe
+            // ----- CAMBIO DE DOCUMENTO (id_usuario) -----
+            // PostgreSQL no permite UPDATE directo de PK con FKs, usamos clonar+borrar
+            if ($nuevoDocumento) {
+                // Verificar que el nuevo documento no exista
                 $checkStmt = $conn->prepare("SELECT COUNT(*) FROM usuarios WHERE id_usuario = :new_id");
-                $checkStmt->execute([':new_id' => $data['documento']]);
+                $checkStmt->execute([':new_id' => $nuevoDocumento]);
                 if ($checkStmt->fetchColumn() > 0) {
-                    throw new Exception("El documento " . $data['documento'] . " ya existe asignado a otro usuario.");
+                    throw new Exception("El documento $nuevoDocumento ya existe asignado a otro usuario.");
                 }
 
-                // Agregar el cambio de id_usuario a los campos a actualizar
-                $updateFields[] = 'id_usuario = :new_id';
-                $params[':new_id'] = $data['documento'];
-            }
+                // Paso 1: renombrar correo temporalmente para liberar UNIQUE
+                $conn->prepare("UPDATE usuarios SET correo = correo || '_tmp_$id' WHERE id_usuario = :id")
+                     ->execute([':id' => $id]);
 
-            // 1. PRIMERO: Actualizar tabla usuarios
-            $sql = "UPDATE usuarios SET " . implode(', ', $updateFields) . " WHERE id_usuario = :id";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute($params);
-            
-            // 2. DESPUÉS: Si hubo cambio de documento, actualizar tablas relacionadas
-            if (!empty($data['documento']) && $data['documento'] != $id) {
-                $nuevoId = $data['documento'];
-                
-                // Obtener rol actual
-                $rolStmt = $conn->prepare("SELECT rol FROM usuarios WHERE id_usuario = :id");
-                $rolStmt->execute([':id' => $nuevoId]);
-                $currentRolData = $rolStmt->fetch();
-                
-                if ($currentRolData && $currentRolData['rol'] === 'instructor') {
-                    // Actualizar instructores
-                    $updateInst = $conn->prepare("UPDATE instructores SET id_usuario = :new_id WHERE id_usuario = :old_id");
-                    $updateInst->execute([':new_id' => $nuevoId, ':old_id' => $id]);
+                // Paso 2: clonar con nuevo ID y datos actualizados
+                $passwordInsert = !empty($data['password'])
+                    ? password_hash($data['password'], PASSWORD_DEFAULT)
+                    : null;
+                $cloneStmt = $conn->prepare(
+                    "INSERT INTO usuarios (id_usuario, nombre, apellido, correo, password_hash, rol, estado, creado_en)
+                     SELECT :new_id, :nombre, :apellido, :correo,
+                            COALESCE(:password_hash, password_hash), rol, :estado, creado_en
+                     FROM usuarios WHERE id_usuario = :old_id"
+                );
+                $cloneStmt->execute([
+                    ':new_id'       => $nuevoDocumento,
+                    ':nombre'       => $data['nombre'],
+                    ':apellido'     => $data['apellido'],
+                    ':correo'       => $data['correo'],
+                    ':password_hash'=> $passwordInsert,
+                    ':estado'       => $data['estado'],
+                    ':old_id'       => $id
+                ]);
+
+                // Paso 3: actualizar FKs en todas las tablas relacionadas
+                foreach ([
+                    'instructores'            => 'id_usuario',
+                    'administracion'          => 'id_usuario',
+                    'administrador'           => 'id_usuario',
+                    'asignacion_instructores' => 'id_usuario',
+                    'horarios_formacion'      => 'id_instructor',
+                    'asistencias'             => 'id_instructor',
+                    'logs'                    => 'id_usuario',
+                ] as $tabla => $col) {
+                    try {
+                        $conn->prepare("UPDATE $tabla SET $col = :new_id WHERE $col = :old_id")
+                             ->execute([':new_id' => $nuevoDocumento, ':old_id' => $id]);
+                    } catch (Exception $e2) { /* tabla puede no tener esa FK */ }
                 }
-                
-                if ($currentRolData && (in_array($currentRolData['rol'], ['director', 'administrativo', 'coordinador', 'admin', 'administrador']))) {
-                    // Actualizar administrador si existe la tabla
-                    $tableCheck = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='administrador'");
-                    if ($tableCheck->fetch()) {
-                        $updateAdmin = $conn->prepare("UPDATE administrador SET id_usuario = :new_id WHERE id_usuario = :old_id");
-                        $updateAdmin->execute([':new_id' => $nuevoId, ':old_id' => $id]);
-                    }
-                }
-                
-                // Actualizar asignacion_instructores
-                $updateAsig = $conn->prepare("UPDATE asignacion_instructores SET id_usuario = :new_id WHERE id_usuario = :old_id");
-                $updateAsig->execute([':new_id' => $nuevoId, ':old_id' => $id]);
-                
-                // Actualizar biometria si existe
-                $bioCheck = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='biometria'");
-                if ($bioCheck->fetch()) {
-                    $updateBio = $conn->prepare("UPDATE biometria SET id_usuario = :new_id WHERE id_usuario = :old_id AND tipo = 'usuario'");
-                    $updateBio->execute([':new_id' => $nuevoId, ':old_id' => $id]);
-                }
-                
-                // Usar el nuevo ID para las siguientes operaciones
-                $effectiveId = $nuevoId;
+                // biometria_usuarios usa TEXT
+                try {
+                    $conn->prepare("UPDATE biometria_usuarios SET id_usuario = :new_id WHERE id_usuario = :old_id")
+                         ->execute([':new_id' => (string)$nuevoDocumento, ':old_id' => (string)$id]);
+                } catch (Exception $e2) {}
+
+                // Paso 4: borrar registro viejo
+                $conn->prepare("DELETE FROM usuarios WHERE id_usuario = :old_id")->execute([':old_id' => $id]);
+
+                $effectiveId = $nuevoDocumento;
+
             } else {
+                // Sin cambio de documento: UPDATE normal
+                $updateFields = ['nombre = :nombre', 'apellido = :apellido', 'correo = :correo', 'estado = :estado'];
+                $params = [':nombre' => $data['nombre'], ':apellido' => $data['apellido'],
+                           ':correo' => $data['correo'], ':estado' => $data['estado'], ':id' => $id];
+                if (!empty($data['password'])) {
+                    $updateFields[] = 'password_hash = :password';
+                    $params[':password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+                }
+                $sql = "UPDATE usuarios SET " . implode(', ', $updateFields) . " WHERE id_usuario = :id";
+                $conn->prepare($sql)->execute($params);
                 $effectiveId = $id;
             }
-            
-            // Si cambiamos el ID, el :id para las siguientes consultas DEBE ser el nuevo ID?
-            // NO, las siguientes consultas usan el ID para buscar el registro a actualizar en tablas satélite.
-            // Si el ID de usuario cambió, el ID en tablas satélite DEBE haber cambiado también por ON UPDATE CASCADE.
-            // Si no hay ON UPDATE CASCADE, fallaría arriba.
-            // Asumimos que si pasó el execute arriba, el ID ya cambió.
-            // Entonces para actualizar la tabla satélite, ¿qué ID usamos en el WHERE?
-            // Si hubo CASCADE, usamos el NUEVO ID.
-            // Si NO hubo CASCADE (y no falló porque no hay FKs?), usamos el VIEJO ID... espera, si no hay FKs no importa.
-            // PERO instructores TIENE FK.
-            // Si SQLite tiene activado FKs (PRAGMA foreign_keys=ON esta en Database.php), y fallaria si no hay CASCADE.
-            // Si funcionó, usamos el NUEVO ID para buscar en `instructores`.
-            
-            $effectiveId = (!empty($data['documento']) && $data['documento'] != $id) ? $data['documento'] : $id;
-            
-            // Obtener rol para saber qué tabla satélite actualizar (usando el ID efectivo)
+
+            // ----- ACTUALIZAR TABLA SATÉLITE (instructores / administrador) -----
             $rolStmt = $conn->prepare("SELECT rol FROM usuarios WHERE id_usuario = :id");
             $rolStmt->execute([':id' => $effectiveId]);
             $currentRol = $rolStmt->fetch()['rol'];
-            
-            // Datos para tablas satélite (nombres en plural)
             $telefono = $data['celular'] ?? null;
 
             if ($currentRol === 'instructor') {
-                $sqlInst = "UPDATE instructores SET 
-                            nombres = :nombre,
-                            apellidos = :apellido,
-                            correo = :correo,
-                            telefono = :telefono,
-                            estado = :estado
-                            WHERE id_usuario = :id";
-                // Aquí el update de tabla instructores también depende de si ID cambió.
-                // Si FK cascade funcionó, el registro en 'instructores' ya tiene el NUEVO ID.
-                // Así que WHERE id_usuario = :new_id es correcto.
-                
-                $stmtInst = $conn->prepare($sqlInst);
-                $stmtInst->execute([
-                    ':nombre' => $data['nombre'],
-                    ':apellido' => $data['apellido'],
-                    ':correo' => $data['correo'],
-                    ':telefono' => $telefono,
-                    ':estado' => $data['estado'],
-                    ':id' => $effectiveId
-                ]);
-            } elseif (in_array($currentRol, ['director', 'administrativo', 'coordinador', 'admin', 'administrador'])) {
-                $sqlAdmin = "UPDATE administrador SET 
-                            nombres = :nombre,
-                            apellidos = :apellido,
-                            correo = :correo,
-                            telefono = :telefono,
-                            estado = :estado
-                            WHERE id_usuario = :id";
-                $stmtAdmin = $conn->prepare($sqlAdmin);
-                $stmtAdmin->execute([
-                    ':nombre' => $data['nombre'],
-                    ':apellido' => $data['apellido'],
-                    ':correo' => $data['correo'],
-                    ':telefono' => $telefono,
-                    ':estado' => $data['estado'],
-                    ':id' => $effectiveId
-                ]);
+                $conn->prepare("UPDATE instructores SET nombres=:nombre, apellidos=:apellido,
+                    correo=:correo, telefono=:telefono, estado=:estado WHERE id_usuario=:id")
+                     ->execute([':nombre'=>$data['nombre'],':apellido'=>$data['apellido'],
+                                ':correo'=>$data['correo'],':telefono'=>$telefono,
+                                ':estado'=>$data['estado'],':id'=>$effectiveId]);
+            } elseif (in_array($currentRol, ['director','administrativo','coordinador','admin','administrador'])) {
+                try {
+                    $conn->prepare("UPDATE administrador SET nombres=:nombre, apellidos=:apellido,
+                        correo=:correo, estado=:estado WHERE id_usuario=:id")
+                         ->execute([':nombre'=>$data['nombre'],':apellido'=>$data['apellido'],
+                                    ':correo'=>$data['correo'],':estado'=>$data['estado'],
+                                    ':id'=>$effectiveId]);
+                } catch (Exception $e2) {}
             }
-            
+
             $conn->commit();
-            
-            // Rehabilitar foreign keys
-            $conn->exec('PRAGMA foreign_keys = ON');
-            
+
             echo json_encode([
                 'success' => true,
-                'message' => 'Usuario actualizado correctamente'
+                'message' => 'Usuario actualizado correctamente',
+                'nuevo_id' => $effectiveId
             ]);
         } catch (Exception $e) {
             $conn->rollBack();
-            
-            // Rehabilitar foreign keys incluso en caso de error
-            $conn->exec('PRAGMA foreign_keys = ON');
-            
             throw $e;
         }
         

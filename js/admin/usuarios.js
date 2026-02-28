@@ -198,7 +198,23 @@ function editarUsuario(idUsuario) {
 
     document.getElementById('modalTitle').textContent = 'Editar Usuario';
     document.getElementById('idUsuarioEdicion').value = usuario.id_usuario;
-    document.getElementById('documentoUsuario').value = usuario.id_usuario; // El id_usuario ES el documento
+
+    const documentoInput = document.getElementById('documentoUsuario');
+    documentoInput.value = usuario.id_usuario; // El id_usuario ES el documento
+    documentoInput.setAttribute('data-original-documento', usuario.id_usuario); // Guardar valor original
+
+    // Mostrar nota visual para el campo de documento
+    let documentoNote = document.getElementById('documentoChangeNote');
+    if (!documentoNote) {
+        documentoNote = document.createElement('small');
+        documentoNote.id = 'documentoChangeNote';
+        documentoNote.style.cssText = 'display: block; color: #ef4444; margin-top: 5px; font-size: 0.85em;';
+        documentoNote.textContent = '⚠ Cambiar el documento requiere confirmación.';
+        documentoInput.parentNode.appendChild(documentoNote);
+    } else {
+        documentoNote.style.display = 'block';
+    }
+
     document.getElementById('nombresUsuario').value = usuario.nombre;
     document.getElementById('apellidosUsuario').value = usuario.apellido;
     document.getElementById('correoUsuario').value = usuario.correo;
@@ -242,6 +258,21 @@ async function guardarUsuario(event) {
     if (!formData.documento) {
         mostrarNotificacion('El documento es obligatorio', 'error');
         return;
+    }
+
+    // Confirmación de seguridad si el documento cambia en edición
+    if (esEdicion) {
+        const originalDocumento = document.getElementById('documentoUsuario').getAttribute('data-original-documento');
+        if (originalDocumento && originalDocumento !== formData.documento) {
+            const confirmChange = confirm(
+                `Ha cambiado el número de documento del usuario de "${originalDocumento}" a "${formData.documento}".\n\n` +
+                `¿Está seguro de que desea realizar este cambio? Esto podría afectar la integridad de los datos relacionados.`
+            );
+            if (!confirmChange) {
+                mostrarNotificacion('Cambio de documento cancelado', 'info');
+                return;
+            }
+        }
     }
 
     try {
