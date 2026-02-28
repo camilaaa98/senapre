@@ -152,6 +152,19 @@ function aplicarRestriccionesDePagina() {
 
     // Ocultar tabs de secciones no permitidas para roles de bienestar/voceros
     if (!esDirector) {
+        // Dinamizar Título para Voceros de Ficha
+        if (esVoceroFicha) {
+            const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
+            const titulo = document.getElementById('titulo-gestion-aprendices');
+            const desc = document.getElementById('desc-gestion-aprendices');
+            if (titulo) titulo.textContent = `Gestión de Aprendices - Ficha ${scopeFicha.ficha}`;
+            if (desc) desc.textContent = `Listado oficial de aprendices asignados a la ficha ${scopeFicha.ficha}`;
+
+            // Ocultar filtro de fichas (ya que está bloqueado en cargarAprendices)
+            const contenedorFicha = document.querySelector('#filtroFicha')?.closest('.filtro-item-fixed');
+            if (contenedorFicha) contenedorFicha.style.display = 'none';
+        }
+
         const tabsNoPermitidos = [];
 
         if (esVocero) {
@@ -797,15 +810,6 @@ function cargarEstadisticasPoblacion() {
 
         const data = d.data;
 
-        // Si es vocero de enfoque, filtrar los datos base por su población para las estadísticas
-        let filteredData = data;
-        if (scopeEnfoque) {
-            const miPob = scopeEnfoque.poblacion.toLowerCase();
-            setTimeout(() => {
-                filtrarPorPoblacion(miPob);
-            }, 500);
-        }
-
         // Conteos básicos
         const stats = {
             mujer: data.filter(a => a.mujer == 1).length,
@@ -892,9 +896,127 @@ function renderChartPoblacion(labels, values) {
         }
     });
 }
-// si no están en la primera página de la lista principal.
-todosAprendices = data;
-    });
+
+/**
+ * Exporta el listado de aprendices a PDF con diseño SENA/SenApre.
+ */
+async function exportarAprendicesPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4');
+    const user = authSystem.getCurrentUser();
+    const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+    const scope = scopes[0] || {};
+    const fecha = new Date().toLocaleDateString('es-ES');
+
+    // Estados inactivos a excluir para voceros
+    const estadosInactivos = ['RETIRO', 'CANCELADO', 'RETIRADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'CANCELADA', 'FINALIZADA'];
+
+    let url = 'api/aprendices.php?limit=-1';
+    if (user.rol === 'vocero') {
+        if (scope.tipo === 'principal' || scope.tipo === 'suplente') {
+            url += `&ficha=${scope.ficha}`;
+        } else if (scope.tipo === 'enfoque') {
+            url += `&tabla_poblacion=${scope.poblacion}`;
+        }
+    } else {
+        const search = document.getElementById('filtroSearch')?.value || '';
+        const ficha = document.getElementById('filtroFicha')?.value || '';
+        const estado = document.getElementById('filtroEstado')?.value || '';
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (ficha) url += `&ficha=${encodeURIComponent(ficha)}`;
+        if (estado) url += `&estado=${encodeURIComponent(estado)}`;
+    }
+
+    try {
+        const res = await fetch(url);
+        const result = await res.json();
+        if (!result.success || !result.data) throw new Error("No hay datos para exportar");
+
+        let dataFiltrada = result.data;
+        if (user.rol === 'vocero') {
+            dataFiltrada = result.data.filter(a => !estadosInactivos.includes((a.estado || '').toUpperCase().trim()));
+        }
+
+        const rows = dataFiltrada.map(a => [
+            a.documento,
+            (a.nombre || a.nombres || '').toUpperCase(),
+            (a.apellido || a.apellidos || '').toUpperCase(),
+            a.numero_ficha || a.ficha_id || 'N/A',
+            (a.nombre_programa || 'PROGRAMA NO ASIGNADO').toUpperCase(),
+            (a.estado || '').toUpperCase()
+        ]);
+
+        // LOGOS Y CABECERA
+        const drawHeader = async () => {
+            const logoSena = new Image();
+            logoSena.src = 'assets/img/logosena.png';
+            const logoSenApre = new Image();
+            logoSenApre.src = 'assets/img/asi.png';
+
+            await Promise.all([
+                new Promise(r => logoSena.onload = r),
+                new Promise(r => logoSenApre.onload = r)
+            ]);
+
+            doc.addImage(logoSena, 'PNG', 15, 10, 22, 22);
+            doc.addImage(logoSenApre, 'PNG', 260, 10, 22, 22);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.setTextColor(57, 169, 0);
+
+            let tituloPrincipal = "REPORTE DE APRENDICES";
+            let subTitulo = "VOCERÍA DE FORMACIÓN";
+
+            if (user.rol === 'vocero') {
+                if (scope.tipo === 'enfoque') {
+                    tituloPrincipal = `TIPO DE POBLACIÓN ${scope.poblacion.toUpperCase()}`;
+                    subTitulo = `VOCERO DE ENFOQUE DIFERENCIAL ${scope.poblacion.toUpperCase()}`;
+                } else {
+                    tituloPrincipal = `LISTADO DE APRENDICES - FICHA ${scope.ficha}`;
+                    subTitulo = `VOCERÍA ${scope.tipo.toUpperCase()} - FICHA ${scope.ficha}`;
+                }
+            }
+
+            doc.text(tituloPrincipal, 148, 20, { align: 'center' });
+            doc.setFontSize(14);
+            doc.text(subTitulo, 148, 28, { align: 'center' });
+            doc.setFontSize(16);
+            doc.setTextColor(0, 50, 77); // Azul Oscuro
+            doc.text(`${user.nombre.toUpperCase()} ${user.apellido.toUpperCase()}`, 148, 38, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Fecha de reporte: ${fecha}`, 148, 45, { align: 'center' });
+        };
+
+        await drawHeader();
+
+        doc.autoTable({
+            startY: 55,
+            head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'FICHA', 'PROGRAMA', 'ESTADO']],
+            body: rows,
+            theme: 'grid',
+            headStyles: { fillColor: [57, 169, 0], textColor: [255, 255, 255], halign: 'center' },
+            columnStyles: {
+                0: { halign: 'center', cellWidth: 35 },
+                1: { cellWidth: 45 },
+                2: { cellWidth: 45 },
+                3: { halign: 'center', cellWidth: 30 },
+                4: { cellWidth: 80 },
+                5: { halign: 'center', cellWidth: 30 }
+            },
+            styles: { fontSize: 9, cellPadding: 3 },
+            margin: { left: 15, right: 15 }
+        });
+
+        doc.save(`Reporte_Aprendices_${user.rol}_F${scope.ficha || 'NA'}_${fecha}.pdf`);
+        mostrarNotificacion("PDF generado con éxito", "success");
+
+    } catch (error) {
+        console.error("PDF Error:", error);
+        mostrarNotificacion("Error al generar PDF: " + error.message, "error");
+    }
 }
 
 function renderizarGraficaPoblacion(c) {

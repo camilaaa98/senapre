@@ -578,6 +578,7 @@ function cargarEstadisticasPoblacionDashboard() {
         });
 }
 
-// Inicializar restricciones
+// Inicializar restricciones inmediatamente para evitar parpadeo
+aplicarRestriccionesDeRol();
 document.addEventListener('DOMContentLoaded', aplicarRestriccionesDeRol);
 

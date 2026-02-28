@@ -111,8 +111,9 @@
             <!-- SECCIÓN: LISTA DE APRENDICES -->
             <div id="seccion-lista" class="content-section active">
                 <div class="content-header">
-                    <h1 class="content-title">Gestión de Aprendices</h1>
-                    <p class="content-description">Administración completa de aprendices matriculados</p>
+                    <h1 class="content-title" id="titulo-gestion-aprendices">Gestión de Aprendices</h1>
+                    <p class="content-description" id="desc-gestion-aprendices">Administración completa de aprendices
+                        matriculados</p>
                 </div>
                 <!-- Filtros de Búsqueda -->
                 <div class="card card-filtros">
@@ -153,8 +154,10 @@
                             <button onclick="nuevoAprendiz()" class="btn-primary btn-nuevo btn-flex-center">
                                 + Agregar Aprendiz
                             </button>
-                            <button onclick="exportarAprendices()" class="btn-primary btn-exportar">📊 Exportar
-                                Excel</button>
+                            <button onclick="exportarAprendicesPDF()" class="btn-primary"
+                                style="background: #ef4444; color: white; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
                         </div>
                     </div>
                     <div class="table-wrapper table-scroll">
