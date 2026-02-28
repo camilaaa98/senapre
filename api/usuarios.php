@@ -18,6 +18,26 @@ try {
     
     // GET - Listar usuarios con paginación y filtros
     if ($method === 'GET') {
+        // Asegurar tablas auxiliares para evitar error 500 en el JOIN
+        $conn->exec("CREATE TABLE IF NOT EXISTS administrador (
+            id_usuario INTEGER PRIMARY KEY,
+            nombres TEXT NOT NULL,
+            apellidos TEXT NOT NULL,
+            correo TEXT NOT NULL,
+            telefono TEXT,
+            estado TEXT DEFAULT 'activo',
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        )");
+        $conn->exec("CREATE TABLE IF NOT EXISTS instructores (
+            id_usuario INTEGER PRIMARY KEY,
+            nombres TEXT NOT NULL,
+            apellidos TEXT NOT NULL,
+            correo TEXT NOT NULL,
+            telefono TEXT,
+            estado TEXT DEFAULT 'activo',
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+        )");
+
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
         $offset = ($page - 1) * $limit;
