@@ -5,7 +5,7 @@ require_once __DIR__ . '/api/config/Database.php';
 function sync() {
     $db = new Database();
     $conn = $db->getConnection();
-    $conn->exec("PRAGMA busy_timeout = 60000"); // 60s timeout
+    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA busy_timeout = 60000"); // 60s timeout }
 
     $passHash = password_hash('123456', PASSWORD_DEFAULT);
     $created = 0;

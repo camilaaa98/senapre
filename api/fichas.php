@@ -128,7 +128,7 @@ try {
         
         // Verificar columnas y AUTO-MIGRACIÓN
         try {
-            $checkColumn = $conn->query("PRAGMA table_info(fichas)");
+    if (!getenv('DATABASE_URL')) { $checkColumn = $conn->query("PRAGMA table_info(fichas)"); }
             $columns = $checkColumn->fetchAll(PDO::FETCH_ASSOC);
             $existingCols = array_column($columns, 'name');
 

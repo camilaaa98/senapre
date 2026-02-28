@@ -5,8 +5,10 @@ require_once __DIR__ . '/api/config/Database.php';
 function sync() {
     $db = Database::getInstance();
     $conn = $db->getConnection();
-    // Use a very long timeout
-    $conn->exec("PRAGMA busy_timeout = 60000");
+    // Use a long timeout only for SQLite
+    if (!getenv('DATABASE_URL')) {
+    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA busy_timeout = 60000"); }
+    }
 
     $passHash = password_hash('123456', PASSWORD_DEFAULT);
     $created = 0;

@@ -9,7 +9,7 @@ try {
     $response = [];
 
     // Check aprendices table info
-    $stmt = $conn->query("PRAGMA table_info(aprendices)");
+    if (!getenv('DATABASE_URL')) { $stmt = $conn->query("PRAGMA table_info(aprendices)"); }
     $response['aprendices_structure'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode($response, JSON_PRETTY_PRINT);

@@ -17,7 +17,7 @@ try {
     // Verificar y actualizar estructura de tabla
     try {
         // Verificar columnas existentes
-        $checkTable = $conn->query("PRAGMA table_info(asignacion_instructores)");
+    if (!getenv('DATABASE_URL')) { $checkTable = $conn->query("PRAGMA table_info(asignacion_instructores)"); }
         $columns = $checkTable->fetchAll(PDO::FETCH_COLUMN, 1);
         
         // Si no tiene las columnas requeridas o no existe, recrear

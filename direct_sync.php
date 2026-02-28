@@ -3,8 +3,8 @@ $db_file = 'C:/wamp64/www/YanguasEjercicios/senapre/database/Asistnet.db';
 try {
     $conn = new PDO("sqlite:" . $db_file);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->exec("PRAGMA busy_timeout = 60000");
-    $conn->exec("PRAGMA journal_mode = WAL");
+    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA busy_timeout = 60000"); }
+    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA journal_mode = WAL"); }
 
     $passHash = password_hash('123456', PASSWORD_DEFAULT);
 

@@ -12,7 +12,7 @@ try {
     echo "Verificando esquema de la tabla asistencias...\n\n";
     
     // Obtener información de la tabla actual
-    $stmt = $conn->query("PRAGMA table_info(asistencias)");
+    if (!getenv('DATABASE_URL')) { $stmt = $conn->query("PRAGMA table_info(asistencias)"); }
     $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (empty($columns)) {
@@ -102,7 +102,7 @@ try {
     }
     
     echo "\n=== Esquema final ===\n";
-    $stmt = $conn->query("PRAGMA table_info(asistencias)");
+    if (!getenv('DATABASE_URL')) { $stmt = $conn->query("PRAGMA table_info(asistencias)"); }
     $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($columns as $col) {
         echo "  - {$col['name']} ({$col['type']})\n";

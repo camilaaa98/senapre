@@ -90,8 +90,8 @@ try {
         
         // === ACTIVAR WAL MODE PARA ESTA CONEXIÓN ===
         try {
-            $conn->exec('PRAGMA journal_mode = WAL;');
-            $conn->exec('PRAGMA busy_timeout = 30000;');
+    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA journal_mode = WAL;'); }
+    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA busy_timeout = 30000;'); }
         } catch (Exception $e) {
             // Ignorar si falla
         }

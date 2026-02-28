@@ -5,7 +5,7 @@ require_once __DIR__ . '/api/config/Database.php';
 try {
     $db = new Database();
     $conn = $db->getConnection();
-    $conn->exec("PRAGMA busy_timeout = 5000"); // Esperar hasta 5 segundos si está bloqueada
+    if (!getenv('DATABASE_URL')) { $conn->exec("PRAGMA busy_timeout = 5000"); // Esperar hasta 5 segundos si está bloqueada }
 
     $passHash = password_hash('123456', PASSWORD_DEFAULT);
     $count = 0;

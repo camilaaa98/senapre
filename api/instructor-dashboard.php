@@ -16,8 +16,8 @@ try {
 
     // Optimización: Modo WAL para lectura sin bloqueos y timeout
     try {
-        $conn->exec('PRAGMA journal_mode = WAL;');
-        $conn->exec('PRAGMA busy_timeout = 5000;');
+    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA journal_mode = WAL;'); }
+    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA busy_timeout = 5000;'); }
     } catch (Exception $e) {
         // Continuar si falla optimización
     }
