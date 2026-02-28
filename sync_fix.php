@@ -3,7 +3,7 @@ header('Content-Type: text/plain');
 require_once __DIR__ . '/api/config/Database.php';
 
 function sync() {
-    $db = new Database();
+    $db = Database::getInstance();
     $conn = $db->getConnection();
     // Use a very long timeout
     $conn->exec("PRAGMA busy_timeout = 60000");
@@ -40,7 +40,14 @@ function sync() {
             continue;
         }
 
-        $correo = !empty($ap['correo']) ? $ap['correo'] : ($doc . "@senapre.edu.co");
+        $correo = !empty($ap['correo']) ? trim($ap['correo']) : ($doc . "@senapre.edu.co");
+
+        // Verificar si el correo ya existe en otro usuario
+        $checkEmail = $conn->prepare("SELECT id_usuario FROM usuarios WHERE correo = :cor AND id_usuario != :id");
+        $checkEmail->execute([':cor' => $correo, ':id' => $doc]);
+        if ($checkEmail->fetch()) {
+            $correo = $doc . "@senapre.edu.co"; // Usar alternativo si el principal está duplicado
+        }
 
         $check = $conn->prepare("SELECT id_usuario FROM usuarios WHERE id_usuario = :id");
         $check->execute([':id' => $doc]);
@@ -59,8 +66,8 @@ function sync() {
             $created++;
             echo "Created: $doc ($correo)\n";
         } else {
-            $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo' WHERE id_usuario = :id")
-                 ->execute([':id' => $doc]);
+            $conn->prepare("UPDATE usuarios SET rol = 'vocero', estado = 'activo', correo = :cor WHERE id_usuario = :id")
+                 ->execute([':cor' => $correo, ':id' => $doc]);
             $updated++;
         }
     }
