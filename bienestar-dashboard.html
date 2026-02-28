@@ -86,15 +86,13 @@
                             <th>Documento</th>
                             <th>Aprendiz</th>
                             <th>Tipo de Líder</th>
-                            <th>Detalle / Ficha</th>
-                            <th>Población</th>
+                            <th>Ficha</th>
                             <th>Contacto</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tbodyLideres">
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 30px;">Cargando líderes...</td>
+                            <td colspan="5" style="text-align: center; padding: 30px;">Cargando líderes...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -177,17 +175,11 @@
                     <td><strong>${l.nombre} ${l.apellido}</strong></td>
                     <td><span class="badge" style="background: var(--sena-green); color: white;">${l.tipo}</span></td>
                     <td>${l.detalle}</td>
-                    <td><span style="font-size: 0.85rem; color: #64748b;">${l.poblacion}</span></td>
                     <td>
                         <div style="font-size: 0.9rem;">
                             <i class="fas fa-envelope"></i> ${l.correo || 'N/A'}<br>
                             <i class="fab fa-whatsapp"></i> ${l.telefono || 'N/A'}
                         </div>
-                    </td>
-                    <td>
-                        <button onclick="window.location.href='bienestar-asistencia.html?doc=${l.documento}'" class="btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">
-                            <i class="fas fa-check"></i> Asistencia
-                        </button>
                     </td>
                 </tr>
             `).join('');

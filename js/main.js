@@ -479,10 +479,24 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
  * Carga las estadísticas de población para el panel del dashboard.
  */
 function cargarEstadisticasPoblacionDashboard() {
-    const canvas = document.getElementById('chartPoblacionDash');
-    if (!canvas) return;
+    const user = authSystem.getCurrentUser();
+    if (!user) return;
 
-    fetch('api/aprendices.php?limit=-1')
+    const canvas = document.getElementById('chartPoblacionDash');
+    const statTotalEl = document.getElementById('dashStatTotal');
+    const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+    const scope = scopes[0] || null;
+
+    let url = 'api/aprendices.php?limit=-1';
+    if (user.rol === 'vocero' && scope) {
+        if (scope.tipo === 'principal' || scope.tipo === 'suplente') {
+            url += `&ficha=${scope.ficha}`;
+        } else if (scope.tipo === 'enfoque') {
+            url += `&tabla_poblacion=${scope.poblacion}`;
+        }
+    }
+
+    fetch(url)
         .then(r => r.json())
         .then(d => {
             if (!d.success) {
@@ -493,11 +507,13 @@ function cargarEstadisticasPoblacionDashboard() {
             const c = { mujer: 0, indigena: 0, narp: 0, campesino: 0, lgbtiq: 0, discapacidad: 0 };
             const estadosInactivos = ['RETIRO', 'CANCELADO', 'RETIRADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'CANCELADA', 'FINALIZADA'];
 
-            d.data.forEach(a => {
+            // Si es vocero, solo contar los que NO están en estados inactivos
+            const dataPura = d.data.filter(a => {
                 const estado = (a.estado || '').toUpperCase().trim();
-                if (estadosInactivos.includes(estado)) return;
-                if (!estado) return;
+                return !estadosInactivos.includes(estado) && estado !== '';
+            });
 
+            dataPura.forEach(a => {
                 if (a.mujer == 1) c.mujer++;
                 if (a.indigena == 1) c.indigena++;
                 if (a.narp == 1) c.narp++;
@@ -506,7 +522,7 @@ function cargarEstadisticasPoblacionDashboard() {
                 if (a.discapacidad == 1) c.discapacidad++;
             });
 
-            const totalPob = Object.values(c).reduce((a, b) => a + b, 0);
+            const totalConteo = dataPura.length;
 
             const dMujer = document.getElementById('dashStatMujer');
             const dIndi = document.getElementById('dashStatIndigena');
@@ -518,7 +534,7 @@ function cargarEstadisticasPoblacionDashboard() {
             if (dIndi) dIndi.textContent = c.indigena;
             if (dNarp) dNarp.textContent = c.narp;
             if (dLgbt) dLgbt.textContent = c.lgbtiq;
-            if (dTot) dTot.textContent = totalPob;
+            if (dTot) dTot.textContent = totalConteo;
 
             // Actualizar números en panel detalle (si existen)
             const updateText = (id, val) => {
@@ -532,7 +548,7 @@ function cargarEstadisticasPoblacionDashboard() {
             updateText('stat-campesino', c.campesino);
             updateText('stat-lgbtiq', c.lgbtiq);
             updateText('stat-discapacidad', c.discapacidad);
-            updateText('stat-total-poblacion', totalPob);
+            updateText('stat-total-poblacion', totalConteo);
 
             // Renderizar gráfica
             const ctx = canvas.getContext('2d');
