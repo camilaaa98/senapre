@@ -22,6 +22,10 @@ body {
     line-height: 1.6;
 }
 
+.text-center {
+    text-align: center !important;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -507,6 +511,7 @@ body {
     font-size: 1.8rem;
     color: var(--sena-blue);
     text-align: center;
+    width: 100%;
 }
 
 .card-grid {
@@ -538,6 +543,8 @@ body {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--sena-blue);
+    text-align: center;
+    width: 100%;
 }
 
 .stat-value {
@@ -569,6 +576,7 @@ body {
     background-color: var(--sena-green);
     font-weight: 600;
     color: white;
+    text-align: center;
 }
 
 .table tr:last-child td {
@@ -704,6 +712,7 @@ body {
     font-size: 1.8rem;
     color: var(--sena-blue);
     text-align: center;
+    width: 100%;
 }
 
 .card-grid {
@@ -735,6 +744,8 @@ body {
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--sena-blue);
+    text-align: center;
+    width: 100%;
 }
 
 .stat-value {
@@ -766,6 +777,7 @@ body {
     background-color: #f8f9fa;
     font-weight: 600;
     color: var(--sena-blue);
+    text-align: center;
 }
 
 .table tr:last-child td {

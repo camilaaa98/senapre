@@ -7,6 +7,7 @@
     <title>Bienestar del Aprendiz - SenApre</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .bienestar-grid {
             display: grid;
@@ -207,7 +208,7 @@
 
         <main class="main-content">
             <div class="content-header">
-                <div>
+                <div style="text-align: center; width: 100%;">
                     <h1 class="content-title">Bienestar del Aprendiz</h1>
                     <p class="content-description">Gestión integral de áreas y responsables de bienestar institucional
                     </p>
@@ -254,17 +255,32 @@
                     </button>
                 </div>
 
-                <!-- Área: Enfermería -->
+                <!-- Área: Promoción y Prevención de Enfermedades -->
                 <div class="area-card" style="border-top-color: #ef4444;">
                     <div class="area-icon" style="background: #fef2f2; color: #ef4444;"><i class="fas fa-heartbeat"></i>
                     </div>
-                    <div class="area-title">Enfermería</div>
+                    <div class="area-title">Promoción y Prevención de Enfermedades</div>
                     <div class="area-desc">Atención primaria, seguimiento de salud y prevención para aprendices.</div>
                     <div class="responsable-info" id="info-enfermeria">
                         <i class="fas fa-user-tie"></i>
                         <p class="responsable-name">Sin asignar</p>
                     </div>
                     <button class="btn-assign" onclick="irAAsignacion('enfermeria')">
+                        <i class="fas fa-user-plus"></i> Asignar Área
+                    </button>
+                </div>
+
+                <!-- Área: Socioemocional -->
+                <div class="area-card" style="border-top-color: #f472b6;">
+                    <div class="area-icon" style="background: #fdf2f8; color: #f472b6;"><i class="fas fa-brain"></i>
+                    </div>
+                    <div class="area-title">Socioemocional</div>
+                    <div class="area-desc">Acompañamiento psicológico, manejo de emociones y clima institucional.</div>
+                    <div class="responsable-info" id="info-socioemocional">
+                        <i class="fas fa-user-tie"></i>
+                        <p class="responsable-name">Sin asignar</p>
+                    </div>
+                    <button class="btn-assign" onclick="irAAsignacion('socioemocional')">
                         <i class="fas fa-user-plus"></i> Asignar Área
                     </button>
                 </div>
@@ -319,7 +335,7 @@
 
     <script src="js/main.js"></script>
     <script>
-        const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'deporte', 'arte', 'apoyos'];
+        const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
 
         document.addEventListener('DOMContentLoaded', () => {
             areas.forEach(area => cargarResponsable(area));
@@ -333,6 +349,7 @@
                 'jefe_bienestar': 'info-jefe-bienestar',
                 'liderazgo': 'info-liderazgo',
                 'enfermeria': 'info-enfermeria',
+                'socioemocional': 'info-socioemocional',
                 'deporte': 'info-deporte',
                 'arte': 'info-arte',
                 'apoyos': 'info-apoyos'
