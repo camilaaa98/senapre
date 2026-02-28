@@ -100,10 +100,8 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
 
-            // Detectar si estamos en localhost normal o en Live Server/otro puerto
-            // Si no estamos en el puerto 80 (WAMP por defecto), forzamos la ruta completa a WAMP
-            const isWamp = window.location.port === '' || window.location.port === '80';
-            const API_BASE_URL = isWamp ? 'api' : 'http://localhost/YanguasEjercicios/senapre/api';
+            // Usar ruta relativa para el API para que funcione en cualquier servidor (WAMP o Render)
+            const API_BASE_URL = 'api';
 
             try {
                 const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
