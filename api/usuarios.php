@@ -95,7 +95,7 @@ try {
                          COALESCE(a.apellidos, i.apellidos, u.apellido) as apellido,
                          COALESCE(a.correo, i.correo, u.correo) as correo,
                          COALESCE(a.estado, i.estado, u.estado) as estado,
-                         COALESCE(a.telefono, i.telefono) as telefono";
+                         COALESCE(CAST(a.telefono AS TEXT), CAST(i.telefono AS TEXT)) as telefono";
         
         $joins = "LEFT JOIN administrador a ON u.id_usuario = a.id_usuario
                   LEFT JOIN instructores i ON u.id_usuario = i.id_usuario";
@@ -404,7 +404,8 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'debug_sql' => $sql ?? 'Not set'
     ]);
 }
 ?>
