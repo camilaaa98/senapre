@@ -19,15 +19,19 @@ try {
     // GET - Listar usuarios con paginación y filtros
     if ($method === 'GET') {
         // Asegurar tablas auxiliares para evitar error 500 en el JOIN
-        $conn->exec("CREATE TABLE IF NOT EXISTS administrador (
-            id_usuario INTEGER PRIMARY KEY,
-            nombres TEXT NOT NULL,
-            apellidos TEXT NOT NULL,
-            correo TEXT NOT NULL,
-            telefono TEXT,
-            estado TEXT DEFAULT 'activo',
-            FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
-        )");
+        try {
+            $conn->exec("CREATE TABLE IF NOT EXISTS administrador (
+                id_usuario INTEGER PRIMARY KEY,
+                nombres TEXT NOT NULL,
+                apellidos TEXT NOT NULL,
+                correo TEXT NOT NULL,
+                telefono TEXT,
+                estado TEXT DEFAULT 'activo',
+                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+            )");
+            // Forzar adición de columna si ya existía la tabla sin ella
+            $conn->exec("ALTER TABLE administrador ADD COLUMN IF NOT EXISTS telefono TEXT");
+        } catch (Exception $e) { /* Silencioso en GET */ }
         $conn->exec("CREATE TABLE IF NOT EXISTS instructores (
             id_usuario INTEGER PRIMARY KEY,
             nombres TEXT NOT NULL,
