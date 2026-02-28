@@ -11,7 +11,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
 
     // Optimización: Modo WAL para lectura sin bloqueos y timeout

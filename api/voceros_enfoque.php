@@ -7,7 +7,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
     
     $method = $_SERVER['REQUEST_METHOD'];

@@ -20,7 +20,7 @@ ini_set('display_errors', 0);
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
     
     $action = isset($_GET['action']) ? $_GET['action'] : '';

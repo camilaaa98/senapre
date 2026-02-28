@@ -2,7 +2,7 @@
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $db = new Database();
+    $db = Database::getInstance();
     $conn = $db->getConnection();
 
     echo "Iniciando migración de Tipo de Formación...\n";

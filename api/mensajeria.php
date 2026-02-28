@@ -22,7 +22,7 @@ try {
     $destinatarios = $data['destinatarios'];
     $enviados = 0;
 
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
 
     foreach ($destinatarios as $dest) {

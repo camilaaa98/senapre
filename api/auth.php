@@ -16,7 +16,7 @@ require_once __DIR__ . '/config/Database.php';
 require_once __DIR__ . '/controllers/AuthController.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $db = $database->getConnection();
     $auth = new AuthController($db);
 

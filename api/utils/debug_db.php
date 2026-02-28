@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $db = new Database();
+    $db = Database::getInstance();
     $conn = $db->getConnection();
 
     $response = [];

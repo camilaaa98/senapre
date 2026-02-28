@@ -11,7 +11,7 @@ ini_set('display_errors', 0);
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
     
     // require_once __DIR__ . '/session_start.php'; // Removed: File does not exist

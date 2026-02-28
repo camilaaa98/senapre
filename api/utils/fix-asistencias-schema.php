@@ -6,7 +6,7 @@
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $database = new Database();
+    $database = Database::getInstance();
     $conn = $database->getConnection();
     
     echo "Verificando esquema de la tabla asistencias...\n\n";

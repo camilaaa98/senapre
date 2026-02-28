@@ -22,7 +22,7 @@ function safeQuery($conn, $sql, $default = 0) {
 }
 
 try {
-    $db = new Database();
+    $db = Database::getInstance();
     $conn = $db->getConnection();
     
     // 1. Totales Simples (Safe Mode)

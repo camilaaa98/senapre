@@ -7,7 +7,7 @@ ini_set('opcache.enable', 0);
 require_once __DIR__ . '/config/Database.php';
 
 try {
-    $db = new Database();
+    $db = Database::getInstance();
     $conn = $db->getConnection();
     
     $search = '3312828';
