@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel exclusivo de vocería — SenApre SENA">
+    <title>Panel Vocería - SenApre</title>
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/vocero.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="voc-container">
+
+        <!-- SIDEBAR EXCLUSIVO VOCERO -->
+        <aside class="voc-sidebar">
+            <div class="voc-sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo">
+                <h3 id="voc-nombre-sidebar">Vocero</h3>
+                <div class="voc-badge"><i class="fas fa-star"></i> Vocería</div>
+                <p class="voc-ficha-tag">Ficha: <span id="voc-ficha-sidebar">—</span></p>
+            </div>
+            <nav class="voc-nav">
+                <a href="vocero-dashboard.html" class="active"><i class="fas fa-home"></i> Inicio</a>
+                <a href="#voc-resumen-seccion" onclick="irA('voc-resumen-seccion')">
+                    <i class="fas fa-chart-bar"></i> Informe de Estados
+                </a>
+                <a href="#voc-seccion-aprendices" onclick="irA('voc-seccion-aprendices')">
+                    <i class="fas fa-user-graduate"></i> Listado de Aprendices
+                </a>
+                <a href="#" onclick="exportarPDF()">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </a>
+            </nav>
+            <nav class="voc-nav voc-nav-footer">
+                <a href="index.html" onclick="cerrarSesion(event)">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </nav>
+            <div class="voc-sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="voc-main">
+
+            <!-- ── Encabezado ─────────────────────────────────── -->
+            <div class="voc-header">
+                <div class="voc-header-left">
+                    <h1>Panel de Vocería</h1>
+                    <p id="voc-tipo-label">Vocero/a — Ficha asignada</p>
+                </div>
+                <div class="voc-header-right">
+                    <div class="voc-ficha-label">FICHA</div>
+                    <div class="voc-ficha-num" id="voc-ficha-header">—</div>
+                </div>
+            </div>
+
+            <!-- ── Indicadores Principales (5 tarjetas) ───────── -->
+            <div class="voc-stats-extended">
+                <div class="voc-stat-sm">
+                    <div class="voc-stat-sm-num" id="st-total">—</div>
+                    <div class="voc-stat-sm-label">Total Aprendices</div>
+                </div>
+                <div class="voc-stat-sm s-verde">
+                    <div class="voc-stat-sm-num" id="st-lectiva">—</div>
+                    <div class="voc-stat-sm-label">Lectiva</div>
+                </div>
+                <div class="voc-stat-sm s-rojo">
+                    <div class="voc-stat-sm-num" id="st-cancelado">—</div>
+                    <div class="voc-stat-sm-label">Cancelado</div>
+                </div>
+                <div class="voc-stat-sm s-amarillo">
+                    <div class="voc-stat-sm-num" id="st-retirado">—</div>
+                    <div class="voc-stat-sm-label">Retirado</div>
+                </div>
+                <div class="voc-stat-sm s-gris">
+                    <div class="voc-stat-sm-num" id="st-otros">—</div>
+                    <div class="voc-stat-sm-label">Otros</div>
+                </div>
+            </div>
+
+            <!-- ── Sección: Informe de Estados + Gráficas ─────── -->
+            <div id="voc-resumen-seccion" class="voc-charts">
+
+                <!-- Gráfica de Dona -->
+                <div class="voc-chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Distribución por Estado</h3>
+                    <div class="voc-chart-wrap">
+                        <canvas id="chart-dona"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfica de Barras -->
+                <div class="voc-chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Aprendices por Estado</h3>
+                    <div class="voc-chart-wrap">
+                        <canvas id="chart-barras"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Tabla Resumen Oficial de Estados ───────────── -->
+            <div class="voc-tabla-estados" style="margin-bottom: 25px;">
+                <h3><i class="fas fa-table"></i> Resumen Oficial de Aprendices</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                            <th>Porcentaje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-estados-body">
+                        <tr>
+                            <td colspan="3">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ── Listado Activos de Aprendices ──────────────── -->
+            <div class="voc-table-card" id="voc-seccion-aprendices">
+                <div class="voc-table-header">
+                    <h2>
+                        <i class="fas fa-users"></i>
+                        Gestión de Aprendices — Ficha <span id="voc-ficha-tabla">—</span>
+                    </h2>
+                    <div class="voc-filters">
+                        <input type="text" class="voc-input" id="filtro-search"
+                            placeholder="Buscar nombre o documento..." oninput="filtrarTabla()">
+                        <select class="voc-select" id="filtro-estado" onchange="filtrarTabla()">
+                            <option value="">Solo activos (Lectiva)</option>
+                            <option value="TODOS">Ver todos</option>
+                            <option value="LECTIVA">Lectiva</option>
+                            <option value="CANCELADO">Cancelado</option>
+                            <option value="RETIRADO">Retirado</option>
+                            <option value="APLAZADO">Aplazado</option>
+                            <option value="TRASLADO">Traslado</option>
+                        </select>
+                        <button class="voc-btn voc-btn-pdf" onclick="exportarPDF()">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="voc-aviso-filtro" id="aviso-filtro">
+                    <i class="fas fa-info-circle"></i>
+                    Mostrando únicamente aprendices en estado <strong>LECTIVA</strong> (activos).
+                    Use el filtro para ver todos los estados.
+                </div>
+
+                <div id="voc-tabla-body">
+                    <div class="voc-loading">
+                        <i class="fas fa-spinner"></i>
+                        Cargando aprendices...
+                    </div>
+                </div>
+
+                <div class="voc-pag" id="voc-paginacion"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- DEPENDENCIAS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/vocero/vocero-dashboard.js?v=1.1.0"></script>
+</body>
+
+</html>

@@ -237,14 +237,26 @@ async function cargarInstructoresParaLider() {
 async function cargarAprendices(pagina = 1) {
     try {
         const user = authSystem.getCurrentUser();
+        console.group("DEBUG SENAPRE: Carga de Aprendices");
+        console.log("1. Usuario recuperado:", user);
+
+        if (!user) {
+            console.error("ERROR: No hay usuario en sesión");
+            console.groupEnd();
+            return;
+        }
+
         const search = document.getElementById('filtroSearch')?.value || '';
         let ficha = document.getElementById('filtroFicha')?.value || '';
         const estado = document.getElementById('filtroEstado')?.value || '';
         let urlPoblacion = '';
 
         const rol = (user.rol || '').toLowerCase();
-        // Restricción automática para Voceros
         const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+
+        console.log("2. Rol detectado:", rol);
+        console.log("3. Ámbitos (Scopes):", scopes);
+
         if (user && rol === 'vocero' && scopes.length > 0) {
             const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
             const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
@@ -254,6 +266,7 @@ async function cargarAprendices(pagina = 1) {
                 urlPoblacion = `&tabla_poblacion=${scopeEnfoque.poblacion}`;
             } else if (scopeFicha) {
                 ficha = scopeFicha.ficha;
+                console.log("DEBUG VOCERO FICHA:", ficha);
                 // Bloquear el filtro visualmente
                 const selFicha = document.getElementById('filtroFicha');
                 if (selFicha) {
@@ -271,8 +284,13 @@ async function cargarAprendices(pagina = 1) {
         if (estado) url += `&estado=${encodeURIComponent(estado)}`;
         if (filtroPoblacionActivo) url += `&poblacion=${encodeURIComponent(filtroPoblacionActivo)}`;
 
+        console.log("4. URL FINAL GENERADA:", url);
+
         const response = await fetch(url);
         const result = await response.json();
+
+        console.log("5. RESPUESTA DEL SERVIDOR:", result);
+        console.groupEnd();
 
         if (result.success) {
             todosAprendices = result.data;
@@ -294,7 +312,7 @@ function mostrarAprendices(aprendices) {
     if (!tbody) return;
 
     if (!aprendices || aprendices.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron aprendices registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">No se encontraron aprendices registrados para los filtros seleccionados</td></tr>';
         return;
     }
 

@@ -5,7 +5,7 @@
 
 require_once __DIR__ . '/api/config/Database.php';
 
-$db = new Database();
+$db = Database::getInstance();
 $conn = $db->getConnection();
 
 echo "=== VERIFICACIÓN REAL DEL SISTEMA ===\n\n";

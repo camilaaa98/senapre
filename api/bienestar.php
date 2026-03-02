@@ -53,7 +53,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['doc_p'], 'nombre' => $row['nom_p'], 'apellido' => $row['ape_p'],
                             'correo' => $row['cor_p'], 'telefono' => $row['tel_p'], 'tipo' => 'Vocero Principal',
-                            'detalle' => "Ficha: " . $row['numero_ficha'],
+                            'detalle' => $row['numero_ficha'],
                             'poblacion' => $row['pob_p'] ?? 'Ninguna'
                         ];
                     }
@@ -61,7 +61,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['doc_s'], 'nombre' => $row['nom_s'], 'apellido' => $row['ape_s'],
                             'correo' => $row['cor_s'], 'telefono' => $row['tel_s'], 'tipo' => 'Vocero Suplente',
-                            'detalle' => "Ficha: " . $row['numero_ficha'],
+                            'detalle' => $row['numero_ficha'],
                             'poblacion' => $row['pob_s'] ?? 'Ninguna'
                         ];
                     }
@@ -79,7 +79,7 @@ try {
                     $lideres[] = [
                         'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
                         'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Vocero Enfoque',
-                        'detalle' => "Población: " . $row['tipo_poblacion'],
+                        'detalle' => $row['numero_ficha'],
                         'poblacion' => $row['pob_a'] ?? $row['tipo_poblacion']
                     ];
                 }
@@ -96,7 +96,7 @@ try {
                     $lideres[] = [
                         'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
                         'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Representante',
-                        'detalle' => "Jornada: " . $row['jornada'],
+                        'detalle' => $row['numero_ficha'],
                         'poblacion' => $row['pob_a'] ?? 'Ninguna'
                     ];
                 }

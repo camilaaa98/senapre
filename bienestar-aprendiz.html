@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel de Bienestar del Aprendiz — SenApre SENA">
+    <title>Bienestar del Aprendiz - SenApre</title>
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/bienestar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="bw-container">
+
+        <!-- SIDEBAR EXCLUSIVO BIENESTAR -->
+        <aside class="bw-sidebar">
+            <div class="bw-sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo">
+                <h3 id="bw-nombre">Bienestar</h3>
+                <div class="bw-badge"><i class="fas fa-heartbeat"></i> Bienestar</div>
+            </div>
+            <nav class="bw-nav">
+                <a href="bienestar-aprendiz.html" class="active"><i class="fas fa-home"></i> Inicio</a>
+                <a href="#" onclick="mostrarTab('aprendices', this)"><i class="fas fa-user-graduate"></i> Aprendices</a>
+                <a href="#" onclick="mostrarTab('lideres', this)"><i class="fas fa-star"></i> Líderes / Voceros</a>
+                <a href="#" onclick="mostrarTab('poblacion', this)"><i class="fas fa-layer-group"></i> Tipo de
+                    Población</a>
+            </nav>
+            <nav class="bw-nav bw-nav-footer">
+                <a href="#" onclick="cerrarSesion(event)"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+            </nav>
+            <div class="bw-sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="bw-main">
+
+            <div class="bw-header">
+                <h1><i class="fas fa-heartbeat"></i> Bienestar del Aprendiz</h1>
+                <p>Panel de gestión y seguimiento del bienestar estudiantil — SENA CTPI</p>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="bw-stats">
+                <div class="bw-stat">
+                    <div class="bw-stat-icon">🎓</div>
+                    <div class="bw-stat-num" id="bw-total">—</div>
+                    <div class="bw-stat-label">Total Aprendices</div>
+                </div>
+                <div class="bw-stat bw-verde">
+                    <div class="bw-stat-icon">✅</div>
+                    <div class="bw-stat-num" id="bw-activos">—</div>
+                    <div class="bw-stat-label">En Formación</div>
+                </div>
+                <div class="bw-stat">
+                    <div class="bw-stat-icon">📋</div>
+                    <div class="bw-stat-num" id="bw-fichas">—</div>
+                    <div class="bw-stat-label">Fichas Activas</div>
+                </div>
+                <div class="bw-stat bw-amarillo">
+                    <div class="bw-stat-icon">⭐</div>
+                    <div class="bw-stat-num" id="bw-lideres">—</div>
+                    <div class="bw-stat-label">Líderes Registrados</div>
+                </div>
+            </div>
+
+            <!-- Panel con Pestañas -->
+            <div class="bw-card">
+                <div class="bw-tabs">
+                    <div class="bw-tab active" id="tab-aprendices" onclick="mostrarTab('aprendices', this)">
+                        <i class="fas fa-user-graduate"></i> Aprendices
+                    </div>
+                    <div class="bw-tab" id="tab-lideres" onclick="mostrarTab('lideres', this)">
+                        <i class="fas fa-star"></i> Líderes Estudiantiles
+                    </div>
+                    <div class="bw-tab" id="tab-poblacion" onclick="mostrarTab('poblacion', this)">
+                        <i class="fas fa-layer-group"></i> Tipo de Población
+                    </div>
+                </div>
+
+                <!-- TAB: APRENDICES -->
+                <div id="panel-aprendices">
+                    <div class="bw-card-header">
+                        <h2>Listado General de Aprendices</h2>
+                        <div class="bw-filters">
+                            <input type="text" class="bw-input" id="bw-search" placeholder="Buscar nombre, documento..."
+                                oninput="filtrarAprendices()">
+                            <select class="bw-select" id="bw-estado" onchange="filtrarAprendices()">
+                                <option value="">Todos los estados</option>
+                                <option value="LECTIVA">Lectiva</option>
+                                <option value="CANCELADO">Cancelado</option>
+                                <option value="RETIRADO">Retirado</option>
+                                <option value="APLAZADO">Aplazado</option>
+                                <option value="TRASLADO">Traslado</option>
+                            </select>
+                            <select class="bw-select" id="bw-ficha" onchange="filtrarAprendices()">
+                                <option value="">Todas las fichas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="bw-tabla-aprendices">
+                        <div class="bw-loading"><i class="fas fa-spinner"></i> Cargando aprendices...</div>
+                    </div>
+                    <div class="bw-pag" id="bw-pag-aprendices"></div>
+                </div>
+
+                <!-- TAB: LÍDERES -->
+                <div id="panel-lideres" class="bw-panel-oculto">
+                    <div class="bw-card-header">
+                        <h2>Líderes Estudiantiles Registrados</h2>
+                    </div>
+                    <div id="bw-tabla-lideres">
+                        <div class="bw-loading"><i class="fas fa-spinner"></i> Cargando líderes...</div>
+                    </div>
+                </div>
+
+                <!-- TAB: POBLACIÓN -->
+                <div id="panel-poblacion" class="bw-panel-oculto">
+                    <div class="bw-card-header">
+                        <h2>Aprendices por Tipo de Población</h2>
+                    </div>
+                    <div id="bw-tabla-poblacion">
+                        <div class="bw-loading"><i class="fas fa-spinner"></i> Cargando datos...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- DEPENDENCIAS -->
+    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/bienestar/bienestar-aprendiz.js?v=1.0.0"></script>
+</body>
+
+</html>

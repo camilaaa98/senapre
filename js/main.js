@@ -65,17 +65,8 @@ class AuthSystem {
             const result = await response.json();
 
             if (result.success && result.data) {
-                // Normalize data structure if needed
-                this.currentUser = {
-                    id: result.data.id_usuario,
-                    nombre: result.data.nombre,
-                    apellido: result.data.apellido,
-                    correo: result.data.correo,
-                    rol: result.data.rol,
-                    instructor_data: result.data.instructor_data,
-                    bienestar_data: result.data.bienestar_data || []
-                };
-
+                // Guardar objeto completo para no perder scopes, instructor_data, etc.
+                this.currentUser = result.data;
                 localStorage.setItem(this.storageKey, JSON.stringify(this.currentUser));
                 return this.currentUser;
             } else {
@@ -110,17 +101,22 @@ class AuthSystem {
     isAdmin() {
         if (!this.currentUser) return false;
         const rol = this.currentUser.rol.toLowerCase();
-        return ['director', 'administrativo', 'coordinador', 'admin', 'administrador', 'vocero'].includes(rol);
+        // Vocero NO es administrador — tiene su propio panel exclusivo
+        return ['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol);
     }
 
     redirectToDashboard() {
         if (!this.currentUser) return;
-
         const rol = this.currentUser.rol.toLowerCase();
-        if (['director', 'administrativo', 'coordinador', 'admin', 'administrador', 'vocero'].includes(rol)) {
-            window.location.href = 'admin-dashboard.html';
+        // Cada rol va a su página exclusiva
+        if (rol === 'vocero') {
+            window.location.href = 'vocero-dashboard.html';
+        } else if (rol === 'bienestar') {
+            window.location.href = 'bienestar-aprendiz.html';
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard.html';
+        } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
+            window.location.href = 'admin-dashboard.html';
         }
     }
 }
@@ -416,7 +412,7 @@ function filtrarDashboardParaBienestar(esRespLiderazgo = false) {
         btnRepo.style.background = '#00324D';
     }
 
-    // Mostrar panel de estadísticas para Jefe de Bienestar (o también resp liderazgo si se desea)
+    // Mostrar panel de estadísticas para Jefe de Bienestar y Responsable de Liderazgo
     const panelStats = document.getElementById('panel-estadisticas-poblacion');
     if (panelStats) {
         panelStats.style.display = 'block';

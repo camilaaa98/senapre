@@ -129,17 +129,21 @@
                 }
 
                 if (data.success) {
-                    // Store user data
-                    localStorage.setItem('user', JSON.stringify(data.data));
+                    // Store user data (Ensure full object is stored for scopes)
+                    const userToStore = data.data;
+                    localStorage.setItem('user', JSON.stringify(userToStore));
 
-                    // Redirect based on role
+                    // Redirigir según el rol exacto — cada rol a su página exclusiva
                     const userRol = data.data.rol.toLowerCase();
                     if (userRol === 'vocero') {
-                        window.location.href = 'admin-dashboard.html';
+                        // Panel exclusivo de voceros — sin módulos del director
+                        window.location.href = 'vocero-dashboard.html';
                     } else if (userRol === 'instructor') {
                         window.location.href = 'instructor-dashboard.html';
+                    } else if (userRol === 'bienestar') {
+                        // Panel exclusivo de Bienestar del Aprendiz
+                        window.location.href = 'bienestar-aprendiz.html';
                     } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
-                        // Si es Jefe de Bienestar
                         const isBienestar = data.data.bienestar_data && data.data.bienestar_data.includes('jefe_bienestar');
                         if (isBienestar && userRol !== 'director') {
                             window.location.href = 'jefe-bienestar-dashboard.html';

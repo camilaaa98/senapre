@@ -295,12 +295,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/admin/dashboard.js"></script>
+    <script src="js/main.js?v=1.0.5"></script>
+    <script src="js/admin/dashboard.js?v=1.0.5"></script>
     <script>
         const user = authSystem.getCurrentUser();
+        const userRolAdmin = (user?.rol || '').toLowerCase();
 
-        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
+        // Guardia de seguridad: redirigir cada rol a su página exclusiva
+        if (!authSystem.isAuthenticated()) {
+            window.location.href = 'index.html';
+        } else if (userRolAdmin === 'vocero') {
+            // Voceros no deben ver esta página — tienen su panel exclusivo
+            window.location.href = 'vocero-dashboard.html';
+        } else if (!authSystem.isAdmin()) {
             window.location.href = 'index.html';
         }
 

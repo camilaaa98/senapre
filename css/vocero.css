@@ -1,0 +1,592 @@
+/* Estructura general */
+.voc-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.voc-sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #00324D 0%, #004f75 100%);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.voc-sidebar-header {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.voc-sidebar-header img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 12px;
+}
+
+.voc-sidebar-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.voc-badge {
+    background: #39A900;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.voc-ficha-tag {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+.voc-nav {
+    padding: 15px 0;
+    flex: 1;
+}
+
+.voc-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.voc-nav a:hover,
+.voc-nav a.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    border-left-color: #39A900;
+}
+
+.voc-nav a i {
+    width: 20px;
+    text-align: center;
+}
+
+.voc-nav-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voc-sidebar-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voc-sidebar-footer img {
+    height: 45px;
+    opacity: 0.8;
+}
+
+/* ── Contenido Principal ──────────────────────────────────── */
+.voc-main {
+    margin-left: 240px;
+    padding: 30px;
+    flex: 1;
+    min-height: 100vh;
+}
+
+/* ── Encabezado ───────────────────────────────────────────── */
+.voc-header {
+    background: white;
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 5px solid #39A900;
+}
+
+.voc-header-left h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1e293b;
+    text-align: left;
+}
+
+.voc-header-left p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.voc-header-right {
+    text-align: center;
+}
+
+.voc-ficha-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00324D;
+}
+
+.voc-ficha-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ── Tarjetas de Estadísticas ─────────────────────────────── */
+.voc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.voc-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    border-top: 4px solid #00324D;
+}
+
+.voc-stat-card.voc-verde {
+    border-top-color: #39A900;
+}
+
+.voc-stat-card.voc-amarillo {
+    border-top-color: #f59e0b;
+}
+
+.voc-stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.voc-stat-num {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 5px 0;
+}
+
+.voc-stat-label {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* ── Tabla de Aprendices ──────────────────────────────────── */
+.voc-table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.voc-table-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.voc-table-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.voc-filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.voc-input {
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 220px;
+}
+
+.voc-input:focus {
+    border-color: #00324D;
+}
+
+.voc-select {
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+}
+
+.voc-btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s;
+}
+
+.voc-btn-pdf {
+    background: #dc2626;
+    color: white;
+}
+
+.voc-btn-pdf:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+/* ── Tabla General ────────────────────────────────────────── */
+.voc-table-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.voc-table-card th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.voc-table-card td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.88rem;
+    color: #374151;
+}
+
+.voc-table-card tr:hover td {
+    background: #f8fafc;
+}
+
+.voc-table-card tr:last-child td {
+    border-bottom: none;
+}
+
+/* ── Badges de Estado ─────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-lectiva {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-cancelado {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-retirado {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge-aplazado {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.badge-default {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* ── Paginación ───────────────────────────────────────────── */
+.voc-pag {
+    padding: 15px 25px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.voc-pag-btn {
+    padding: 7px 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.voc-pag-btn:hover,
+.voc-pag-btn.active {
+    background: #00324D;
+    color: white;
+    border-color: #00324D;
+}
+
+/* ── Estado de Carga ──────────────────────────────────────── */
+.voc-loading {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+}
+
+.voc-loading i {
+    font-size: 2rem;
+    animation: voc-spin 1s linear infinite;
+    display: block;
+    margin-bottom: 10px;
+}
+
+@keyframes voc-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Responsivo ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .voc-sidebar {
+        width: 200px;
+    }
+
+    .voc-main {
+        margin-left: 200px;
+        padding: 15px;
+    }
+
+    .voc-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .voc-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .voc-resumen {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Panel de Gráficas ────────────────────────────────────── */
+.voc-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.voc-chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.voc-chart-card h3 {
+    margin: 0 0 16px;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+    border-left: 3px solid #39A900;
+    padding-left: 10px;
+}
+
+.voc-chart-wrap {
+    position: relative;
+    height: 220px;
+}
+
+/* ── Tabla de Resumen de Estados ──────────────────────────── */
+.voc-tabla-estados {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.voc-tabla-estados h3 {
+    margin: 0;
+    padding: 18px 22px;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+    border-left: 3px solid #00324D;
+    padding-left: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.voc-tabla-estados table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.voc-tabla-estados th {
+    background: #00324D;
+    color: white;
+    padding: 12px 18px;
+    text-align: left;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.voc-tabla-estados td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.voc-tabla-estados tbody tr:last-child td {
+    font-weight: 700;
+    background: #f8fafc;
+    color: #00324D;
+    border-bottom: none;
+    font-size: 0.95rem;
+}
+
+.voc-tabla-estados tbody tr:hover:not(:last-child) td {
+    background: #f8fafc;
+}
+
+.voc-estado-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.dot-lectiva {
+    background: #39A900;
+}
+
+.dot-cancelado {
+    background: #dc2626;
+}
+
+.dot-retirado {
+    background: #f59e0b;
+}
+
+.dot-aplazado {
+    background: #64748b;
+}
+
+.dot-traslado {
+    background: #94a3b8;
+}
+
+.dot-total {
+    background: #00324D;
+}
+
+/* ── Aviso de filtrado activos ────────────────────────────── */
+.voc-aviso-filtro {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.83rem;
+    color: #15803d;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Stats expandidas (5 indicadores) ─────────────────────── */
+.voc-stats-extended {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.voc-stat-sm {
+    background: white;
+    border-radius: 10px;
+    padding: 18px 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    text-align: center;
+    border-top: 3px solid #00324D;
+}
+
+.voc-stat-sm.s-verde {
+    border-top-color: #39A900;
+}
+
+.voc-stat-sm.s-rojo {
+    border-top-color: #dc2626;
+}
+
+.voc-stat-sm.s-amarillo {
+    border-top-color: #f59e0b;
+}
+
+.voc-stat-sm.s-gris {
+    border-top-color: #94a3b8;
+}
+
+.voc-stat-sm-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 4px 0;
+    line-height: 1;
+}
+
+.voc-stat-sm-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 4px;
+}

@@ -63,10 +63,10 @@ class AuthController {
             // Datos específicos si es VOCERO
             $voceroScopes = [];
             if ($usuario['rol'] === 'vocero') {
-                $doc = $usuario['id_usuario'];
+                $doc = trim($usuario['id_usuario']);
                 
                 // 1. ¿Es vocero principal?
-                $stmt = $this->conn->prepare("SELECT numero_ficha FROM fichas WHERE vocero_principal = :doc");
+                $stmt = $this->conn->prepare("SELECT numero_ficha FROM fichas WHERE TRIM(vocero_principal) = :doc");
                 $stmt->execute([':doc' => $doc]);
                 $f = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($f as $row) {
@@ -74,7 +74,7 @@ class AuthController {
                 }
 
                 // 2. ¿Es vocero suplente?
-                $stmt = $this->conn->prepare("SELECT numero_ficha FROM fichas WHERE vocero_suplente = :doc");
+                $stmt = $this->conn->prepare("SELECT numero_ficha FROM fichas WHERE TRIM(vocero_suplente) = :doc");
                 $stmt->execute([':doc' => $doc]);
                 $f = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($f as $row) {
@@ -82,7 +82,7 @@ class AuthController {
                 }
 
                 // 3. ¿Es vocero de enfoque?
-                $stmt = $this->conn->prepare("SELECT tipo_poblacion FROM voceros_enfoque WHERE documento = :doc");
+                $stmt = $this->conn->prepare("SELECT tipo_poblacion FROM voceros_enfoque WHERE TRIM(documento) = :doc");
                 $stmt->execute([':doc' => $doc]);
                 $f = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($f as $row) {
@@ -90,12 +90,14 @@ class AuthController {
                 }
 
                 // 4. ¿Es representante?
-                $stmt = $this->conn->prepare("SELECT jornada FROM representantes_jornada WHERE documento = :doc");
+                $stmt = $this->conn->prepare("SELECT jornada FROM representantes_jornada WHERE TRIM(documento) = :doc");
                 $stmt->execute([':doc' => $doc]);
                 $f = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($f as $row) {
                     $voceroScopes[] = ['tipo' => 'representante', 'jornada' => $row['jornada']];
                 }
+                
+                error_log("AuthController: Vocero $doc procesado. Scopes: " . count($voceroScopes));
             }
 
             // Registrar login en logs (BD)
@@ -111,7 +113,8 @@ class AuthController {
                 'instructor_data' => $instructorData,
                 'bienestar_data' => $bienestarData,
                 'vocero_scope' => !empty($voceroScopes) ? $voceroScopes[0] : null,
-                'vocero_scopes' => $voceroScopes
+                'vocero_scopes' => $voceroScopes,
+                'id_usuario_str' => (string)$usuario['id_usuario']
             ];
 
             return $this->response(200, 'Login exitoso', $response);

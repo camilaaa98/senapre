@@ -921,6 +921,10 @@ body {
 }
 
 /* Secciones de Contenido */
+.sidebar-menu .menu-item {
+    display: none;
+}
+
 .content-section {
     display: none;
 }

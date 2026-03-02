@@ -38,16 +38,20 @@ try {
         }
         
         if (!empty($ficha)) {
-            $where[] = "a.numero_ficha = :ficha";
-            $params[':ficha'] = $ficha;
+            // Limpiar ficha y asegurar comparación robusta
+            $fichaBusqueda = trim($ficha);
+            $where[] = "(a.numero_ficha = :ficha OR a.numero_ficha LIKE :ficha_like)";
+            $params[':ficha'] = $fichaBusqueda;
+            $params[':ficha_like'] = "%$fichaBusqueda%";
         }
         
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } elseif (empty($tabla_poblacion)) {
-            // Por defecto, excluir estados inactivos SOLO si no estamos viendo una población específica
-            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO')";
+        } elseif (empty($tabla_poblacion) && empty($ficha)) {
+            // EXCLUIR estados de inactividad total SOLO si no se filtra por FICHA o POBLACIÓN
+            // Queremos que el vocero vea TODO en su ficha, incluso los cancelados si los hay.
+            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA')";
         }
 
         if (!empty($tabla_poblacion)) {

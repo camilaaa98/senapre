@@ -1,6 +1,4 @@
-/**
- * Dashboard Admin - AsistNet
- */
+
 
 document.addEventListener('DOMContentLoaded', () => {
     cargarEstadisticas();
@@ -9,8 +7,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarEstadisticas() {
     try {
-        const response = await fetch('api/reportes.php');
+        const user = typeof authSystem !== 'undefined' ? authSystem.getCurrentUser() : JSON.parse(localStorage.getItem('user'));
+        console.group("DEBUG DASHBOARD: Estadísticas");
+        console.log("1. Usuario recuperado:", user);
+
+        let params = '';
+        if (user && (user.rol || '').toLowerCase() === 'vocero') {
+            const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+            console.log("2. Scopes detectados:", scopes);
+            const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
+            const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
+
+            if (scopeFicha) {
+                params = `?ficha=${scopeFicha.ficha}`;
+                console.log("3. Parametrizando Ficha:", scopeFicha.ficha);
+            } else if (scopeEnfoque) {
+                params = `?tabla_poblacion=${scopeEnfoque.poblacion}`;
+                console.log("3. Parametrizando Población:", scopeEnfoque.poblacion);
+            }
+        }
+
+        const url = `api/reportes.php${params}`;
+        console.log("4. URL Final:", url);
+
+        const response = await fetch(url);
         const result = await response.json();
+        console.log("5. Resultado API:", result);
+        console.groupEnd();
 
         if (result.success) {
             const data = result.data?.resumen || {};
@@ -28,7 +51,18 @@ async function cargarEstadisticas() {
 
 async function cargarGraficaAprendices() {
     try {
-        const response = await fetch('api/reportes.php');
+        const user = typeof authSystem !== 'undefined' ? authSystem.getCurrentUser() : JSON.parse(localStorage.getItem('user'));
+        let params = '';
+        if (user && user.rol.toLowerCase() === 'vocero') {
+            const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+            const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
+            const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
+
+            if (scopeFicha) params = `?ficha=${scopeFicha.ficha}`;
+            else if (scopeEnfoque) params = `?tabla_poblacion=${scopeEnfoque.poblacion}`;
+        }
+
+        const response = await fetch(`api/reportes.php${params}`);
         const result = await response.json();
 
         if (result.success && result.data?.aprendices_estado) {

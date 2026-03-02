@@ -1,8 +1,5 @@
 <?php
-/**
- * Reportes API - Versión Robusta
- */
-header('Content-Type: application/json');
+er('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET');
 
@@ -22,29 +19,70 @@ function safeQuery($conn, $sql, $default = 0) {
 }
 
 try {
-    $db = Database::getInstance();
-    $conn = $db->getConnection();
+    $ficha = $_GET['ficha'] ?? '';
+    $tabla_poblacion = $_GET['tabla_poblacion'] ?? '';
     
-    // 1. Totales Simples (Safe Mode)
-    $totalAprendices = safeQuery($conn, "SELECT COUNT(*) as total FROM aprendices");
-    $totalFichas = safeQuery($conn, "SELECT COUNT(*) as total FROM fichas");
-    $totalInstructores = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios WHERE rol = 'instructor'");
-    $totalUsuarios = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios");
-    $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
+    $where = "";
+    $whereA = ""; // Alias 'a' para aprendices
+    $params = [];
+    
+    if (!empty($ficha)) {
+        $where = " WHERE numero_ficha = :ficha";
+        $whereA = " WHERE a.numero_ficha = :ficha";
+        $params[':ficha'] = trim($ficha);
+    } elseif (!empty($tabla_poblacion)) {
+        $tablasPermitidas = ['mujer', 'indigena', 'indígena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        if (in_array(strtolower($tabla_poblacion), $tablasPermitidas)) {
+            $tableName = strtolower($tabla_poblacion === 'indígena' ? 'indígena' : $tabla_poblacion);
+            $where = " WHERE documento IN (SELECT documento FROM `$tableName`)";
+            $whereA = " WHERE a.documento IN (SELECT documento FROM `$tableName`)";
+        }
+    }
+
+    // 1. Totales Simples con Filtrado de Ámbito
+    $totalAprendices = 0;
+    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM aprendices $where");
+    $stmt->execute($params);
+    $totalAprendices = $stmt->fetch()['total'];
+
+    $totalFichas = 0;
+    if (!empty($ficha)) {
+        $totalFichas = 1; // Solo su ficha
+    } else {
+        $totalFichas = safeQuery($conn, "SELECT COUNT(*) as total FROM fichas");
+    }
+
+    // Para voceros, usuarios e instructores se limitan a los relevantes de la ficha si es posible, 
+    // pero por ahora mantendremos coherencia con el total de aprendices.
+    $totalInstructores = 0;
+    $totalUsuarios = 0;
+    $totalProgramas = 0;
+
+    if (!empty($ficha)) {
+        // Si hay ficha, solo contamos lo relacionado a esa ficha
+        $totalUsuarios = $totalAprendices; // Solo sus aprendices son "usuarios" visibles
+        $totalInstructores = safeQuery($conn, "SELECT COUNT(DISTINCT id_usuario) as total FROM instructores"); // Instructores son generales o por ficha si tuviéramos tabla relación
+        $totalProgramas = 1; // El programa de su ficha
+    } else {
+        $totalInstructores = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios WHERE rol = 'instructor'");
+        $totalUsuarios = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios");
+        $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
+    }
     
     // 4. Aprendices por Estado
     $aprendicesPorEstado = [];
-    try {
-        $stmt = $conn->query("SELECT estado, COUNT(*) as cantidad FROM aprendices GROUP BY estado");
-        if ($stmt) $aprendicesPorEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {}
+    $stmt = $conn->prepare("SELECT estado, COUNT(*) as cantidad FROM aprendices $where GROUP BY estado");
+    $stmt->execute($params);
+    $aprendicesPorEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // 5. Fichas por Programa
+    // 5. Fichas por Programa (Ocultar si es vocero de una sola ficha)
     $fichasPorPrograma = [];
-    try {
-        $stmt = $conn->query("SELECT nombre_programa, COUNT(*) as cantidad FROM fichas GROUP BY nombre_programa ORDER BY cantidad DESC LIMIT 8");
-        if ($stmt) $fichasPorPrograma = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {}
+    if (empty($ficha)) {
+        try {
+            $stmt = $conn->query("SELECT nombre_programa, COUNT(*) as cantidad FROM fichas GROUP BY nombre_programa ORDER BY cantidad DESC LIMIT 8");
+            if ($stmt) $fichasPorPrograma = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {}
+    }
     
     // 6. Asistencias Recientes
     $asistenciasRecientes = [];

@@ -1,8 +1,4 @@
 <?php
-/**
- * Logout System
- * Destroys server session and cookies
- */
 session_start();
 
 // Destruir todas las variables de sesión
