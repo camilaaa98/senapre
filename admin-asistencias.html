@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Asistencias - AsistNet SENA</title>
+    <title>Consultar Asistencias - SenApre</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -13,11 +14,10 @@
     <div class="dashboard-container">
                         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="assets/img/asi.png" alt="ASI Logo"
-                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
                 <div class="sidebar-subtitle" id="user-role-display"
-                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+                   >Director</div>
             </div>
 
             <nav class="sidebar-menu">
@@ -91,14 +91,13 @@
                     </a>
                 </li>
             </nav>
-            <div class="sidebar-footer"
-                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
-                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
             </div>
         </aside>
 
         <main class="main-content">
-            <div class="content-header" style="text-align: center; margin-bottom: 30px;">
+            <div class="content-header">
                 <h1 class="content-title">Consulta de Asistencias</h1>
                 <p class="content-description">Historial de asistencias registradas</p>
             </div>
@@ -166,15 +165,9 @@
         </main>
     </div>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=1.0.6"></script>
     <script src="js/admin/asistencias.js?v=2"></script>
-    <script>
-        const user = authSystem.getCurrentUser();
-
-        if (!authSystem.isAuthenticated() || !authSystem.isAdmin()) {
-            window.location.href = 'index.html';
-        }
-    </script>
+    
 </body>
 
 </html>
