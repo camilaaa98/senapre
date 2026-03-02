@@ -2,6 +2,10 @@
 /**
  * Aprendices API - Complete CRUD with Pagination and Filters
  */
+// Suprimir warnings para que no contaminen la salida JSON
+error_reporting(0);
+@ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -13,7 +17,7 @@ try {
     $database = Database::getInstance();
     $conn = $database->getConnection();
     
-    $method = $_SERVER['REQUEST_METHOD'];
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     
     // GET - Listar aprendices con paginación y filtros
     if ($method === 'GET') {
