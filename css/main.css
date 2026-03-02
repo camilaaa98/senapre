@@ -22,6 +22,45 @@ body {
     line-height: 1.6;
 }
 
+/* ── Scrollbars Globales y Elegantes (Evitan espacios grises en Windows) ── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Scrollbars específicos para barras laterales oscuras (Admin, Bienestar, Vocero) */
+.sidebar::-webkit-scrollbar,
+.voc-sidebar::-webkit-scrollbar,
+.bw-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.voc-sidebar::-webkit-scrollbar-track,
+.bw-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.voc-sidebar::-webkit-scrollbar-thumb,
+.bw-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
 .text-center {
     text-align: center !important;
 }
@@ -49,6 +88,8 @@ body {
     top: 0;
     height: 100vh;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .sidebar-header {
