@@ -1,3 +1,41 @@
+/**
+ * js/admin/dashboard.js — v2.0.0
+ * Panel de Administración — SenApre SENA
+ * SOLID: Toda la lógica extraída del HTML
+ */
+
+'use strict';
+
+// ── Guarda de seguridad y configuración inicial ───────────────
+(function guardarSeguridad() {
+    const user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
+        ? authSystem.getCurrentUser()
+        : JSON.parse(localStorage.getItem('user') || 'null');
+    const rol = (user?.rol || '').toLowerCase();
+
+    if (!user || !(typeof authSystem !== 'undefined' && authSystem.isAuthenticated())) {
+        window.location.href = 'index.html';
+        return;
+    }
+    if (rol === 'vocero') {
+        window.location.href = 'vocero-dashboard.html';
+        return;
+    }
+    if (typeof authSystem !== 'undefined' && !authSystem.isAdmin()) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Bienvenida personalizada
+    const bienvenida = document.getElementById('admin-bienvenida');
+    if (bienvenida && user) {
+        bienvenida.textContent = `Bienvenido, ${user.nombre || ''} ${user.apellido || ''}`.trim();
+    }
+
+    // Mostrar rol en sidebar
+    const rolDisplay = document.getElementById('user-role-display');
+    if (rolDisplay) rolDisplay.textContent = rol;
+})();
 
 
 document.addEventListener('DOMContentLoaded', () => {
