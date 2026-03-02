@@ -1,414 +1,419 @@
 /**
- * vocero-dashboard.js — v1.2.0
- * Panel Profesional de Vocería con Gráficas e Informe de Estados
- * SENA SenApre — Principios SOLID aplicados
+ * vocero-dashboard.js — v2.0.0 DEFINITIVO
+ * Panel de Vocería — SenApre SENA
+ * Usa api/vocero/dashboard.php directamente con id_usuario
  */
-
 'use strict';
 
 const VoceroDashboard = (() => {
-    // ── Estado del módulo ──────────────────────────────────────
+
+    // Estado interno
     let vocFicha = '';
     let vocNombre = '';
     let vocTipo = '';
-    let todosAprendices = [];
+    let idUsuario = '';
+    let aprendices = [];       // todos
     let paginaActual = 1;
-    const POR_PAGINA = 20;
+    const POR_PAG = 20;
 
-    const ESTADOS_INACTIVOS = new Set(['CANCELADO', 'RETIRADO', 'APLAZADO', 'TRASLADO', 'FINALIZADO']);
+    const INACTIVOS = new Set(['CANCELADO', 'RETIRADO', 'APLAZADO', 'TRASLADO', 'FINALIZADO']);
+    const COL = { LECTIVA: '#39A900', CANCELADO: '#dc2626', RETIRADO: '#f59e0b', APLAZADO: '#64748b', TRASLADO: '#94a3b8' };
 
-    const COLORES_ESTADO = {
-        LECTIVA: '#39A900',
-        CANCELADO: '#dc2626',
-        RETIRADO: '#f59e0b',
-        APLAZADO: '#64748b',
-        TRASLADO: '#94a3b8',
-    };
-    const COLOR_DEFECTO = '#cbd5e1';
+    let chartDona = null, chartBar = null;
 
-    let chartDona = null;
-    let chartBarras = null;
-
-    // ── Inicialización (async — robusta) ───────────────────────
+    // ────────────────────────────────────────────────────────────
+    // INICIALIZACIÓN
+    // ────────────────────────────────────────────────────────────
     async function init() {
-        const user = _obtenerUsuario();
-        if (!user) { window.location.href = 'index.html'; return; }
+        // 1. Leer usuario del localStorage
+        let user = null;
+        try {
+            user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
+                ? authSystem.getCurrentUser()
+                : JSON.parse(localStorage.getItem('user') || 'null');
+        } catch { }
+
+        if (!user) { location.href = 'index.html'; return; }
         if ((user.rol || '').toLowerCase() !== 'vocero') {
             localStorage.removeItem('user');
-            window.location.href = 'index.html';
+            location.href = 'index.html';
             return;
         }
 
-        vocNombre = (`${user.nombre || ''} ${user.apellido || ''}`).trim();
-        _setText('voc-nombre-sidebar', vocNombre || 'Vocero');
+        idUsuario = String(user.id_usuario || user.id || '').trim();
+        vocNombre = `${user.nombre || ''} ${user.apellido || ''}`.trim();
 
-        // ─ Intentar obtener ficha desde los scopes guardados ──
-        const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
-        const scope = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
+        $('voc-nombre-sidebar', vocNombre || 'Vocero');
+        $('voc-tipo-label', 'Cargando ficha...');
+        cargando('voc-tabla-body');
 
-        if (scope && scope.ficha) {
-            vocFicha = scope.ficha;
-            vocTipo = scope.tipo === 'principal' ? 'Vocero/a Principal' : 'Vocero/a Suplente';
-        } else {
-            // ─ Fallback: Sesión vieja — renovar buscando la ficha via API de auth ─
-            try {
-                const idUsuario = user.id_usuario || user.id || '';
-                const resp = await fetch(`api/fichas.php?vocero=${encodeURIComponent(idUsuario)}`);
-                const data = await resp.json();
-
-                if (data.success && data.data && data.data.length > 0) {
-                    vocFicha = data.data[0].numero_ficha;
-                    vocTipo = 'Vocero/a';
-                    // Actualizar localStorage para próximas sesiones
-                    user.vocero_scopes = [{ tipo: 'principal', ficha: vocFicha }];
-                    localStorage.setItem('user', JSON.stringify(user));
-                } else {
-                    // No se encontró ficha asignada
-                    _mostrarError('voc-tabla-body',
-                        'No tiene una ficha asignada. Contacte al administrador del sistema.');
-                    _resetIndicadores();
-                    return;
-                }
-            } catch (e) {
-                _mostrarError('voc-tabla-body', 'Error al obtener la ficha. Recargue la página.');
-                _resetIndicadores();
-                return;
-            }
-        }
-
-        vocTipo = vocTipo || 'Vocero/a';
-        _setText('voc-ficha-sidebar', vocFicha);
-        _setText('voc-ficha-header', vocFicha);
-        _setText('voc-ficha-tabla', vocFicha);
-        _setText('voc-tipo-label', `${vocTipo} — Ficha ${vocFicha}`);
-        document.title = `Panel Vocería — Ficha ${vocFicha}`;
-
-        cargarAprendices();
+        // 2. Llamar al endpoint dedicado
+        await cargarDatos();
     }
 
-    // ── Carga de aprendices ────────────────────────────────────
-    async function cargarAprendices() {
-        _mostrarCargando('voc-tabla-body');
+    // ────────────────────────────────────────────────────────────
+    // CARGA DE DATOS DESDE ENDPOINT DEDICADO
+    // ────────────────────────────────────────────────────────────
+    async function cargarDatos() {
+        if (!idUsuario) { err('voc-tabla-body', 'No se pudo identificar al usuario. Por favor cierre sesión y vuelva a ingresar.'); return; }
+
         try {
-            const resp = await fetch(`api/aprendices.php?ficha=${encodeURIComponent(vocFicha)}&limit=500&page=1`);
-            const data = await resp.json();
+            const resp = await fetch(`api/vocero/dashboard.php?id_usuario=${encodeURIComponent(idUsuario)}`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const json = await resp.json();
 
-            if (data.success && data.data && data.data.length > 0) {
-                todosAprendices = data.data;
-                _actualizarIndicadores();
-                _renderTablaEstados();
-                _renderGraficas();
-                paginaActual = 1;
-                renderizarTabla();
-            } else {
-                _mostrarInfo('voc-tabla-body', 'No se encontraron aprendices para esta ficha.');
-                _resetIndicadores();
-                _vaciarTablaEstados();
-            }
-        } catch (err) {
-            console.error('Error al cargar aprendices:', err);
-            _mostrarError('voc-tabla-body', 'Error al cargar datos. Recargue la página.');
+            if (!json.success) { err('voc-tabla-body', json.message || 'Error al cargar datos.'); return; }
+
+            const d = json.data;
+            aprendices = d.aprendices || [];
+            vocFicha = d.ficha.numero_ficha;
+            vocTipo = d.tipo_vocero === 'principal' ? 'Vocero/a Principal' : 'Vocero/a Suplente';
+
+            // Actualizar UI de cabecera
+            $('voc-ficha-sidebar', vocFicha);
+            $('voc-ficha-header', vocFicha);
+            $('voc-ficha-tabla', vocFicha);
+            $('voc-tipo-label', `${vocTipo} — Ficha ${vocFicha}`);
+            document.title = `Panel Vocería — Ficha ${vocFicha}`;
+
+            // Renderizar
+            renderIndicadores(d.resumen, d.total);
+            renderTablaEstados(d.resumen, d.total);
+            renderGraficas(d.resumen);
+            paginaActual = 1;
+            renderTabla();
+
+        } catch (e) {
+            console.error('VoceroDashboard error:', e);
+            err('voc-tabla-body', `Error de conexión: ${e.message}. Recargue la página.`);
         }
     }
 
-    // ── Indicadores de Resumen ─────────────────────────────────
-    function _actualizarIndicadores() {
-        const por = _agruparPorEstado();
-        const total = todosAprendices.length;
-        _setText('st-total', total);
-        _setText('st-lectiva', por['LECTIVA'] || 0);
-        _setText('st-cancelado', por['CANCELADO'] || 0);
-        _setText('st-retirado', por['RETIRADO'] || 0);
-        const otros = total - (por['LECTIVA'] || 0) - (por['CANCELADO'] || 0) - (por['RETIRADO'] || 0);
-        _setText('st-otros', Math.max(0, otros));
+    // ────────────────────────────────────────────────────────────
+    // INDICADORES (5 tarjetas)
+    // ────────────────────────────────────────────────────────────
+    function renderIndicadores(resumen, total) {
+        $('st-total', total);
+        $('st-lectiva', resumen['LECTIVA'] || 0);
+        $('st-cancelado', resumen['CANCELADO'] || 0);
+        $('st-retirado', resumen['RETIRADO'] || 0);
+        const otros = total - (resumen['LECTIVA'] || 0) - (resumen['CANCELADO'] || 0) - (resumen['RETIRADO'] || 0);
+        $('st-otros', Math.max(0, otros));
     }
 
-    function _resetIndicadores() {
-        ['st-total', 'st-lectiva', 'st-cancelado', 'st-retirado', 'st-otros']
-            .forEach(id => _setText(id, 0));
-    }
-
-    function _vaciarTablaEstados() {
-        const el = document.getElementById('tabla-estados-body');
-        if (el) el.innerHTML = '<tr><td colspan="3">Sin datos disponibles.</td></tr>';
-    }
-
-    // ── Tabla de Resumen de Estados ────────────────────────────
-    function _renderTablaEstados() {
-        const por = _agruparPorEstado();
-        const total = todosAprendices.length;
+    // ────────────────────────────────────────────────────────────
+    // TABLA DE ESTADOS
+    // ────────────────────────────────────────────────────────────
+    function renderTablaEstados(resumen, total) {
         const orden = ['LECTIVA', 'CANCELADO', 'RETIRADO', 'APLAZADO', 'TRASLADO'];
-        Object.keys(por).forEach(e => { if (!orden.includes(e)) orden.push(e); });
+        Object.keys(resumen).forEach(e => { if (!orden.includes(e)) orden.push(e); });
 
-        let filas = '';
+        let html = '';
         orden.forEach(est => {
-            if (!por[est]) return;
-            const cnt = por[est];
-            const pct = total > 0 ? ((cnt / total) * 100).toFixed(1) : '0.0';
-            const dot = est.toLowerCase().replace(/[áé]/g, c => ({ á: 'a', é: 'e' }[c] || c));
-            filas += `<tr>
+            if (!resumen[est]) return;
+            const cnt = resumen[est];
+            const pct = ((cnt / total) * 100).toFixed(1);
+            const dot = est.toLowerCase();
+            html += `<tr>
                 <td><span class="voc-estado-dot dot-${dot}"></span><strong>${est}</strong></td>
-                <td>${cnt}</td>
-                <td>${pct}%</td>
+                <td>${cnt}</td><td>${pct}%</td>
             </tr>`;
         });
-
-        filas += `<tr>
+        html += `<tr>
             <td><span class="voc-estado-dot dot-total"></span><strong>TOTAL</strong></td>
-            <td><strong>${total} aprendices</strong></td>
-            <td><strong>100%</strong></td>
+            <td><strong>${total} aprendices</strong></td><td><strong>100%</strong></td>
         </tr>`;
-
         const el = document.getElementById('tabla-estados-body');
-        if (el) el.innerHTML = filas;
+        if (el) el.innerHTML = html;
     }
 
-    // ── Gráficas Chart.js ──────────────────────────────────────
-    function _renderGraficas() {
-        const por = _agruparPorEstado();
-        const labels = Object.keys(por);
-        const values = labels.map(e => por[e]);
-        const colores = labels.map(e => COLORES_ESTADO[e] || COLOR_DEFECTO);
-
+    // ────────────────────────────────────────────────────────────
+    // GRÁFICAS
+    // ────────────────────────────────────────────────────────────
+    function renderGraficas(resumen) {
         if (chartDona) { chartDona.destroy(); chartDona = null; }
-        if (chartBarras) { chartBarras.destroy(); chartBarras = null; }
+        if (chartBar) { chartBar.destroy(); chartBar = null; }
 
-        const baseOpts = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } }
-            }
+        const labels = Object.keys(resumen);
+        const values = labels.map(e => resumen[e]);
+        const colores = labels.map(e => COL[e] || '#cbd5e1');
+
+        const base = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } } }
         };
 
-        const ctxDona = document.getElementById('chart-dona');
-        if (ctxDona) {
-            chartDona = new Chart(ctxDona, {
-                type: 'doughnut',
-                data: {
-                    labels, datasets: [{
-                        data: values, backgroundColor: colores,
-                        borderWidth: 2, borderColor: '#fff', hoverOffset: 8
-                    }]
-                },
-                options: {
-                    ...baseOpts, cutout: '60%',
-                    plugins: {
-                        ...baseOpts.plugins,
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ` ${ctx.label}: ${ctx.parsed} (${((ctx.parsed / todosAprendices.length) * 100).toFixed(1)}%)`
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        const ctxBar = document.getElementById('chart-barras');
-        if (ctxBar) {
-            chartBarras = new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels, datasets: [{
-                        label: 'Aprendices', data: values,
-                        backgroundColor: colores, borderRadius: 6, borderSkipped: false
-                    }]
-                },
-                options: {
-                    ...baseOpts,
-                    plugins: { ...baseOpts.plugins, legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#f1f5f9' } },
-                        x: { ticks: { font: { size: 11 } }, grid: { display: false } }
-                    }
-                }
-            });
-        }
-    }
-
-    // ── Tabla de Aprendices (con filtros) ──────────────────────
-    function renderizarTabla() {
-        const search = (_getVal('filtro-search')).toLowerCase();
-        const estadoFilt = _getVal('filtro-estado').toUpperCase();
-        const mostrarTodos = estadoFilt === 'TODOS';
-
-        const lista = todosAprendices.filter(a => {
-            const est = (a.estado || '').toUpperCase();
-            const activo = mostrarTodos
-                || (!estadoFilt && !ESTADOS_INACTIVOS.has(est))
-                || (!mostrarTodos && estadoFilt && est === estadoFilt);
-            const ms = !search
-                || (a.nombre || '').toLowerCase().includes(search)
-                || (a.apellido || '').toLowerCase().includes(search)
-                || (a.documento || '').includes(search);
-            return activo && ms;
+        const elD = document.getElementById('chart-dona');
+        if (elD) chartDona = new Chart(elD, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data: values, backgroundColor: colores, borderWidth: 2, borderColor: '#fff', hoverOffset: 8 }] },
+            options: { ...base, cutout: '60%' }
         });
 
+        const elB = document.getElementById('chart-barras');
+        if (elB) chartBar = new Chart(elB, {
+            type: 'bar',
+            data: { labels, datasets: [{ label: 'Aprendices', data: values, backgroundColor: colores, borderRadius: 6, borderSkipped: false }] },
+            options: {
+                ...base,
+                plugins: { ...base.plugins, legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // TABLA DE APRENDICES CON EDICIÓN INLINE
+    // ────────────────────────────────────────────────────────────
+    function renderTabla() {
+        const busq = (document.getElementById('filtro-search')?.value || '').toLowerCase();
+        const estadoFilt = (document.getElementById('filtro-estado')?.value || '').toUpperCase();
+        const verTodos = estadoFilt === 'TODOS';
+
+        const lista = aprendices.filter(a => {
+            const est = (a.estado || '').toUpperCase();
+            const pasaEstado = verTodos
+                || (!estadoFilt && !INACTIVOS.has(est))
+                || (estadoFilt && estadoFilt !== 'TODOS' && est === estadoFilt);
+            const pasaBusq = !busq
+                || (a.nombre || '').toLowerCase().includes(busq)
+                || (a.apellido || '').toLowerCase().includes(busq)
+                || (a.documento || '').includes(busq);
+            return pasaEstado && pasaBusq;
+        });
+
+        // Aviso de filtro activo
         const aviso = document.getElementById('aviso-filtro');
-        if (aviso) aviso.style.display = (mostrarTodos || estadoFilt) ? 'none' : 'flex';
+        if (aviso) aviso.style.display = (verTodos || estadoFilt) ? 'none' : 'flex';
 
         if (!lista.length) {
-            _mostrarInfo('voc-tabla-body', 'Sin resultados con los filtros aplicados.');
-            const pag = document.getElementById('voc-paginacion');
-            if (pag) pag.innerHTML = '';
+            info('voc-tabla-body', 'Sin resultados con los filtros aplicados.');
+            const p = document.getElementById('voc-paginacion');
+            if (p) p.innerHTML = '';
             return;
         }
 
-        const inicio = (paginaActual - 1) * POR_PAGINA;
-        const paginaArr = lista.slice(inicio, inicio + POR_PAGINA);
-        const totalPags = Math.ceil(lista.length / POR_PAGINA);
+        const ini = (paginaActual - 1) * POR_PAG;
+        const pagArr = lista.slice(ini, ini + POR_PAG);
+        const total = Math.ceil(lista.length / POR_PAG);
 
-        const filas = paginaArr.map((a, i) => {
+        const filas = pagArr.map((a, i) => {
             const est = (a.estado || '').toUpperCase();
-            const badge = _badgeEstado(est);
-            return `<tr>
-                <td>${inicio + i + 1}</td>
-                <td><strong>${a.documento || '—'}</strong></td>
-                <td>${(a.nombre || '')} ${(a.apellido || '')}</td>
-                <td>${a.correo || '—'}</td>
-                <td>${a.celular || '—'}</td>
+            const badge = ({ LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado', APLAZADO: 'badge-aplazado', TRASLADO: 'badge-aplazado' })[est] || 'badge-default';
+            const doc = a.documento || '';
+            return `<tr id="fila-${doc}" data-doc="${doc}" data-ficha="${vocFicha}">
+                <td>${ini + i + 1}</td>
+                <td><strong>${doc}</strong></td>
+                <td>${a.nombre || ''} ${a.apellido || ''}</td>
+                <td>
+                    <span class="voc-campo" id="correo-txt-${doc}">${a.correo || '—'}</span>
+                    <input class="voc-input voc-edit-input" id="correo-inp-${doc}" value="${a.correo || ''}" placeholder="correo@ejemplo.com" style="display:none">
+                </td>
+                <td>
+                    <span class="voc-campo" id="cel-txt-${doc}">${a.celular || '—'}</span>
+                    <input class="voc-input voc-edit-input" id="cel-inp-${doc}" value="${a.celular || ''}" placeholder="310 000 0000" style="display:none">
+                </td>
                 <td><span class="badge ${badge}">${a.estado || '—'}</span></td>
+                <td>
+                    <button class="voc-btn voc-btn-edit" onclick="VoceroDashboard.editarFila('${doc}')" id="btn-edit-${doc}" title="Editar contacto">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="voc-btn voc-btn-save" onclick="VoceroDashboard.guardarFila('${doc}')" id="btn-save-${doc}" style="display:none" title="Guardar">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="voc-btn voc-btn-cancel" onclick="VoceroDashboard.cancelarEdicion('${doc}')" id="btn-cancel-${doc}" style="display:none" title="Cancelar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
             </tr>`;
         }).join('');
 
-        const tablaEl = document.getElementById('voc-tabla-body');
-        if (tablaEl) tablaEl.innerHTML = `
-            <table>
-                <thead><tr>
-                    <th>#</th><th>Documento</th><th>Nombre Completo</th>
-                    <th>Correo</th><th>Celular</th><th>Estado</th>
-                </tr></thead>
-                <tbody>${filas}</tbody>
-            </table>`;
+        const el = document.getElementById('voc-tabla-body');
+        if (el) el.innerHTML = `<table>
+            <thead><tr>
+                <th>#</th><th>Documento</th><th>Nombre Completo</th>
+                <th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
+            </tr></thead>
+            <tbody>${filas}</tbody>
+        </table>`;
 
-        const pagEl = document.getElementById('voc-paginacion');
-        if (pagEl) pagEl.innerHTML = _renderPaginacion(totalPags, paginaActual);
+        const pg = document.getElementById('voc-paginacion');
+        if (pg) pg.innerHTML = renderPag(total, paginaActual);
     }
 
-    // ── Paginación ─────────────────────────────────────────────
-    function irPagina(p) {
-        paginaActual = p;
-        renderizarTabla();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // ────────────────────────────────────────────────────────────
+    // EDICIÓN INLINE
+    // ────────────────────────────────────────────────────────────
+    function editarFila(doc) {
+        _toggle(doc, true);
     }
 
-    // ── Exportación PDF ────────────────────────────────────────
+    function cancelarEdicion(doc) {
+        _toggle(doc, false);
+    }
+
+    async function guardarFila(doc) {
+        const correo = document.getElementById(`correo-inp-${doc}`)?.value.trim() || '';
+        const celular = document.getElementById(`cel-inp-${doc}`)?.value.trim() || '';
+
+        const btn = document.getElementById(`btn-save-${doc}`);
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+
+        try {
+            const resp = await fetch('api/vocero/dashboard.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ documento: doc, numero_ficha: vocFicha, correo, celular })
+            });
+            const json = await resp.json();
+
+            if (json.success) {
+                // Actualizar datos locales
+                const a = aprendices.find(x => x.documento === doc);
+                if (a) { if (correo) a.correo = correo; if (celular) a.celular = celular; }
+
+                // Actualizar spans en pantalla sin re-renderizar toda la tabla
+                const cT = document.getElementById(`correo-txt-${doc}`);
+                const cB = document.getElementById(`cel-txt-${doc}`);
+                if (cT) cT.textContent = correo || '—';
+                if (cB) cB.textContent = celular || '—';
+
+                _toggle(doc, false);
+                _toast('✅ Información actualizada correctamente');
+            } else {
+                _toast('❌ ' + (json.message || 'Error al guardar'), 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i>'; }
+            }
+        } catch {
+            _toast('❌ Error de conexión. Intente de nuevo.', 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i>'; }
+        }
+    }
+
+    function _toggle(doc, modoEdicion) {
+        ['correo', 'cel'].forEach(campo => {
+            const txt = document.getElementById(`${campo}-txt-${doc}`);
+            const inp = document.getElementById(`${campo}-inp-${doc}`);
+            if (txt) txt.style.display = modoEdicion ? 'none' : '';
+            if (inp) inp.style.display = modoEdicion ? '' : 'none';
+        });
+        const btnEdit = document.getElementById(`btn-edit-${doc}`);
+        const btnSave = document.getElementById(`btn-save-${doc}`);
+        const btnCancel = document.getElementById(`btn-cancel-${doc}`);
+        if (btnEdit) btnEdit.style.display = modoEdicion ? 'none' : '';
+        if (btnSave) { btnSave.style.display = modoEdicion ? '' : 'none'; btnSave.disabled = false; btnSave.innerHTML = '<i class="fas fa-check"></i>'; }
+        if (btnCancel) btnCancel.style.display = modoEdicion ? '' : 'none';
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // EXPORTAR PDF
+    // ────────────────────────────────────────────────────────────
     function exportarPDF() {
-        if (!todosAprendices.length) { alert('No hay aprendices para exportar.'); return; }
-        if (!window.jspdf) { alert('Librería PDF no disponible. Verifique conexión a internet.'); return; }
+        if (!aprendices.length) { alert('No hay aprendices para exportar.'); return; }
+        if (!window.jspdf) { alert('Librería PDF no disponible.'); return; }
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        const pageW = doc.internal.pageSize.getWidth();
+        const pw = doc.internal.pageSize.getWidth();
         const hoy = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        doc.setFillColor(0, 50, 77);
-        doc.rect(0, 0, pageW, 38, 'F');
+        doc.setFillColor(0, 50, 77); doc.rect(0, 0, pw, 38, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(13); doc.setFont('helvetica', 'bold');
-        doc.text('SENA — Centro de Teleinformática y Producción Industrial', pageW / 2, 12, { align: 'center' });
+        doc.text('SENA — Centro de Teleinformática y Producción Industrial', pw / 2, 12, { align: 'center' });
         doc.setFontSize(11);
-        doc.text(`Informe Oficial de Aprendices — Ficha ${vocFicha}`, pageW / 2, 21, { align: 'center' });
+        doc.text(`Informe Oficial de Aprendices — Ficha ${vocFicha}`, pw / 2, 21, { align: 'center' });
         doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
-        doc.text(`${vocTipo}: ${vocNombre}   |   Fecha: ${hoy}`, pageW / 2, 30, { align: 'center' });
+        doc.text(`${vocTipo}: ${vocNombre}   |   Fecha: ${hoy}`, pw / 2, 30, { align: 'center' });
 
-        const por = _agruparPorEstado();
-        const total = todosAprendices.length;
+        // Resumen
+        const res = _resumen();
+        const total = aprendices.length;
         let y = 46;
         doc.setDrawColor(200); doc.setFillColor(248, 250, 252);
-        doc.roundedRect(14, y, pageW - 28, 8 + Object.keys(por).length * 7 + 7, 3, 3, 'FD');
+        doc.roundedRect(14, y, pw - 28, 8 + Object.keys(res).length * 7 + 7, 3, 3, 'FD');
         doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 50, 77); doc.setFontSize(9);
         doc.text('RESUMEN POR ESTADO', 20, y + 6); y += 12;
         doc.setFont('helvetica', 'normal'); doc.setTextColor(55, 65, 81); doc.setFontSize(8.5);
-        Object.entries(por).forEach(([estado, cnt]) => {
-            doc.text(`${estado}:`, 22, y);
-            doc.text(`${cnt}  (${((cnt / total) * 100).toFixed(1)}%)`, 80, y);
-            y += 7;
+        Object.entries(res).forEach(([e, c]) => {
+            doc.text(`${e}:`, 22, y); doc.text(`${c}  (${((c / total) * 100).toFixed(1)}%)`, 80, y); y += 7;
         });
         doc.setFont('helvetica', 'bold'); doc.setTextColor(0, 50, 77);
         doc.text('TOTAL:', 22, y + 1); doc.text(`${total} aprendices`, 80, y + 1); y += 14;
 
-        const activos = todosAprendices.filter(a => !ESTADOS_INACTIVOS.has((a.estado || '').toUpperCase()));
+        const activos = aprendices.filter(a => !INACTIVOS.has((a.estado || '').toUpperCase()));
         doc.autoTable({
             startY: y,
-            head: [['#', 'Documento', 'Nombre Completo', 'Correo', 'Celular', 'Estado']],
-            body: activos.map((a, i) => [
-                i + 1, a.documento || '—',
-                `${a.nombre || ''} ${a.apellido || ''}`.trim(),
-                a.correo || '—', a.celular || '—', a.estado || '—'
-            ]),
+            head: [['#', 'Documento', 'Nombre', 'Correo', 'Celular', 'Estado']],
+            body: activos.map((a, i) => [i + 1, a.documento || '—', `${a.nombre || ''} ${a.apellido || ''}`.trim(), a.correo || '—', a.celular || '—', a.estado || '—']),
             headStyles: { fillColor: [0, 50, 77], textColor: 255, fontStyle: 'bold', fontSize: 8.5 },
             bodyStyles: { fontSize: 8 },
             alternateRowStyles: { fillColor: [246, 248, 252] },
-            columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 26 }, 2: { cellWidth: 55 }, 3: { cellWidth: 48 }, 4: { cellWidth: 22 }, 5: { cellWidth: 22 } }
+            columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 25 }, 2: { cellWidth: 52 }, 3: { cellWidth: 48 }, 4: { cellWidth: 22 }, 5: { cellWidth: 22 } }
         });
 
         const pages = doc.internal.getNumberOfPages();
         for (let p = 1; p <= pages; p++) {
             doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(150);
-            doc.text(`Página ${p} de ${pages}  —  Documento generado por SenApre`, pageW / 2, 290, { align: 'center' });
+            doc.text(`Página ${p} de ${pages} — SenApre`, pw / 2, 290, { align: 'center' });
         }
         doc.save(`informe-ficha-${vocFicha}.pdf`);
     }
 
-    // ── Utilidades Privadas ────────────────────────────────────
-    function _agruparPorEstado() {
-        return todosAprendices.reduce((acc, a) => {
-            const est = (a.estado || 'SIN ESTADO').toUpperCase();
-            acc[est] = (acc[est] || 0) + 1;
-            return acc;
+    // ────────────────────────────────────────────────────────────
+    // UTILIDADES PRIVADAS
+    // ────────────────────────────────────────────────────────────
+    function _resumen() {
+        return aprendices.reduce((a, c) => {
+            const e = (c.estado || 'SIN ESTADO').toUpperCase();
+            a[e] = (a[e] || 0) + 1; return a;
         }, {});
     }
-
-    function _obtenerUsuario() {
-        try {
-            return typeof authSystem !== 'undefined'
-                ? authSystem.getCurrentUser()
-                : JSON.parse(localStorage.getItem('user') || 'null');
-        } catch { return null; }
+    function $(id, val) { const e = document.getElementById(id); if (e) e.textContent = val; }
+    function cargando(id) { const e = document.getElementById(id); if (e) e.innerHTML = '<div class="voc-loading"><i class="fas fa-spinner"></i> Cargando datos...</div>'; }
+    function info(id, msg) { const e = document.getElementById(id); if (e) e.innerHTML = `<div class="voc-loading"><i class="fas fa-inbox"></i> ${msg}</div>`; }
+    function err(id, msg) { const e = document.getElementById(id); if (e) e.innerHTML = `<div class="voc-loading"><i class="fas fa-exclamation-triangle" style="color:#dc2626"></i> ${msg}</div>`; }
+    function renderPag(total, actual) {
+        if (total <= 1) return '';
+        let h = '';
+        if (actual > 1) h += `<button class="voc-pag-btn" onclick="VoceroDashboard.irPagina(${actual - 1})">‹ Ant.</button>`;
+        for (let p = Math.max(1, actual - 2); p <= Math.min(total, actual + 2); p++)
+            h += `<button class="voc-pag-btn ${p === actual ? 'active' : ''}" onclick="VoceroDashboard.irPagina(${p})">${p}</button>`;
+        if (actual < total) h += `<button class="voc-pag-btn" onclick="VoceroDashboard.irPagina(${actual + 1})">Sig. ›</button>`;
+        return h;
+    }
+    function _toast(msg, tipo = 'ok') {
+        let t = document.getElementById('voc-toast');
+        if (!t) { t = document.createElement('div'); t.id = 'voc-toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;font-size:.88rem;font-weight:600;z-index:9999;transition:opacity .4s;box-shadow:0 4px 15px rgba(0,0,0,.15)'; document.body.appendChild(t); }
+        t.textContent = msg;
+        t.style.background = tipo === 'ok' ? '#39A900' : '#dc2626';
+        t.style.color = '#fff';
+        t.style.opacity = '1';
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
     }
 
-    function _setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-    function _getVal(id) { return document.getElementById(id)?.value || ''; }
-
-    function _badgeEstado(estado) {
-        const map = { LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado', APLAZADO: 'badge-aplazado', TRASLADO: 'badge-aplazado' };
-        return map[estado] || 'badge-default';
+    // ────────────────────────────────────────────────────────────
+    // PAGINACIÓN
+    // ────────────────────────────────────────────────────────────
+    function irPagina(p) {
+        paginaActual = p;
+        renderTabla();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function _mostrarCargando(id) {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<div class="voc-loading"><i class="fas fa-spinner"></i> Cargando datos...</div>';
-    }
-    function _mostrarInfo(id, msg) {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = `<div class="voc-loading"><i class="fas fa-inbox"></i> ${msg}</div>`;
-    }
-    function _mostrarError(id, msg) {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = `<div class="voc-loading"><i class="fas fa-times-circle" style="color:#dc2626"></i> ${msg}</div>`;
-    }
+    // ── API PÚBLICA ────────────────────────────────────────────
+    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFila, cancelarEdicion };
 
-    function _renderPaginacion(totalPags, actual) {
-        if (totalPags <= 1) return '';
-        let html = '';
-        if (actual > 1) html += `<button class="voc-pag-btn" onclick="VoceroDashboard.irPagina(${actual - 1})">‹ Ant.</button>`;
-        for (let p = Math.max(1, actual - 2); p <= Math.min(totalPags, actual + 2); p++) {
-            html += `<button class="voc-pag-btn ${p === actual ? 'active' : ''}" onclick="VoceroDashboard.irPagina(${p})">${p}</button>`;
-        }
-        if (actual < totalPags) html += `<button class="voc-pag-btn" onclick="VoceroDashboard.irPagina(${actual + 1})">Sig. ›</button>`;
-        return html;
-    }
-
-    // ── API pública del módulo ─────────────────────────────────
-    return { init, cargarAprendices, renderizarTabla, irPagina, exportarPDF };
 })();
 
-// ── Puente HTML → módulo ───────────────────────────────────────
-function filtrarTabla() { VoceroDashboard.renderizarTabla(); }
+// Puente HTML → módulo
+function filtrarTabla() { VoceroDashboard.renderTabla(); }
 function exportarPDF() { VoceroDashboard.exportarPDF(); }
 function irA(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
-function cerrarSesion(e) { e.preventDefault(); localStorage.removeItem('user'); window.location.href = 'index.html'; }
+function cerrarSesion(e) { e.preventDefault(); localStorage.removeItem('user'); location.href = 'index.html'; }
 
 document.addEventListener('DOMContentLoaded', () => VoceroDashboard.init());
