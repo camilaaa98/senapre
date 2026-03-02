@@ -1027,52 +1027,32 @@ body {
     padding: 0 5px;
 }
 
-/* ── Centrado global de logos y títulos en todos los sidebars ── */
-.sidebar,
-.sidebar-header,
-aside.sidebar {
-    text-align: center !important;
-}
-
+/* ── Centrado de logo y título en header del sidebar (admin/instructor) ── */
+/* NOTA: No tocar .sidebar ni sidebar-menu para no romper la navegación */
 .sidebar-header {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 20px 10px !important;
+    text-align: center;
 }
 
-.sidebar-header img,
-.sidebar img:first-child {
-    display: block !important;
-    margin: 0 auto 10px auto !important;
-    border-radius: 50% !important;
+.sidebar-header img {
+    display: block;
+    margin: 0 auto 10px auto;
 }
 
 .sidebar-header h3,
-.sidebar-header h2,
-.sidebar-header .sidebar-title {
-    text-align: center !important;
-    width: 100% !important;
+.sidebar-header h2 {
+    text-align: center;
 }
 
 .sidebar-header .sidebar-subtitle,
-.sidebar-header [id*="user-role"],
-.sidebar-header [id*="rol"],
-.sidebar-header p {
-    text-align: center !important;
-    width: 100% !important;
+.sidebar-header div[id*="user-role"] {
+    text-align: center;
 }
 
 .sidebar-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 12px !important;
+    text-align: center;
 }
 
 .sidebar-footer img {
-    display: block !important;
-    margin: 0 auto !important;
+    display: block;
+    margin: 0 auto;
 }
