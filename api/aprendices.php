@@ -270,7 +270,7 @@ try {
         // Mapa: ValorCheckbox => NombreTablaBD
         $mapPoblacion = [
             'Mujer' => 'Mujer', 
-            'Indígena' => 'indígena', 
+            'Indígena' => 'indigena', 
             'NARP' => 'narp', 
             'Campesino' => 'campesino', 
             'LGBTIQ+' => 'lgbtiq', 

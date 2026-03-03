@@ -322,6 +322,12 @@ body {
     font-size: 1.4rem;
 }
 
+.sena-logo-footer {
+    height: 60px;
+    width: auto;
+    opacity: 0.9;
+}
+
 /* Right Side - Form Section */
 .login-form-section {
     width: 55%;

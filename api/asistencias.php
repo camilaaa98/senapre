@@ -15,12 +15,12 @@ require_once __DIR__ . '/config/Database.php';
 try {
     $database = Database::getInstance();
     $conn = $database->getConnection();
+    $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
     
     $method = $_SERVER['REQUEST_METHOD'];
     
     // GET - Consultar asistencias
     if ($method === 'GET') {
-        // NUEVO: Endpoint para obtener aprendices pendientes (sin asistencia del día)
         $action = isset($_GET['action']) ? $_GET['action'] : '';
         
         if ($action === 'aprendices_pendientes') {
@@ -33,6 +33,7 @@ try {
             }
             
             // Obtener aprendices de la ficha que NO tienen asistencia registrada ese día
+            $dateCast = $isPg ? "a.fecha::date" : "DATE(a.fecha)";
             $sql = "SELECT a.documento, a.nombre, a.apellido, a.correo, a.celular, a.estado,
                            b.id_biometria,
                            CASE WHEN b.id_biometria IS NOT NULL THEN 1 ELSE 0 END as tiene_biometria
@@ -41,19 +42,17 @@ try {
                     WHERE a.numero_ficha = :ficha
                     AND a.estado = 'EN FORMACION'
                     AND a.documento NOT IN (
-                        SELECT documento
+                        SELECT documento_aprendiz
                         FROM asistencias
                         WHERE numero_ficha = :ficha
-                        AND DATE(fecha) = :fecha
-                        AND id_usuario = :id_usuario
+                        AND " . ($isPg ? "fecha::date" : "DATE(fecha)") . " = :fecha
                     )
                     ORDER BY a.apellido, a.nombre";
             
             $stmt = $conn->prepare($sql);
             $stmt->execute([
                 ':ficha' => $ficha,
-                ':fecha' => $fecha,
-                ':id_usuario' => $idUsuario
+                ':fecha' => $fecha
             ]);
             $aprendices = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -66,7 +65,7 @@ try {
             exit;
         }
         
-        // Consulta normal de asistencias (código existente)
+        // Consulta normal de asistencias
         $ficha = isset($_GET['ficha']) ? $_GET['ficha'] : '';
         $fecha = isset($_GET['fecha']) ? $_GET['fecha'] : '';
         $fechaInicio = isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : '';
@@ -82,7 +81,7 @@ try {
         }
         
         if (!empty($fecha)) {
-            $where[] = "DATE(a.fecha) = :fecha";
+            $where[] = ($isPg ? "a.fecha::date" : "DATE(a.fecha)") . " = :fecha";
             $params[':fecha'] = $fecha;
         }
         
@@ -111,18 +110,18 @@ try {
         $countSql = "SELECT COUNT(*) as total FROM asistencias a WHERE $whereClause";
         $countStmt = $conn->prepare($countSql);
         $countStmt->execute($params);
-        $totalItems = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+        $totalItems = $countStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
         
         $select = "a.*, ap.nombre, ap.apellido, f.nombre_programa";
         $joins = "LEFT JOIN aprendices ap ON a.documento_aprendiz = ap.documento
                   LEFT JOIN fichas f ON a.numero_ficha = f.numero_ficha";
 
         if ($limit === -1) {
-            $sql = "SELECT $select FROM asistencias a $joins WHERE $whereClause ORDER BY a.fecha DESC, a.creado_en DESC, ap.apellido, ap.nombre";
+            $sql = "SELECT $select FROM asistencias a $joins WHERE $whereClause ORDER BY a.fecha DESC, a.creado_en DESC";
             $stmt = $conn->prepare($sql);
             $stmt->execute($params);
         } else {
-            $sql = "SELECT $select FROM asistencias a $joins WHERE $whereClause ORDER BY a.fecha DESC, a.creado_en DESC, ap.apellido, ap.nombre LIMIT :limit OFFSET :offset";
+            $sql = "SELECT $select FROM asistencias a $joins WHERE $whereClause ORDER BY a.fecha DESC, a.creado_en DESC LIMIT :limit OFFSET :offset";
             $stmt = $conn->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
@@ -156,72 +155,45 @@ try {
         }
         
         $registros = $data['registros'];
-        
         if (count($registros) === 0) {
             throw new Exception('No hay registros para guardar');
         }
         
-        // Obtener user_id del primer registro (asumiendo mismo instructor para todos)
         $user = isset($data['id_usuario']) ? $data['id_usuario'] : null;
-        
-        // Iniciar transacción
         $conn->beginTransaction();
         
         try {
-            // === NUEVA LÓGICA: UPSERT (Registro Único) ===
-            // No eliminamos registros existentes. Solo insertamos/actualizamos según sea necesario.
-            
             $ficha = $registros[0]['numero_ficha'];
             $fecha = $registros[0]['fecha'];
             
-            // Obtener configuración de horario para cálculo de retardo
             $fechaActual = date('Y-m-d');
             $esHoy = ($fecha === $fechaActual);
-            $horaInicio = null;
             $limiteRetardo = null;
             
             if ($esHoy) {
-                $diaSemana = date('N'); // 1=Lunes, 7=Domingo
-                
-                $sqlHorario = "SELECT hora_inicio FROM horarios_formacion 
-                               WHERE numero_ficha = :ficha AND dia_semana = :dia";
+                $diaSemana = date('N'); 
+                $sqlHorario = "SELECT hora_inicio FROM horarios_formacion WHERE numero_ficha = :ficha AND dia_semana = :dia";
                 $stmtHorario = $conn->prepare($sqlHorario);
                 $stmtHorario->execute([':ficha' => $ficha, ':dia' => $diaSemana]);
                 $horario = $stmtHorario->fetch(PDO::FETCH_ASSOC);
                 
                 if ($horario) {
                     $horaInicio = $horario['hora_inicio'];
-                    // Tolerancia: MINUTOS_TOLERANCIA después de la hora de inicio
                     $limiteRetardo = date('H:i:s', strtotime("$horaInicio + " . MINUTOS_TOLERANCIA . " minutes"));
                 }
             }
             
-            // Preparar consulta para verificar existencia
-            $checkSql = "SELECT id_asistencia, estado, creado_en 
-                         FROM asistencias 
-                         WHERE documento_aprendiz = :documento 
-                         AND numero_ficha = :ficha 
-                         AND DATE(fecha) = :fecha";
+            $checkSql = "SELECT id_asistencia, estado, observaciones FROM asistencias 
+                         WHERE documento_aprendiz = :documento AND numero_ficha = :ficha 
+                         AND " . ($isPg ? "fecha::date" : "DATE(fecha)") . " = :fecha";
             $checkStmt = $conn->prepare($checkSql);
             
-            // Preparar consulta de inserción
             $insertSql = "INSERT INTO asistencias 
-                         (documento_aprendiz, numero_ficha, fecha, estado, observaciones, id_instructor, creado_en)
-                         VALUES (:documento, :ficha, :fecha, :estado, :observaciones, :id_instructor, :creado_en)";
+                         (documento_aprendiz, numero_ficha, fecha, estado, observaciones, id_instructor)
+                         VALUES (:documento, :ficha, :fecha, :estado, :observaciones, :id_instructor)";
             $insertStmt = $conn->prepare($insertSql);
             
-            // Preparar consulta de actualización (solo para observaciones)
-            $updateSql = "UPDATE asistencias 
-                         SET observaciones = :observaciones
-                         WHERE id_asistencia = :id";
-            $updateStmt = $conn->prepare($updateSql);
-            
-            $registrosNuevos = 0;
-            $registrosActualizados = 0;
-            $registrosIgnorados = 0;
-
             foreach ($registros as $reg) {
-                // Verificar si ya existe registro para este aprendiz en esta fecha
                 $checkStmt->execute([
                     ':documento' => $reg['documento_aprendiz'],
                     ':ficha' => $reg['numero_ficha'],
@@ -230,189 +202,57 @@ try {
                 $existente = $checkStmt->fetch(PDO::FETCH_ASSOC);
                 
                 if ($existente) {
-                    // YA EXISTE REGISTRO
-                    $estadoActual = $existente['estado'];
-                    $estadoNuevo = $reg['estado'];
-
-                    // LÓGICA DE ACTUALIZACIÓN INTELIGENTE
-                    // Si estaba Ausente y ahora marca CUALQUIER OTRA COSA (Presente, Retardo, etc.) -> ACTUALIZAR
-                    if ($estadoActual === 'Ausente' && $estadoNuevo !== 'Ausente') {
-                        $horaRegistro = date('H:i:s');
-                        $estadoFinal = $estadoNuevo;
-                        
-                        // Si marca Presente, recalcular Retardo según hora
-                        if ($estadoFinal === 'Presente' && $esHoy && $limiteRetardo && $horaRegistro > $limiteRetardo) {
+                    if ($existente['estado'] === 'Ausente' && $reg['estado'] !== 'Ausente') {
+                        $estadoFinal = $reg['estado'];
+                        if ($estadoFinal === 'Presente' && $esHoy && $limiteRetardo && date('H:i:s') > $limiteRetardo) {
                             $estadoFinal = 'Retardo';
                         }
-
-                        $updateStatusSql = "UPDATE asistencias 
-                                            SET estado = :estado, 
-                                                observaciones = :observaciones,
-                                                creado_en = :creado_en 
-                                            WHERE id_asistencia = :id";
-                        $updateStatusStmt = $conn->prepare($updateStatusSql);
-                        $updateStatusStmt->execute([
-                            ':estado' => $estadoFinal,
-                            ':observaciones' => $reg['observaciones'],
-                            ':creado_en' => date('Y-m-d H:i:s'), // Actualizar hora de llegada
-                            ':id' => $existente['id_asistencia']
-                        ]);
-                        $registrosActualizados++;
-                    } 
-                    // Si ya estaba Presente/Retardo, VALIDAR si solo cambiamos observaciones
-                    else {
-                        if (!empty($reg['observaciones']) && $reg['observaciones'] !== $existente['observaciones']) {
-                            $updateStmt->execute([
-                                ':observaciones' => $reg['observaciones'],
-                                ':id' => $existente['id_asistencia']
-                            ]);
-                            $registrosActualizados++;
-                        } else {
-                            $registrosIgnorados++;
-                        }
+                        $conn->prepare("UPDATE asistencias SET estado = :e, observaciones = :o WHERE id_asistencia = :id")
+                             ->execute([':e' => $estadoFinal, ':o' => $reg['observaciones'], ':id' => $existente['id_asistencia']]);
                     }
                 } else {
-                    // NO EXISTE - Insertar nuevo registro
-                    $horaRegistro = date('H:i:s');
                     $estadoFinal = $reg['estado'];
-                    
-                    // Calcular estado basado en hora de llegada INDIVIDUAL
-                    if ($estadoFinal === 'Presente' && $esHoy && $limiteRetardo) {
-                        // Comparar hora actual contra límite de retardo
-                        if ($horaRegistro > $limiteRetardo) {
-                            $estadoFinal = 'Retardo';
-                        }
+                    if ($estadoFinal === 'Presente' && $esHoy && $limiteRetardo && date('H:i:s') > $limiteRetardo) {
+                        $estadoFinal = 'Retardo';
                     }
-                    
                     $insertStmt->execute([
                         ':documento' => $reg['documento_aprendiz'],
                         ':ficha' => $reg['numero_ficha'],
                         ':fecha' => $fecha,
                         ':estado' => $estadoFinal,
                         ':observaciones' => $reg['observaciones'] ?? null,
-                        ':id_instructor' => $user,
-                        ':creado_en' => date('Y-m-d H:i:s') // Hora exacta de registro
+                        ':id_instructor' => $user
                     ]);
-                    $registrosNuevos++;
                 }
             }
             
             $conn->commit();
-            
-            echo json_encode([
-                'success' => true,
-                'message' => count($registros) . ' registros guardados exitosamente'
-            ]);
+            echo json_encode(['success' => true, 'message' => count($registros) . ' registros procesados']);
         } catch (Exception $e) {
             $conn->rollBack();
             throw $e;
         }
-        
         exit;
     }
-    
-    // PUT - Actualizar asistencia individual
+
+    // PUT/DELETE (Keep standard logical implementation)
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
-        
-        $sql = "UPDATE asistencias 
-                SET estado = :estado, observaciones = :observaciones
-                WHERE id_asistencia = :id";
-        
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':estado' => $data['estado'],
-            ':observaciones' => $data['observaciones'] ?? null,
-            ':id' => $data['id_asistencia']
-        ]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Asistencia actualizada'
-        ]);
+        $conn->prepare("UPDATE asistencias SET estado = :e, observaciones = :o WHERE id_asistencia = :id")
+             ->execute([':e' => $data['estado'], ':o' => $data['observaciones'], ':id' => $data['id_asistencia']]);
+        echo json_encode(['success' => true, 'message' => 'Actualizado']);
         exit;
     }
-    
-    // DELETE - Eliminar registro de asistencia
+
     if ($method === 'DELETE') {
-        $id = isset($_GET['id']) ? $_GET['id'] : '';
-        
-        if (empty($id)) {
-            throw new Exception('ID requerido');
-        }
-        
-        $sql = "DELETE FROM asistencias WHERE id_asistencia = :id";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([':id' => $id]);
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Asistencia eliminada'
-        ]);
+        $id = $_GET['id'] ?? '';
+        $conn->prepare("DELETE FROM asistencias WHERE id_asistencia = :id")->execute([':id' => $id]);
+        echo json_encode(['success' => true, 'message' => 'Eliminado']);
         exit;
     }
     
 } catch (Exception $e) {
-    // Si la tabla no existe o tiene esquema incorrecto, intentar crearla/reconstruirla
-    if (strpos($e->getMessage(), 'no such table: asistencias') !== false || 
-        strpos($e->getMessage(), 'no such column: numero_ficha') !== false) {
-        try {
-            // Si el error es de columna faltante, necesitamos reconstruir la tabla
-            if (strpos($e->getMessage(), 'no such column') !== false) {
-                // Respaldar tabla existente
-                $conn->exec("DROP TABLE IF EXISTS asistencias_backup");
-                $conn->exec("ALTER TABLE asistencias RENAME TO asistencias_backup");
-            }
-            
-            // Crear tabla con el esquema correcto
-            $conn->exec("CREATE TABLE IF NOT EXISTS asistencias (
-                id_asistencia INTEGER PRIMARY KEY AUTOINCREMENT,
-                documento_aprendiz TEXT NOT NULL,
-                numero_ficha TEXT NOT NULL,
-                fecha DATE NOT NULL,
-                estado TEXT NOT NULL DEFAULT 'Presente',
-                observaciones TEXT,
-                id_instructor INTEGER,
-                creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
-            )");
-            
-            // Intentar migrar datos si había tabla de respaldo
-            try {
-                $conn->exec("INSERT INTO asistencias 
-                    (id_asistencia, documento_aprendiz, numero_ficha, fecha, estado, observaciones, id_instructor, creado_en)
-                    SELECT 
-                        a.id_asistencia, 
-                        a.documento_aprendiz,
-                        COALESCE(f.numero_ficha, '0000000'),
-                        a.fecha,
-                        a.estado,
-                        a.observaciones,
-                        a.id_instructor,
-                        a.creado_en
-                    FROM asistencias_backup a
-                    LEFT JOIN fichas f ON a.id_ficha = f.id_ficha");
-            } catch (Exception $migrateError) {
-                // Si falla la migración, continuar sin datos antiguos
-            }
-            
-            echo json_encode([
-                'success' => true,
-                'data' => [],
-                'message' => 'Tabla de asistencias actualizada. Por favor intente guardar nuevamente.'
-            ]);
-        } catch (Exception $createError) {
-            http_response_code(500);
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error actualizando tabla: ' . $createError->getMessage()
-            ]);
-        }
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

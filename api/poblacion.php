@@ -20,8 +20,8 @@ try {
         // Mapeo de tablas de población
         $tablas = [
             'mujer' => 'Mujer',
-            'indigena' => 'indígena',
-            'indígena' => 'indígena',
+            'indigena' => 'indigena',
+            'indígena' => 'indigena',
             'narp' => 'narp',
             'campesino' => 'campesino',
             'lgbtiq' => 'lgbtiq',
@@ -63,7 +63,7 @@ try {
         $poblacion = strtolower($_GET['poblacion'] ?? '');
 
         $tablas = [
-            'mujer' => 'Mujer', 'indigena' => 'indígena', 'indígena' => 'indígena',
+            'mujer' => 'Mujer', 'indigena' => 'indigena', 'indígena' => 'indigena',
             'narp' => 'narp', 'campesino' => 'campesino', 'lgbtiq' => 'lgbtiq',
             'discapacidad' => 'discapacidad'
         ];

@@ -73,8 +73,10 @@ try {
         $countStmt->execute($params);
         $total = $countStmt->fetch()['total'];
         
-        // Obtener datos paginados con JOIN para instructor líder
         // Obtener datos paginados con JOIN para instructor líder y voceros
+        $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
+        $joinUsuario = $isPg ? "LEFT JOIN usuarios u ON f.instructor_lider = CAST(u.id_usuario AS TEXT)" : "LEFT JOIN usuarios u ON f.instructor_lider = u.id_usuario";
+
         $sqlBase = "SELECT f.*, 
                        COALESCE(p.nombre_programa, f.nombre_programa) as nombre_programa,
                        u.nombre || ' ' || u.apellido as nombre_instructor,
@@ -84,7 +86,7 @@ try {
                        vs.documento as id_vocero_suplente
                 FROM fichas f 
                 LEFT JOIN programas_formacion p ON f.nombre_programa = p.nombre_programa 
-                LEFT JOIN usuarios u ON f.instructor_lider = u.id_usuario
+                $joinUsuario
                 LEFT JOIN aprendices vp ON f.vocero_principal = vp.documento
                 LEFT JOIN aprendices vs ON f.vocero_suplente = vs.documento
                 $whereClause
@@ -128,21 +130,24 @@ try {
         
         // Verificar columnas y AUTO-MIGRACIÓN
         try {
-    if (!getenv('DATABASE_URL')) { $checkColumn = $conn->query("PRAGMA table_info(fichas)"); }
-            $columns = $checkColumn->fetchAll(PDO::FETCH_ASSOC);
-            $existingCols = array_column($columns, 'name');
+            $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
+            if (!$isPg) { 
+                $checkColumn = $conn->query("PRAGMA table_info(fichas)");
+                $columns = $checkColumn->fetchAll(PDO::FETCH_ASSOC);
+                $existingCols = array_column($columns, 'name');
 
-            if (!in_array('instructor_lider', $existingCols)) {
-                $conn->exec("ALTER TABLE fichas ADD COLUMN instructor_lider TEXT");
-            }
-            if (!in_array('vocero_principal', $existingCols)) {
-                $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_principal TEXT");
-            }
-            if (!in_array('vocero_suplente', $existingCols)) {
-                $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_suplente TEXT");
+                if (!in_array('instructor_lider', $existingCols)) {
+                    $conn->exec("ALTER TABLE fichas ADD COLUMN instructor_lider TEXT");
+                }
+                if (!in_array('vocero_principal', $existingCols)) {
+                    $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_principal TEXT");
+                }
+                if (!in_array('vocero_suplente', $existingCols)) {
+                    $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_suplente TEXT");
+                }
             }
         } catch (Exception $e) {
-            // Ignorar si ya existen o error menor
+            // Ignorar en producción o si falla
         }
         
         $sql = "INSERT INTO fichas (numero_ficha, nombre_programa, jornada, estado, instructor_lider, tipoFormacion) 
@@ -255,7 +260,6 @@ try {
     
     // DELETE - Eliminar ficha
     if ($method === 'DELETE') {
-        // ... (Keep existing DELETE logic)
         $numero = isset($_GET['numero']) ? $_GET['numero'] : '';
         if (empty($numero)) throw new Exception('Número de ficha requerido');
         $conn->prepare("DELETE FROM fichas WHERE numero_ficha = :numero")->execute([':numero' => $numero]);
