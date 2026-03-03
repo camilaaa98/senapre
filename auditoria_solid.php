@@ -1,9 +1,4 @@
 <?php
-/**
- * auditoria_solid.php
- * Auditoría completa de principios SOLID: CSS/JS embebido, organización de archivos
- */
-
 $base = __DIR__;
 
 // ── 1. Archivos HTML − detectar <style> y <script> embebidos ──────────────

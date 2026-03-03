@@ -1,9 +1,4 @@
 <?php
-/**
- * auditoria_rutas.php
- * Verifica EXACTAMENTE qué imágenes sueltas de la raíz son referenciadas
- * en los archivos HTML y en qué rutas.
- */
 $base = __DIR__;
 $imagenesRaiz = ['asi.png','logosena.png','LGBTI.png','afrodedescendientes.png'];
 $htmlFiles    = glob($base . '/*.html');

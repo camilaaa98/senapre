@@ -1,7 +1,3 @@
-/**
- * AuthSystem - Unified Authentication for AsistNet/SENAPRE
- * Consolidates legacy and v0 authentication logic.
- */
 class AuthSystem {
     constructor() {
         this.storageKey = 'user';
@@ -578,7 +574,11 @@ function cargarEstadisticasPoblacionDashboard() {
         });
 }
 
-// Inicializar restricciones inmediatamente para evitar parpadeo
-aplicarRestriccionesDeRol();
+// Inicializar restricciones inmediatamente para evitar parpadeo si el DOM ya tiene algo útil
+try {
+    aplicarRestriccionesDeRol();
+} catch (e) {
+    // Es normal que falle si el DOM no está listo, se reintentará en DOMContentLoaded
+}
 document.addEventListener('DOMContentLoaded', aplicarRestriccionesDeRol);
 

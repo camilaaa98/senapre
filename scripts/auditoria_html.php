@@ -1,8 +1,4 @@
 <?php
-/**
- * auditoria_html.php — Versión simplificada para consola
- * Lista todos los HTML con su conteo de <style> y <script> inline
- */
 $base = __DIR__;
 $htmlFiles = glob($base . '/*.html');
 usort($htmlFiles, fn($a,$b) => strcmp(basename($a), basename($b)));

@@ -1,9 +1,4 @@
 <?php
-/**
- * refactorizar_otros.php
- * Aplica refactorización SOLID a módulos Bienestar, Instructor e Index
- */
-
 $archivos = [
     // Bienestar
     'bienestar-dashboard.html',

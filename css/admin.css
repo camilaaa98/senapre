@@ -1,13 +1,3 @@
-/**
- * css/admin.css — Estilos del módulo Administración
- * SenApre SENA — Principios SOLID aplicados
- * Separado del HTML para cumplir con separación de responsabilidades
- */
-
-/* ── Nota: Los estilos globales (dashboard-container, sidebar, main-content, etc.) 
-   se movieron a css/main.css para que apliquen a todos los paneles (SOLID). ── */
-
-
 /* ── Tarjetas de estadísticas ─────────────────────────────── */
 .admin-stats-grid {
     display: grid;

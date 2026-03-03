@@ -1,0 +1,53 @@
+/**
+ * Bienestar Dashboard - Admin Logic
+ */
+
+const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
+
+document.addEventListener('DOMContentLoaded', () => {
+    areas.forEach(area => cargarResponsable(area));
+});
+
+async function cargarResponsable(area) {
+    const domMap = {
+        'jefe_bienestar': 'info-jefe-bienestar',
+        'liderazgo': 'info-liderazgo',
+        'enfermeria': 'info-enfermeria',
+        'socioemocional': 'info-socioemocional',
+        'deporte': 'info-deporte',
+        'arte': 'info-arte',
+        'apoyos': 'info-apoyos'
+    };
+
+    const container = document.getElementById(domMap[area]);
+    if (!container) return;
+
+    const card = container.closest('.area-card');
+    const element = container.querySelector('.responsable-name');
+    const btnAssign = card.querySelector('.btn-assign');
+
+    try {
+        const response = await fetch(`api/bienestar.php?action=getResponsable&area=${area}`);
+        const result = await response.json();
+        const loggedUser = authSystem.getCurrentUser();
+
+        if (result.success && result.data) {
+            element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span style="font-size: 0.75rem; color: #64748b;">${result.data.correo}</span>`;
+            if (btnAssign) btnAssign.innerHTML = '<i class="fas fa-user-edit"></i> Cambiar Responsable';
+
+            // REGLA: Jefe de bienestar NO puede auto-asignarse (si es el responsable actual del area jefe_bienestar)
+            if (area === 'jefe_bienestar' && loggedUser && loggedUser.id_usuario == result.data.id_usuario) {
+                if (btnAssign) btnAssign.style.display = 'none';
+            }
+        } else {
+            element.textContent = 'Sin asignar';
+        }
+    } catch (error) {
+        console.error(`Error cargando responsable de ${area}:`, error);
+        element.textContent = 'Error al cargar';
+    }
+}
+
+function irAAsignacion(area) {
+    window.location.href = `admin-bienestar-asignacion.html?area=${area}`;
+}

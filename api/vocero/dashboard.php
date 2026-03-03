@@ -1,10 +1,4 @@
 <?php
-/**
- * api/vocero/dashboard.php
- * Endpoint dedicado al panel de vocería.
- * Recibe el id_usuario del vocero y retorna la ficha asignada + aprendices.
- * Soporta también la actualización de correo/celular de un aprendiz (PUT).
- */
 error_reporting(0);
 @ini_set('display_errors', 0);
 header('Content-Type: application/json; charset=utf-8');

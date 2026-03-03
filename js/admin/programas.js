@@ -1,6 +1,4 @@
-/**
- * Gestión de Programas - Admin
- */
+
 
 let currentPage = 1;
 const itemsPerPage = 10;

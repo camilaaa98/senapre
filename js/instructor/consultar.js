@@ -1,9 +1,3 @@
-/**
- * Consultar Asistencias - Lógica de Negocio Profesional
- * Incluye reportes PDF, Excel con colores y logo
- * NUEVO: Gestión de Excusas (Inasistencia y Llegada Tarde)
- */
-
 // Variables globales
 let asistenciasActuales = [];
 let logoBase64 = '';

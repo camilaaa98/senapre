@@ -1,9 +1,3 @@
-/**
- * js/admin/dashboard.js — v2.0.0
- * Panel de Administración — SenApre SENA
- * SOLID: Toda la lógica extraída del HTML
- */
-
 'use strict';
 
 // ── Guarda de seguridad y configuración inicial ───────────────

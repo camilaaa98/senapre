@@ -8,111 +8,7 @@
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
     <link rel="stylesheet" href="css/admin.css?v=2.0.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .bienestar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .area-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            border-top: 5px solid var(--sena-green);
-        }
-
-        .area-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .area-icon {
-            width: 50px;
-            height: 50px;
-            background: #f0fdf4;
-            color: var(--sena-green);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-
-        .area-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
-        }
-
-        .area-desc {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-
-        .responsable-info {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .responsable-info i {
-            color: #94a3b8;
-        }
-
-        .responsable-name {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #334155;
-            margin: 0;
-        }
-
-        .btn-assign {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            color: #475569;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-assign:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-        }
-
-        .btn-module {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            background: var(--sena-green);
-            color: white;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin-bienestar.css?v=1.0.1">
 </head>
 
 <body>
@@ -121,8 +17,7 @@
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display"
-                   >Director</div>
+                <div class="sidebar-subtitle" id="user-role-display">Director</div>
             </div>
 
             <nav class="sidebar-menu">
@@ -328,55 +223,8 @@
     </div>
 
     <script src="js/main.js?v=1.0.6"></script>
-    <script>
-        const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
+    <script src="js/admin/bienestar-dashboard.js?v=1.0.0"></script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            areas.forEach(area => cargarResponsable(area));
-        });
-
-        async function cargarResponsable(area) {
-            const shortArea = area.split('_')[0]; // para el ID del DOM si es largo
-            const targetId = `info-${area.replace(/_y_/, '-')}`;
-            const domMap = {
-                'jefe_bienestar': 'info-jefe-bienestar',
-                'liderazgo': 'info-liderazgo',
-                'enfermeria': 'info-enfermeria',
-                'socioemocional': 'info-socioemocional',
-                'deporte': 'info-deporte',
-                'arte': 'info-arte',
-                'apoyos': 'info-apoyos'
-            };
-
-            const card = document.getElementById(domMap[area]).closest('.area-card');
-            const element = document.getElementById(domMap[area]).querySelector('.responsable-name');
-            const btnAssign = card.querySelector('.btn-assign');
-
-            try {
-                const response = await fetch(`api/bienestar.php?action=getResponsable&area=${area}`);
-                const result = await response.json();
-                const loggedUser = authSystem.getCurrentUser();
-
-                if (result.success && result.data) {
-                    element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span style="font-size: 0.75rem; color: #64748b;">${result.data.correo}</span>`;
-                    btnAssign.innerHTML = '<i class="fas fa-user-edit"></i> Cambiar Responsable';
-
-                    // REGLA: Jefe de bienestar NO puede auto-asignarse (si es el responsable actual del area jefe_bienestar)
-                    if (area === 'jefe_bienestar' && loggedUser && loggedUser.id_usuario == result.data.id_usuario) {
-                        btnAssign.style.display = 'none';
-                    }
-                } else {
-                    element.textContent = 'Sin asignar';
-                }
-            } catch (error) {
-                element.textContent = 'Error al cargar';
-            }
-        }
-
-        function irAAsignacion(area) {
-            window.location.href = `admin-bienestar-asignacion.html?area=${area}`;
-        }
-    </script>
 </body>
 
 </html>

@@ -1,8 +1,4 @@
 <?php
-/**
- * scripts/forzar_cache_css.php
- * Añade/actualiza ?v= en todos los links de css/main.css en los HTML
- */
 $version  = '2.0.2';
 $archivos = glob(__DIR__ . '/../*.html');
 $updated  = 0;

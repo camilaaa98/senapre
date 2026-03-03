@@ -1,15 +1,4 @@
 <?php
-/**
- * refactorizar_admin.php
- * Reemplaza automáticamente los patrones de violación SOLID en todos los HTML admin:
- * 1. style inline en img del sidebar-header → clase CSS
- * 2. style inline en sidebar-footer → clase CSS
- * 3. style inline en content-header → clase CSS
- * 4. <script> de guarda embebido → elimina (ya está en js/admin/dashboard.js)
- * 5. Añade css/admin.css si no está
- * 6. Versión de main.js → actualiza a v1.0.6
- */
-
 $archivos = [
     'admin-fichas.html'          => 'fichas',
     'admin-programas.html'       => 'programas',
