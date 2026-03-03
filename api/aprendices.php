@@ -60,9 +60,9 @@ try {
 
         if (!empty($tabla_poblacion)) {
             // Validar que la tabla sea una de las permitidas para evitar inyecciones
-            $tablasPermitidas = ['mujer', 'indígena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+            $tablasPermitidas = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
             if (in_array(strtolower($tabla_poblacion), $tablasPermitidas)) {
-                $alias = strtolower($tabla_poblacion === 'indígena' ? 'i' : (
+                $alias = strtolower($tabla_poblacion === 'indigena' ? 'i' : (
                           $tabla_poblacion === 'mujer' ? 'm' : (
                           $tabla_poblacion === 'narp' ? 'n' : (
                           $tabla_poblacion === 'campesino' ? 'c' : (
@@ -81,7 +81,7 @@ try {
         
         // Obtener JOINs base para filtros que los requieran
         $joinsFiltros = "LEFT JOIN Mujer m ON a.documento = m.documento
-                        LEFT JOIN indígena i ON a.documento = i.documento
+                        LEFT JOIN indigena i ON a.documento = i.documento
                         LEFT JOIN narp n ON a.documento = n.documento
                         LEFT JOIN campesino c ON a.documento = c.documento
                         LEFT JOIN lgbtiq l ON a.documento = l.documento
@@ -113,7 +113,7 @@ try {
                   f.nombre_programa";
         
         $joins = "LEFT JOIN Mujer m ON a.documento = m.documento
-                  LEFT JOIN indígena i ON a.documento = i.documento
+                  LEFT JOIN indigena i ON a.documento = i.documento
                   LEFT JOIN narp n ON a.documento = n.documento
                   LEFT JOIN campesino c ON a.documento = c.documento
                   LEFT JOIN lgbtiq l ON a.documento = l.documento
@@ -194,20 +194,21 @@ try {
         // Mapa: ValorCheckbox => NombreTablaBD
         $mapPoblacion = [
             'Mujer' => 'Mujer', 
-            'Indígena' => 'indígena', 
+            'Indígena' => 'indigena', 
             'NARP' => 'narp', 
             'Campesino' => 'campesino', 
             'LGBTIQ+' => 'lgbtiq', 
             'Discapacidad' => 'discapacidad'
         ];
         
+        $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
         $poblacionesSeleccionadas = isset($data['tipo_poblacion']) ? explode(',', $data['tipo_poblacion']) : [];
         $poblacionesSeleccionadas = array_map('trim', $poblacionesSeleccionadas);
 
         foreach ($mapPoblacion as $valorCheckbox => $tableName) {
             if (in_array($valorCheckbox, $poblacionesSeleccionadas)) {
-                $conn->prepare("INSERT OR IGNORE INTO `$tableName` (documento) VALUES (:doc)")
-                     ->execute([':doc' => $data['documento']]);
+                $sqlIgnore = $isPg ? "INSERT INTO \"$tableName\" (documento) VALUES (:doc) ON CONFLICT DO NOTHING" : "INSERT OR IGNORE INTO `$tableName` (documento) VALUES (:doc)";
+                $conn->prepare($sqlIgnore)->execute([':doc' => $data['documento']]);
             }
         }
         
@@ -306,7 +307,7 @@ try {
             // Solo quitar de la tabla de población específica
             $validTables = [
                 'mujer' => 'Mujer', 
-                'indigena' => 'indígena', 
+                'indigena' => 'indigena', 
                 'narp' => 'narp', 
                 'campesino' => 'campesino', 
                 'lgbtiq' => 'lgbtiq', 

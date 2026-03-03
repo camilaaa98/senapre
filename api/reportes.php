@@ -34,11 +34,11 @@ try {
         $whereA = " WHERE a.numero_ficha = :ficha";
         $params[':ficha'] = trim($ficha);
     } elseif (!empty($tabla_poblacion)) {
-        $tablasPermitidas = ['mujer', 'indigena', 'indígena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        $tablasPermitidas = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
         if (in_array(strtolower($tabla_poblacion), $tablasPermitidas)) {
-            $tableName = strtolower($tabla_poblacion === 'indígena' ? 'indígena' : $tabla_poblacion);
-            $where = " WHERE documento IN (SELECT documento FROM `$tableName`)";
-            $whereA = " WHERE a.documento IN (SELECT documento FROM `$tableName`)";
+            $tableName = strtolower($tabla_poblacion);
+            $where = " WHERE documento IN (SELECT documento FROM \"$tableName\")";
+            $whereA = " WHERE a.documento IN (SELECT documento FROM \"$tableName\")";
         }
     }
 
@@ -90,10 +90,20 @@ try {
     // 6. Asistencias Recientes
     $asistenciasRecientes = [];
     try {
-        // Verificar si existe la tabla primero evitando error fatal
-        $stmt = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='asistencias'");
-        if ($stmt->fetch()) {
-             $stmt = $conn->query("SELECT fecha, COUNT(*) as cantidad FROM asistencias WHERE fecha >= date('now', '-7 days') GROUP BY fecha ORDER BY fecha");
+        $isPg = strpos(Database::getInstance()->getDbPath(), 'PostgreSQL') !== false;
+        $tableExists = false;
+        if ($isPg) {
+            $stmtExists = $conn->prepare("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'asistencias')");
+            $stmtExists->execute();
+            $tableExists = $stmtExists->fetchColumn();
+        } else {
+            $stmtExists = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='asistencias'");
+            $tableExists = $stmtExists->fetch();
+        }
+
+        if ($tableExists) {
+             $fechaSql = $isPg ? "fecha >= CURRENT_DATE - INTERVAL '7 days'" : "fecha >= date('now', '-7 days')";
+             $stmt = $conn->query("SELECT fecha, COUNT(*) as cantidad FROM asistencias WHERE $fechaSql GROUP BY fecha ORDER BY fecha");
              if ($stmt) $asistenciasRecientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } catch (Exception $e) {}
