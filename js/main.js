@@ -437,7 +437,7 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
             text.includes('cerrar sesión');
 
         if (esRespLiderazgo) {
-            // Resp. Liderazgo es más restrictivo
+            // Resp. Liderazgo ahora incluye Aprendices
             permitido = text.includes('dashboard') ||
                 text.includes('aprendices') ||
                 text.includes('cerrar sesión');
