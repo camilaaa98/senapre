@@ -289,11 +289,8 @@ function aplicarRestriccionesDeRol() {
 
     // 3. RESTRICCIÓN PARA JEFE DE BIENESTAR Y RESP. LIDERAZGO
     if ((esJefeBienestar || esRespLiderazgo) && !esDirector) {
-        // El responsable de Liderazgo ve el dashboard estándar (similar al Director)
-        if (esJefeBienestar && !esRespLiderazgo) {
-            filtrarDashboardParaBienestar(esRespLiderazgo);
-        }
-        ocultarMenusRestringidos(false, esRespLiderazgo);
+        filtrarDashboardParaBienestar(esRespLiderazgo);
+        ocultarMenusRestringidos(false, esRespLiderazgo, esDirector);
     }
 }
 
@@ -420,7 +417,7 @@ function filtrarDashboardParaBienestar(esRespLiderazgo = false) {
     cargarEstadisticasPoblacionDashboard();
 }
 
-function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) {
+function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, esDirector = false) {
     const menuItems = document.querySelectorAll('.sidebar-menu .menu-item');
 
     menuItems.forEach(item => {
@@ -439,6 +436,9 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
             text.includes('aprendices') ||
             text.includes('cerrar sesión');
 
+        // Los directores y administradores ven TODO
+        if (esDirector) permitido = true;
+
         if (esRespLiderazgo) {
             // Resp. Liderazgo ahora incluye Aprendices
             permitido = text.includes('dashboard') ||
@@ -452,7 +452,8 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
             item.style.display = 'block';
         }
 
-        // Filtrar submenús de aprendices para que solo vea población
+        // Filtrar submenús de aprendices
+        const submenuAprendices = item.querySelector('#submenu-aprendices');
         if (submenuAprendices) {
             const sublinks = submenuAprendices.querySelectorAll('li');
             sublinks.forEach(li => {
