@@ -289,7 +289,10 @@ function aplicarRestriccionesDeRol() {
 
     // 3. RESTRICCIÓN PARA JEFE DE BIENESTAR Y RESP. LIDERAZGO
     if ((esJefeBienestar || esRespLiderazgo) && !esDirector) {
-        filtrarDashboardParaBienestar(esRespLiderazgo);
+        // El responsable de Liderazgo ve el dashboard estándar (similar al Director)
+        if (esJefeBienestar && !esRespLiderazgo) {
+            filtrarDashboardParaBienestar(esRespLiderazgo);
+        }
         ocultarMenusRestringidos(false, esRespLiderazgo);
     }
 }
@@ -450,18 +453,15 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false) 
         }
 
         // Filtrar submenús de aprendices para que solo vea población
-        const submenuAprendices = item.querySelector('#submenu-aprendices');
         if (submenuAprendices) {
             const sublinks = submenuAprendices.querySelectorAll('li');
             sublinks.forEach(li => {
                 const subtext = li.innerText.toLowerCase();
                 if (esRespLiderazgo) {
-                    // Resp Liderazgo solo Población y Lista
-                    if (!subtext.includes('población') && !subtext.includes('lista')) {
-                        li.style.display = 'none';
-                    }
-                } else {
-                    // Jefe de Bienestar ve Lista y Población
+                    // Resp Liderazgo ve todo el submenú de Aprendices
+                    li.style.display = 'block';
+                } else if (!esDirector) {
+                    // Jefe de Bienestar (y otros) ve Lista y Población
                     if (!subtext.includes('población') && !subtext.includes('lista')) {
                         li.style.display = 'none';
                     }
