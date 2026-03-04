@@ -110,7 +110,7 @@
                 <div class="card-header">
                     <h3 class="card-title">Filtros</h3>
                 </div>
-                <div class="card-body-flex">
+                <div class="card-body-flex" style="padding: 10px 15px;">
                     <div class="flex-grow">
                         <input type="text" id="filtroSearch" class="form-control"
                             placeholder="Buscar por instructor o ficha...">
@@ -179,30 +179,30 @@
                 <div class="table-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px;">
                     <h3 class="table-title">Asignaciones Actuales</h3>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="abrirModal()" class="btn-primary"><i class="fas fa-plus"></i> Nueva
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="nuevaAsignacion()" class="btn-primary"
+                            style="padding: 8px 15px; font-size: 0.85rem;"><i class="fas fa-plus"></i> Nueva
                             Asignación</button>
-                        <button onclick="exportarExcel()" class="btn-primary" style="background: #1D6F42;"><i
-                                class="fas fa-file-excel"></i> Excel</button>
-                        <button onclick="exportarPDF()" class="btn-primary" style="background: #E84C3D;"><i
-                                class="fas fa-file-pdf"></i> PDF</button>
+                        <button onclick="exportarExcel()" class="btn-primary btn-excel"
+                            style="padding: 8px 15px; font-size: 0.85rem;"><i class="fas fa-file-excel"></i>
+                            Excel</button>
+                        <button onclick="exportarPDF()" class="btn-primary btn-pdf"
+                            style="padding: 8px 15px; font-size: 0.85rem;"><i class="fas fa-file-pdf"></i> PDF</button>
                     </div>
                 </div>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Instructor</th>
                             <th>Ficha</th>
-                            <th>Programa</th>
-                            <th>Jornada</th>
-                            <th>Fecha</th>
+                            <th>Instructor</th>
+                            <th>Fechas</th>
                             <th>Horario</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tbodyAsignaciones">
+                    <tbody id="tablaAsignaciones">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding: 30px;">Cargando asignaciones...</td>
+                            <td colspan="5" style="text-align:center; padding: 30px;">Cargando asignaciones...</td>
                         </tr>
                     </tbody>
                 </table>

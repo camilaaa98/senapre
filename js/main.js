@@ -484,14 +484,27 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            const academicKeywords = ['aprendices', 'fichas', 'programas', 'asignar', 'asistencias', 'reportes'];
+            const academicKeywords = ['aprendices', 'fichas', 'programas', 'asignar', 'asistencias', 'reportes', 'usuarios'];
             const isAcademic = academicKeywords.some(key => text.includes(key));
 
-            // Permitir solo Bienestar y Cerrar Sesión. El Dashboard central se oculta para obligar a ir a Bienestar
-            permitido = text.includes('bienestar') || text.includes('cerrar sesión');
+            // Permitir solo Liderazgo (antes Bienestar) y Cerrar Sesión
+            permitido = text.includes('bienestar') || text.includes('liderazgo') || text.includes('cerrar sesión');
 
-            // Si es académico, se oculta explícitamente a menos que sea Bienestar
-            if (isAcademic && !text.includes('bienestar')) permitido = false;
+            // Rebranding dinámico de Bienestar a Liderazgo
+            if (text.includes('bienestar')) {
+                const span = item.querySelector('span');
+                if (span) span.textContent = 'Liderazgo Estudiantil';
+                const link = item.querySelector('a');
+                if (link && !link.href.includes('bienestar-dashboard.html')) {
+                    link.href = 'bienestar-dashboard.html';
+                }
+            }
+
+            // Si es académico, se oculta explícitamente
+            if (isAcademic && !text.includes('bienestar') && !text.includes('liderazgo')) permitido = false;
+
+            // Ocultar el Dashboard Administrativo
+            if (text === 'dashboard') permitido = false;
         }
 
         if (!permitido) {
