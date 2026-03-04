@@ -447,10 +447,9 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            // Rol Liderazgo: Ocultar Dashboard de Director (primer item) 
-            // Solo permitir Bienestar, Gestión de Aprendices (si tiene permisos) y reportes específicos
-            permitido = (text.includes('bienestar') || text.includes('aprendices') || text.includes('asistencias') || text.includes('reportes') || text.includes('cerrar sesión'))
-                && !text.includes('home') && !item.querySelector('.fa-home');
+            const lk = item.querySelector('a');
+            const isDash = text.includes('dashboard') || text.includes('home') || (lk && lk.href.includes('admin-dashboard.html'));
+            permitido = (text.includes('bienestar') || text.includes('aprendices') || text.includes('asistencias') || text.includes('reportes') || text.includes('cerrar sesión')) && !isDash;
         }
 
         if (!permitido) {

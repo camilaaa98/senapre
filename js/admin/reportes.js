@@ -20,9 +20,9 @@ async function cargarReportes() {
             const data = result.data;
 
             // Actualizar tarjetas
-            document.getElementById('totalAprendices').textContent = data.resumen.aprendices;
-            document.getElementById('totalFichas').textContent = data.resumen.fichas;
-            document.getElementById('totalInstructores').textContent = data.resumen.instructores;
+            document.getElementById('totalAprendices').textContent = data.resumen.aprendices || 0;
+            document.getElementById('totalFichas').textContent = data.resumen.fichas || 0;
+            document.getElementById('totalInstructores').textContent = data.resumen.instructores || 0;
 
             // Gráfica de Estados
             renderChartEstados(data.aprendices_estado);

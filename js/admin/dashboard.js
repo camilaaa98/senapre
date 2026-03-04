@@ -15,6 +15,10 @@
         window.location.href = 'vocero-dashboard.html';
         return;
     }
+    if (rol === 'liderazgo') {
+        window.location.href = 'admin-bienestar-historico.html';
+        return;
+    }
     if (typeof authSystem !== 'undefined' && !authSystem.isAdmin()) {
         window.location.href = 'index.html';
         return;
