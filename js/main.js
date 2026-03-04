@@ -125,9 +125,45 @@ class AuthSystem {
 // Initialize global navigation features
 function initGlobalNavigation() {
     document.addEventListener('DOMContentLoaded', () => {
-        const header = document.querySelector('.content-header') || document.querySelector('.page-header');
+        // Enforce Professional Responsiveness
+        const head = document.head;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'css/responsive-professional.css?v=' + new Date().getTime();
+        head.appendChild(link);
+
+        const header = document.querySelector('.content-header') || document.querySelector('.page-header') || document.querySelector('.premium-header');
         const isDashboard = window.location.pathname.includes('dashboard.html');
         const isLogin = window.location.pathname.includes('index.html');
+
+        // Sidebar Toggle for Mobile
+        const dashboardContainer = document.querySelector('.dashboard-container');
+        if (dashboardContainer) {
+            // Add Overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            dashboardContainer.appendChild(overlay);
+
+            // Add Hamburger
+            const toggle = document.createElement('button');
+            toggle.className = 'mobile-nav-toggle';
+            toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            document.body.appendChild(toggle);
+
+            const sidebar = document.querySelector('.sidebar');
+
+            toggle.onclick = () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                toggle.innerHTML = sidebar.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            };
+
+            overlay.onclick = () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            };
+        }
 
         if (header && !isDashboard && !isLogin) {
             if (header.querySelector('.btn-back-professional')) return;
