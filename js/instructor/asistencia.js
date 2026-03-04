@@ -109,7 +109,7 @@ async function cargarAprendices() {
     */
 
     try {
-        const respAprendices = await fetch(`api/aprendices.php?ficha=${ficha}&limit=-1&estado=EN FORMACION`);
+        const respAprendices = await fetch(`api/aprendices.php?ficha=${ficha}&limit=-1&estado=LECTIVA`);
         const resAprendices = await respAprendices.json();
 
         if (!resAprendices.success) throw new Error('Error cargando aprendices');

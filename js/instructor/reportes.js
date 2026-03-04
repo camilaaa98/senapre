@@ -269,15 +269,23 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Logos
-    if (logoBase64) doc.addImage(logoBase64, 'PNG', 15, 15, 30, 15);
-    if (logoSenaBase64) doc.addImage(logoSenaBase64, 'PNG', 170, 10, 25, 25);
+    // Logos - Robust check
+    try {
+        if (typeof logoBase64 !== 'undefined' && logoBase64) doc.addImage(logoBase64, 'PNG', 15, 15, 30, 15);
+        if (typeof logoSenaBase64 !== 'undefined' && logoSenaBase64) doc.addImage(logoSenaBase64, 'PNG', 170, 10, 25, 25);
+    } catch (e) {
+        console.warn('Logos not available for PDF');
+    }
 
-    // Título
+    // Título Centrado
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setTextColor(57, 169, 0); // SENA Green
-    doc.text(`REPORTE DE ASISTENCIA - FICHA ${ficha}`, 105, 25, { align: "center" });
+    doc.text('SISTEMA SENAPRE', 105, 20, { align: "center" });
+
+    doc.setFontSize(14);
+    doc.setTextColor(0, 50, 77); // SENA Blue
+    doc.text(`REPORTE DE ASISTENCIA - FICHA ${ficha}`, 105, 28, { align: "center" });
 
     doc.setFontSize(10);
     doc.setTextColor(100);

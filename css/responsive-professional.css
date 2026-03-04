@@ -168,6 +168,35 @@
     box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1) !important;
 }
 
+/* 5. Global Typography Centering */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.content-title,
+.content-description,
+.card-title,
+.table-title,
+.sidebar-header h3,
+.sidebar-subtitle {
+    text-align: center !important;
+}
+
+.premium-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+}
+
+.title-group {
+    text-align: center;
+    width: 100%;
+}
+
 /* Utility Classes */
 .card-margin {
     margin-bottom: 30px !important;
@@ -219,6 +248,47 @@
 .table-header div {
     display: flex !important;
     gap: 8px !important;
+}
+
+/* 6. Assistance Status Colors */
+.badge-status-presente {
+    background-color: #39A900 !important;
+    /* Verde SENA */
+    color: white !important;
+}
+
+.badge-status-retardo,
+.badge-status-retardado {
+    background-color: #f59e0b !important;
+    /* Naranja */
+    color: white !important;
+}
+
+.badge-status-ausente {
+    background-color: #dc2626 !important;
+    /* Rojo */
+    color: white !important;
+}
+
+.badge-status-excusa,
+.badge-status-justificado {
+    background-color: #2563eb !important;
+    /* Azul */
+    color: white !important;
+}
+
+/* 7. Button Style for 'Volver' links */
+.btn-back,
+a[href*="dashboard"].btn-premium-outline,
+a.menu-link[href*="dashboard"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
 }
 
 /* Mobile Toggle Hidden by Default */
