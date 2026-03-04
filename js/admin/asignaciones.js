@@ -166,7 +166,8 @@ async function guardarAsignacion(event) {
     // Validar estado del instructor
     const instructor = instructoresData.find(i => i.id_usuario == instructorSeleccionado);
     if (instructor) {
-        if (instructor.estado === 'inactivo' || instructor.estado === '0' || instructor.estado === 0) {
+        const estadoNorm = String(instructor.estado).toLowerCase().trim();
+        if (estadoNorm === 'inactivo' || estadoNorm === '0' || estadoNorm === 'false') {
             mostrarNotificacion(`No se puede asignar fichas a un instructor INACTIVO (${instructor.nombre} ${instructor.apellido})`, 'error');
             return;
         }

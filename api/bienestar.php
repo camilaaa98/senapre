@@ -157,6 +157,41 @@ try {
             exit;
         }
 
+        // Guardar nueva reunión y procesar notificaciones
+        if ($action === 'saveReunion') {
+            if (empty($data['titulo']) || empty($data['fecha'])) throw new Exception('Datos incompletos');
+            
+            $sql = "INSERT INTO bienestar_reuniones (titulo, fecha, hora) VALUES (:t, :f, :h)";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':t' => $data['titulo'],
+                ':f' => $data['fecha'],
+                ':h' => $data['hora'] ?? '08:00'
+            ]);
+            $idReunion = $conn->lastInsertId();
+
+            // Lógica de notificaciones - En producción esto dispararía workers o servicios externos
+            // Por ahora registramos el éxito del proceso
+            echo json_encode(['success' => true, 'message' => 'Reunión creada', 'id' => $idReunion]);
+            exit;
+        }
+
+        // Actualizar datos de contacto de un líder (Aprendiz)
+        if ($action === 'updateLider') {
+            if (empty($data['documento'])) throw new Exception('Documento requerido');
+            
+            $sql = "UPDATE aprendices SET correo = :c, celular = :t WHERE documento = :d";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':c' => $data['correo'] ?? null,
+                ':t' => $data['telefono'] ?? null,
+                ':d' => $data['documento']
+            ]);
+            
+            echo json_encode(['success' => true, 'message' => 'Datos actualizados']);
+            exit;
+        }
+
         // Registrar asistencia (Biométrica o Manual)
         if ($action === 'registrarAsistencia') {
             $id_reunion = $data['id_reunion'];

@@ -91,6 +91,7 @@
                             <th>Documento</th>
                             <th>Aprendiz</th>
                             <th>Tipo de Líder</th>
+                            <th>Población</th>
                             <th>Ficha</th>
                             <th>Contacto</th>
                             <th>Acciones</th>
@@ -98,10 +99,27 @@
                     </thead>
                     <tbody id="tbodyLideres">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px;">Cargando líderes...</td>
+                            <td colspan="7" style="text-align: center; padding: 30px;">Cargando líderes...</td>
                         </tr>
                     </tbody>
                 </table>
+                <div id="paginationControls" class="pagination-footer"
+                    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                    <div class="pagination-info" style="font-size: 0.9rem; color: #64748b;">
+                        Mostrando <span id="pagStart">0</span> - <span id="pagEnd">0</span> de <span
+                            id="pagTotal">0</span> líderes
+                    </div>
+                    <div class="pagination-buttons" style="display: flex; gap: 8px;">
+                        <button onclick="prevPage()" id="btnPrev" class="btn-premium btn-premium-outline"
+                            style="padding: 5px 15px; font-size: 0.85rem;">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </button>
+                        <button onclick="nextPage()" id="btnNext" class="btn-premium btn-premium-outline"
+                            style="padding: 5px 15px; font-size: 0.85rem;">
+                            Siguiente <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -212,8 +230,9 @@
 
     <script src="js/main.js?v=1.0.6"></script>
     <script>
-        let lideresData = [];
-        let modoMensaje = '';
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredData = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             const user = authSystem.getCurrentUser();
@@ -224,61 +243,103 @@
         async function cargarLideres() {
             const tipo = document.getElementById('filtroTipo').value;
             const tbody = document.getElementById('tbodyLideres');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Cargando líderes...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Cargando líderes...</td></tr>';
             try {
                 const response = await fetch(`api/bienestar.php?action=getLideres&filtro=${tipo}`);
-                if (!response.ok) {
-                    throw new Error(`Error HTTP ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+
                 const result = await response.json();
                 if (result.success && Array.isArray(result.data)) {
                     lideresData = result.data;
-                    renderLideres(lideresData);
+                    filteredData = [...lideresData];
+                    currentPage = 1;
+                    renderTable();
                 } else {
                     throw new Error(result.message || 'Respuesta inesperada del servidor');
                 }
             } catch (error) {
                 console.error('Error cargando líderes:', error);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Error al cargar: ${error.message}. Verifique la conexión con el servidor.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Error al cargar.</td></tr>`;
             }
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            renderLideres(pageData);
+            updatePaginationInfo();
         }
 
         function renderLideres(data) {
             const tbody = document.getElementById('tbodyLideres');
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay líderes registrados en esta categoría</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">No hay líderes para mostrar</td></tr>';
                 return;
             }
             tbody.innerHTML = data.map(l => `
                 <tr>
-                    <td>${l.documento}</td>
+                    <td class="td-mono">${l.documento}</td>
                     <td><strong>${l.nombre} ${l.apellido}</strong></td>
-                    <td><span class="badge" style="background: var(--sena-green); color: white;">${l.tipo}</span></td>
-                    <td>${l.detalle}</td>
+                    <td><span class="badge" style="background: var(--sena-green, #39A900); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${l.tipo}</span></td>
+                    <td style="color: #64748b; font-size: 0.85rem;">${l.poblacion || 'Ninguna'}</td>
+                    <td class="td-mono">${l.detalle}</td>
                     <td>
-                        <div style="font-size: 0.9rem;">
-                            <i class="fas fa-envelope"></i> ${l.correo || 'N/A'}<br>
-                            <i class="fab fa-whatsapp"></i> ${l.telefono || 'N/A'}
+                        <div style="font-size: 0.85rem; color: #475569;">
+                            <i class="fas fa-envelope" style="width: 15px;"></i> ${l.correo || '-'}<br>
+                            <i class="fab fa-whatsapp" style="width: 15px;"></i> ${l.telefono || '-'}
                         </div>
                     </td>
                     <td>
-                        <button onclick='abrirEditarLider(${JSON.stringify(l).replace(/'/g, "&apos;")})' class="btn-primary" style="background: #7c4dff; padding: 5px 10px; font-size: 0.8rem;">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                        <div style="display: flex; gap: 5px;">
+                            <button onclick='abrirEditarLider(${JSON.stringify(l).replace(/'/g, "&apos;")})' class="btn-icon" style="background: #f1f5f9; color: #475569;" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
+        function updatePaginationInfo() {
+            const total = filteredData.length;
+            const start = total === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, total);
+
+            document.getElementById('pagStart').textContent = start;
+            document.getElementById('pagEnd').textContent = end;
+            document.getElementById('pagTotal').textContent = total;
+
+            document.getElementById('btnPrev').disabled = currentPage === 1;
+            document.getElementById('btnNext').disabled = end >= total;
+
+            document.getElementById('btnPrev').style.opacity = currentPage === 1 ? '0.5' : '1';
+            document.getElementById('btnNext').style.opacity = end >= total ? '0.5' : '1';
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage * itemsPerPage) < filteredData.length) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
         function filtrarTabla() {
             const term = (document.getElementById('buscarLider').value || '').toLowerCase();
-            const filtered = lideresData.filter(l => {
-                const nombre = (l.nombre || '').toLowerCase();
-                const apellido = (l.apellido || '').toLowerCase();
-                const doc = (l.documento || '').toLowerCase();
-                return nombre.includes(term) || apellido.includes(term) || doc.includes(term);
+            filteredData = lideresData.filter(l => {
+                const searchStr = `${l.nombre} ${l.apellido} ${l.documento} ${l.detalle} ${l.tipo} ${l.poblacion}`.toLowerCase();
+                return searchStr.includes(term);
             });
-            renderLideres(filtered);
+            currentPage = 1;
+            renderTable();
         }
 
         function prepararMensajeMasivo(modo) {
