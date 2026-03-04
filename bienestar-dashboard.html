@@ -7,7 +7,7 @@
     <title>Bienestar (Liderazgo) - SenApre</title>
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
+</head>
 
 <body>
     <div class="dashboard-container">
@@ -15,8 +15,7 @@
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>Bienestar</h3>
-                <div class="sidebar-subtitle" id="userNameSub"
-                   >Responsable</div>
+                <div class="sidebar-subtitle" id="userNameSub">Responsable</div>
             </div>
             <nav class="sidebar-menu">
                 <li class="menu-item"><a href="admin-dashboard.html" class="menu-link"
@@ -39,9 +38,24 @@
         </aside>
 
         <main class="main-content">
-            <div class="content-header">
-                <h1 class="content-title">Panel de Liderazgo</h1>
-                <p class="content-description">Gestión de líderes estudiantiles y comunicaciones</p>
+            <div class="content-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="content-title">Panel de Liderazgo</h1>
+                    <p class="content-description">Gestión de líderes estudiantiles y comunicaciones</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="abrirModalReunion()" class="btn-primary" style="background: #39A900;">
+                        <i class="fas fa-calendar-plus"></i> Nueva Reunión
+                    </button>
+                    <button onclick="window.location.href='admin-bienestar-asistencia.html'" class="btn-primary"
+                        style="background: #00324D;">
+                        <i class="fas fa-fingerprint"></i> Asistencia Biométrica
+                    </button>
+                    <a href="admin-bienestar-historico.html" class="btn-primary"
+                        style="background: #64748b; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem;">
+                        <i class="fas fa-history"></i> Historial
+                    </a>
+                </div>
             </div>
 
             <div class="card" style="margin-bottom: 25px;">
@@ -86,6 +100,7 @@
                             <th>Tipo de Líder</th>
                             <th>Ficha</th>
                             <th>Contacto</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tbodyLideres">
@@ -96,6 +111,80 @@
                 </table>
             </div>
         </main>
+    </div>
+
+    <!-- Modal Nueva Reunión -->
+    <div id="modalReunion" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
+            <h3>Programar Nueva Reunión</h3>
+            <form id="formReunion" onsubmit="guardarReunion(event)">
+                <div class="form-group">
+                    <label class="form-label">Título de la Reunión</label>
+                    <input type="text" id="tituloReunion" class="form-control" required
+                        placeholder="Ej: Asamblea de Voceros">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" id="fechaReunion" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora</label>
+                        <input type="time" id="horaReunion" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="margin: 15px 0; padding: 10px; background: #f8fafc; border-radius: 8px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Notificar
+                        por:</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="checkbox" id="notiEmail" checked> Email
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="checkbox" id="notiSMS"> SMS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                            <input type="checkbox" id="notiWA" checked> WhatsApp
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="cerrarModalReunion()" class="btn-primary"
+                        style="background: #666;">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="background: #39A900;">Crear y Notificar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Líder -->
+    <div id="modalEditarLider" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px;">
+            <h3>Editar Datos de Contacto</h3>
+            <p id="labelLiderEdit" style="color: #666; font-size: 0.9rem; margin-bottom: 15px;"></p>
+            <form id="formEditarLider" onsubmit="guardarEdicionLider(event)">
+                <input type="hidden" id="editDoc">
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" id="editCorreo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Número de Celular</label>
+                    <input type="tel" id="editTel" class="form-control" required>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="cerrarModalEditar()" class="btn-primary"
+                        style="background: #666;">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="background: #00324D;">Actualizar</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal Mensajería -->
@@ -179,6 +268,11 @@
                             <i class="fab fa-whatsapp"></i> ${l.telefono || 'N/A'}
                         </div>
                     </td>
+                    <td>
+                        <button onclick='abrirEditarLider(${JSON.stringify(l).replace(/'/g, "&apos;")})' class="btn-primary" style="background: #7c4dff; padding: 5px 10px; font-size: 0.8rem;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -253,6 +347,101 @@
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Enviar';
+            }
+        }
+
+        // --- FUNCIONES MÓDULO REUNIONES ---
+        function abrirModalReunion() {
+            document.getElementById('modalReunion').style.display = 'flex';
+        }
+
+        function cerrarModalReunion() {
+            document.getElementById('modalReunion').style.display = 'none';
+        }
+
+        async function guardarReunion(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
+
+            const payload = {
+                titulo: document.getElementById('tituloReunion').value,
+                fecha: document.getElementById('fechaReunion').value,
+                hora: document.getElementById('horaReunion').value,
+                notificar_email: document.getElementById('notiEmail').checked,
+                notificar_sms: document.getElementById('notiSMS').checked,
+                notificar_whatsapp: document.getElementById('notiWA').checked,
+                destinatarios: lideresData.map(l => ({
+                    documento: l.documento,
+                    email: l.correo,
+                    tel: l.telefono,
+                    nombre: `${l.nombre} ${l.apellido}`
+                }))
+            };
+
+            try {
+                const res = await fetch('api/bienestar.php?action=saveReunion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Reunión creada y notificaciones procesadas correctamente.');
+                    cerrarModalReunion();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (err) {
+                alert('Error técnico al crear la reunión');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Crear y Notificar';
+            }
+        }
+
+        // --- FUNCIONES EDICIÓN LIDER ---
+        function abrirEditarLider(l) {
+            document.getElementById('editDoc').value = l.documento;
+            document.getElementById('editCorreo').value = l.correo || '';
+            document.getElementById('editTel').value = l.telefono || '';
+            document.getElementById('labelLiderEdit').textContent = `Líder: ${l.nombre} ${l.apellido} (${l.tipo})`;
+            document.getElementById('modalEditarLider').style.display = 'flex';
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modalEditarLider').style.display = 'none';
+        }
+
+        async function guardarEdicionLider(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+
+            const payload = {
+                documento: document.getElementById('editDoc').value,
+                correo: document.getElementById('editCorreo').value,
+                telefono: document.getElementById('editTel').value
+            };
+
+            try {
+                const res = await fetch('api/bienestar.php?action=updateLider', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    cerrarModalEditar();
+                    cargarLideres(); // Recargar tabla
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (err) {
+                alert('Error al actualizar datos');
+            } finally {
+                btn.disabled = false;
             }
         }
     </script>

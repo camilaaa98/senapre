@@ -100,10 +100,10 @@ body {
 
 /* Logo principal del sidebar — tamaño fijo en TODOS los paneles */
 .logo-principal {
-    width: 100px !important;
-    height: 100px !important;
+    width: 70px !important;
+    height: 70px !important;
     object-fit: cover;
-    border-radius: 50px;
+    border-radius: 35px;
     display: block;
     margin: 0 auto 12px;
 }
@@ -323,7 +323,7 @@ body {
 }
 
 .sena-logo-footer {
-    height: 60px;
+    height: 45px;
     width: auto;
     opacity: 0.9;
 }

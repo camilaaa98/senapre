@@ -149,12 +149,16 @@
                     <div class="table-header-custom">
                         <h2 class="table-title">Lista de Aprendices</h2>
                         <div class="table-actions">
-                            <button onclick="nuevoAprendiz()" class="btn-primary btn-nuevo btn-flex-center">
-                                + Agregar Aprendiz
+                            <button onclick="nuevoAprendiz()" class="btn-primary btn-moderate">
+                                <i class="fas fa-plus"></i> Agregar Aprendiz
                             </button>
-                            <button onclick="exportarAprendicesPDF()" class="btn-primary"
-                                style="background: #ef4444; color: white; display: flex; align-items: center; gap: 8px;">
+                            <button onclick="exportarAprendicesPDF()" class="btn-primary btn-moderate"
+                                style="background: #ef4444;">
                                 <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button onclick="exportarAprendices()" class="btn-primary btn-moderate"
+                                style="background: #16a34a;">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
                             </button>
                         </div>
                     </div>

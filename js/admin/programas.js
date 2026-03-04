@@ -44,7 +44,7 @@ function mostrarProgramas(programas) {
     const tbody = document.getElementById('tablaProgramas');
 
     if (!programas || programas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No se encontraron programas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center color-muted">No se encontraron programas</td></tr>';
         return;
     }
 
@@ -52,11 +52,11 @@ function mostrarProgramas(programas) {
     const startIndex = (currentPage - 1) * itemsPerPage;
 
     tbody.innerHTML = programas.map((p, index) => `
-        <tr>
-            <td style="text-align: center; font-weight: 600; color: #666;">${startIndex + index + 1}</td>
+        <tr class="table-row-divider">
+            <td class="td-index">${startIndex + index + 1}</td>
             <td>${p.nombre_programa}</td>
             <td>${p.nivel_formacion || 'N/A'}</td>
-            <td style="text-align: center;">
+            <td class="text-center">
                 <button onclick="eliminarPrograma('${p.nombre_programa}')" class="btn-icon btn-danger" title="Eliminar">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -206,7 +206,7 @@ async function exportarProgramas() {
         let table = `
             <table border="1">
                 <thead>
-                    <tr style="background-color: #39A900; color: white;">
+                    <tr class="export-header">
                         <th>Nombre del Programa</th>
                         <th>Nivel de Formación</th>
                         <th>Estado</th>
@@ -243,20 +243,13 @@ async function exportarProgramas() {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-    `;
-
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 // Función debounce para optimizar búsqueda

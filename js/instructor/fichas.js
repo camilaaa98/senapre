@@ -46,7 +46,7 @@ async function loadFichas(userId) {
 
         if (data.success) {
             if (data.data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No tienes fichas asignadas.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 color-muted">No tienes fichas asignadas.</td></tr>';
                 return;
             }
 
@@ -67,11 +67,11 @@ async function loadFichas(userId) {
                 tableBody.appendChild(row);
             });
         } else {
-            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error: ${data.message}</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center color-error py-4">Error: ${data.message}</td></tr>`;
         }
     } catch (error) {
         console.error('Error loading fichas:', error);
-        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar las fichas.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center color-error py-4">Error al cargar las fichas.</td></tr>';
     }
 }
 

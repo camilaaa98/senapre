@@ -379,12 +379,12 @@ function calcularEstadisticasPorAprendiz(datos) {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px; padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10000;
-    `;
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 

@@ -66,6 +66,10 @@
                             <span class="input-icon"><i class="fas fa-lock"></i></span>
                             <input type="password" id="password" name="password" class="form-control"
                                 placeholder="••••••••" required>
+                            <span class="input-icon-right" onclick="togglePasswordVisibility()"
+                                style="cursor: pointer;">
+                                <i id="togglePasswordIcon" class="fas fa-eye"></i>
+                            </span>
                         </div>
                     </div>
 
@@ -86,6 +90,20 @@
     </div>
 
     <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 

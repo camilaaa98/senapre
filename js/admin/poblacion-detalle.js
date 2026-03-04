@@ -58,30 +58,33 @@ async function cargarDatosEnfoque(tipoRelativo, tituloOriginal) {
         const voceroContainer = document.getElementById('vocero-data');
         if (vocero && vocero.documento) {
             voceroContainer.innerHTML = `
-                <div class="vocero-avatar"><i class="fas fa-user-check"></i></div>
-                <div>
-                    <h3 style="margin: 0; color: #333;">${vocero.nombre} ${vocero.apellido}</h3>
-                    <p style="margin: 4px 0; color: #666; font-size: 0.95rem;">
-                        <i class="fas fa-id-card"></i> ${vocero.documento} | 
-                        <i class="fas fa-barcode"></i> Ficha: ${vocero.numero_ficha}
-                    </p>
-                    <span class="badge badge-lectiva" style="background: #39A900; color: white;">Vocero Oficial Activo</span>
+                <div class="vocero-avatar vocero-avatar-active"><i class="fas fa-user-check"></i></div>
+                <div class="vocero-info-card">
+                    <div>
+                        <h3>${vocero.nombre} ${vocero.apellido}</h3>
+                        <p>
+                            <i class="fas fa-id-card"></i> ${vocero.documento} | 
+                            <i class="fas fa-barcode"></i> Ficha: ${vocero.numero_ficha}
+                        </p>
+                        <span class="badge badge-lectiva">Vocero Oficial Activo</span>
+                    </div>
                 </div>
             `;
-            // Aplicar estilo al contenedor padre si es necesario
-            document.getElementById('vocero-container').style.display = 'flex';
+            document.getElementById('vocero-container').classList.add('flex-between');
         } else {
             voceroContainer.innerHTML = `
-                <div class="vocero-avatar" style="background: #f1f5f9; color: #94a3b8;"><i class="fas fa-user-slash"></i></div>
-                <div>
-                    <h3 style="margin: 0; color: #94a3b8;">Sin Vocero Asignado</h3>
-                    <p style="margin: 4px 0; color: #94a3b8; font-style: italic;">No se ha designado un representante para esta población aún.</p>
+                <div class="vocero-avatar-status"><i class="fas fa-user-slash"></i></div>
+                <div class="vocero-info-card">
+                    <div>
+                        <h3 class="color-muted">Sin Vocero Asignado</h3>
+                        <p class="italic-muted">No se ha designado un representante para esta población aún.</p>
+                    </div>
                 </div>
             `;
         }
 
         // 2. Cargar Integrantes (Filtrando por tabla física)
-        const tablaApi = tipoRelativo === 'indigena' ? 'indígena' : tipoRelativo;
+        const tablaApi = tipoRelativo === 'indigena' ? 'indigena' : tipoRelativo;
         const resI = await fetch(`api/aprendices.php?limit=-1&tabla_poblacion=${tablaApi}`);
         const rI = await resI.json();
 
@@ -89,13 +92,13 @@ async function cargarDatosEnfoque(tipoRelativo, tituloOriginal) {
         if (rI.success && rI.data.length > 0) {
             integrantesGlobal = rI.data;
             listBody.innerHTML = rI.data.map(a => `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 1rem;">${a.documento}</td>
-                    <td style="padding: 1rem; font-weight: 500;">${a.nombre} ${a.apellido}</td>
-                    <td style="padding: 1rem; color: #00324D; font-weight: bold;">${a.documento}</td>
-                    <td style="padding: 1rem; font-family: monospace; color: #39A900;">${a.documento}</td>
-                    <td style="padding: 1rem;">${a.numero_ficha}</td>
-                    <td style="padding: 1rem;"><span class="badge ${getClaseEstado(a.estado)}">${a.estado}</span></td>
+                <tr class="table-poblacion">
+                    <td>${a.documento}</td>
+                    <td class="td-nombres">${a.nombre} ${a.apellido}</td>
+                    <td class="td-document">${a.documento}</td>
+                    <td class="td-mono">${a.documento}</td>
+                    <td>${a.numero_ficha}</td>
+                    <td><span class="badge ${getClaseEstado(a.estado)}">${a.estado}</span></td>
                 </tr>
             `).join('');
         } else {
@@ -241,12 +244,12 @@ async function cargarPropuestas(titulo) {
 
         if (r.success && r.data.length > 0) {
             container.innerHTML = r.data.map(p => `
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="flex: 1;">
-                        <p style="margin: 0; color: #334155;">${p.propuesta}</p>
-                        <small style="color: #94a3b8;">${new Date(p.fecha_creacion).toLocaleString()}</small>
+                <div class="propuesta-item">
+                    <div class="propuesta-content">
+                        <p>${p.propuesta}</p>
+                        <small>${new Date(p.fecha_creacion).toLocaleString()}</small>
                     </div>
-                    <button onclick="eliminarPropuesta(${p.id})" style="color: #ef4444; background: none; border: none; cursor: pointer; padding: 5px;">
+                    <button class="btn-delete" onclick="eliminarPropuesta(${p.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -340,15 +343,13 @@ window.CerrarModal = function (id) {
 };
 
 function mostrarNotificacion(msg, tipo = 'success') {
-    // Implementación simple si no existe el global
     const toast = document.createElement('div');
     toast.textContent = msg;
-    toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px; padding: 15px 25px;
-        border-radius: 8px; color: white; z-index: 10001; font-weight: 500;
-        background: ${tipo === 'success' ? '#39A900' : '#ef4444'};
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    `;
+    toast.className = `toast-notification toast-${tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }

@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarReportes();
 });
 
+// Helper para obtener colores del CSS
+function getStyleColor(variable) {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim() || '#6b7280';
+}
+
 async function cargarReportes() {
     try {
         const response = await fetch('api/reportes.php');
@@ -36,22 +41,15 @@ function renderChartEstados(data) {
     const labels = data.map(item => item.estado);
     const values = data.map(item => item.cantidad);
 
-    // Asignar colores según el estado
+    // Asignar colores según el estado (Desde CSS)
     const colors = labels.map(estado => {
         const estadoUpper = estado.toUpperCase();
-        if (estadoUpper === 'EN FORMACION') {
-            return '#39A900'; // Verde SENA vibrante para EN FORMACION
-        } else if (estadoUpper === 'APLAZADO') {
-            return '#fbbf24'; // Amarillo para APLAZADO
-        } else if (estadoUpper === 'RETIRADO' || estadoUpper === 'RETIRO VOLUNTARIO' || estadoUpper === 'CANCELADO') {
-            return '#ef4444'; // Rojo para estados negativos
-        } else if (estadoUpper === 'INDUCCION') {
-            return '#3b82f6'; // Azul para INDUCCION
-        } else if (estadoUpper === 'POR CERTIFICAR') {
-            return '#f59e0b'; // Naranja para POR CERTIFICAR
-        } else {
-            return '#6b7280'; // Gris para otros
-        }
+        if (estadoUpper === 'EN FORMACION') return getStyleColor('--chart-formacion');
+        if (estadoUpper === 'APLAZADO') return getStyleColor('--chart-aplazado');
+        if (['RETIRADO', 'RETIRO VOLUNTARIO', 'CANCELADO'].includes(estadoUpper)) return getStyleColor('--chart-negativo');
+        if (estadoUpper === 'INDUCCION') return getStyleColor('--chart-induccion');
+        if (estadoUpper === 'POR CERTIFICAR') return getStyleColor('--chart-certificar');
+        return getStyleColor('--chart-otros');
     });
 
     new Chart(ctx, {
@@ -62,7 +60,7 @@ function renderChartEstados(data) {
                 data: values,
                 backgroundColor: colors,
                 borderWidth: 2,
-                borderColor: '#fff'
+                borderColor: getStyleColor('--white')
             }]
         },
         options: {
@@ -73,9 +71,7 @@ function renderChartEstados(data) {
                     position: 'bottom',
                     labels: {
                         padding: 15,
-                        font: {
-                            size: 12
-                        }
+                        font: { size: 12 }
                     }
                 }
             }
@@ -89,15 +85,11 @@ function renderChartProgramas(data) {
     const labels = data.map(item => item.nombre_programa);
     const values = data.map(item => item.cantidad);
 
-    // Asignar colores según posición: primeras 3 verde, siguientes 3 amarillo, últimas 2 rojo
+    // Asignar colores según posición (Desde CSS)
     const backgroundColors = values.map((_, index) => {
-        if (index < 3) {
-            return '#39A900'; // Verde biche para las primeras 3
-        } else if (index < 6) {
-            return '#fbbf24'; // Amarillo para las siguientes 3
-        } else {
-            return '#ef4444'; // Rojo para las últimas 2
-        }
+        if (index < 3) return getStyleColor('--chart-formacion');
+        if (index < 6) return getStyleColor('--chart-aplazado');
+        return getStyleColor('--chart-negativo');
     });
 
     new Chart(ctx, {
@@ -116,25 +108,12 @@ function renderChartProgramas(data) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
-                    ticks: {
-                        display: false  // Ocultar etiquetas del eje X
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
+                x: { ticks: { display: false } },
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
             },
             plugins: {
-                tooltip: {
-                    enabled: true  // Mantener tooltips al pasar el cursor
-                },
-                legend: {
-                    display: false  // Ocultar leyenda ya que los colores son por posición
-                }
+                tooltip: { enabled: true },
+                legend: { display: false }
             }
         }
     });

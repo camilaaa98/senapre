@@ -187,7 +187,13 @@ const VoceroDashboard = (() => {
 
         // Aviso de filtro activo
         const aviso = document.getElementById('aviso-filtro');
-        if (aviso) aviso.style.display = (verTodos || estadoFilt) ? 'none' : 'flex';
+        if (aviso) {
+            if (verTodos || estadoFilt) {
+                aviso.classList.add('hidden');
+            } else {
+                aviso.classList.remove('hidden');
+            }
+        }
 
         if (!lista.length) {
             info('voc-tabla-body', 'Sin resultados con los filtros aplicados.');
@@ -210,21 +216,21 @@ const VoceroDashboard = (() => {
                 <td>${a.nombre || ''} ${a.apellido || ''}</td>
                 <td>
                     <span class="voc-campo" id="correo-txt-${doc}">${a.correo || '—'}</span>
-                    <input class="voc-input voc-edit-input" id="correo-inp-${doc}" value="${a.correo || ''}" placeholder="correo@ejemplo.com" style="display:none">
+                    <input class="voc-input voc-edit-input hidden" id="correo-inp-${doc}" value="${a.correo || ''}" placeholder="correo@ejemplo.com">
                 </td>
                 <td>
                     <span class="voc-campo" id="cel-txt-${doc}">${a.celular || '—'}</span>
-                    <input class="voc-input voc-edit-input" id="cel-inp-${doc}" value="${a.celular || ''}" placeholder="310 000 0000" style="display:none">
+                    <input class="voc-input voc-edit-input hidden" id="cel-inp-${doc}" value="${a.celular || ''}" placeholder="310 000 0000">
                 </td>
                 <td><span class="badge ${badge}">${a.estado || '—'}</span></td>
                 <td>
                     <button class="voc-btn voc-btn-edit" onclick="VoceroDashboard.editarFila('${doc}')" id="btn-edit-${doc}" title="Editar contacto">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="voc-btn voc-btn-save" onclick="VoceroDashboard.guardarFila('${doc}')" id="btn-save-${doc}" style="display:none" title="Guardar">
+                    <button class="voc-btn voc-btn-save hidden" onclick="VoceroDashboard.guardarFila('${doc}')" id="btn-save-${doc}" title="Guardar">
                         <i class="fas fa-check"></i>
                     </button>
-                    <button class="voc-btn voc-btn-cancel" onclick="VoceroDashboard.cancelarEdicion('${doc}')" id="btn-cancel-${doc}" style="display:none" title="Cancelar">
+                    <button class="voc-btn voc-btn-cancel hidden" onclick="VoceroDashboard.cancelarEdicion('${doc}')" id="btn-cancel-${doc}" title="Cancelar">
                         <i class="fas fa-times"></i>
                     </button>
                 </td>
@@ -297,15 +303,33 @@ const VoceroDashboard = (() => {
         ['correo', 'cel'].forEach(campo => {
             const txt = document.getElementById(`${campo}-txt-${doc}`);
             const inp = document.getElementById(`${campo}-inp-${doc}`);
-            if (txt) txt.style.display = modoEdicion ? 'none' : '';
-            if (inp) inp.style.display = modoEdicion ? '' : 'none';
+            if (txt) {
+                if (modoEdicion) txt.classList.add('hidden');
+                else txt.classList.remove('hidden');
+            }
+            if (inp) {
+                if (modoEdicion) inp.classList.remove('hidden');
+                else inp.classList.add('hidden');
+            }
         });
         const btnEdit = document.getElementById(`btn-edit-${doc}`);
         const btnSave = document.getElementById(`btn-save-${doc}`);
         const btnCancel = document.getElementById(`btn-cancel-${doc}`);
-        if (btnEdit) btnEdit.style.display = modoEdicion ? 'none' : '';
-        if (btnSave) { btnSave.style.display = modoEdicion ? '' : 'none'; btnSave.disabled = false; btnSave.innerHTML = '<i class="fas fa-check"></i>'; }
-        if (btnCancel) btnCancel.style.display = modoEdicion ? '' : 'none';
+
+        if (btnEdit) {
+            if (modoEdicion) btnEdit.classList.add('hidden');
+            else btnEdit.classList.remove('hidden');
+        }
+        if (btnSave) {
+            if (modoEdicion) btnSave.classList.remove('hidden');
+            else btnSave.classList.add('hidden');
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fas fa-check"></i>';
+        }
+        if (btnCancel) {
+            if (modoEdicion) btnCancel.classList.remove('hidden');
+            else btnCancel.classList.add('hidden');
+        }
     }
 
     // ────────────────────────────────────────────────────────────
@@ -375,7 +399,7 @@ const VoceroDashboard = (() => {
     function $(id, val) { const e = document.getElementById(id); if (e) e.textContent = val; }
     function cargando(id) { const e = document.getElementById(id); if (e) e.innerHTML = '<div class="voc-loading"><i class="fas fa-spinner"></i> Cargando datos...</div>'; }
     function info(id, msg) { const e = document.getElementById(id); if (e) e.innerHTML = `<div class="voc-loading"><i class="fas fa-inbox"></i> ${msg}</div>`; }
-    function err(id, msg) { const e = document.getElementById(id); if (e) e.innerHTML = `<div class="voc-loading"><i class="fas fa-exclamation-triangle" style="color:#dc2626"></i> ${msg}</div>`; }
+    function err(id, msg) { const e = document.getElementById(id); if (e) e.innerHTML = `<div class="voc-loading"><i class="fas fa-exclamation-triangle color-error"></i> ${msg}</div>`; }
     function renderPag(total, actual) {
         if (total <= 1) return '';
         let h = '';
@@ -387,13 +411,25 @@ const VoceroDashboard = (() => {
     }
     function _toast(msg, tipo = 'ok') {
         let t = document.getElementById('voc-toast');
-        if (!t) { t = document.createElement('div'); t.id = 'voc-toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;font-size:.88rem;font-weight:600;z-index:9999;transition:opacity .4s;box-shadow:0 4px 15px rgba(0,0,0,.15)'; document.body.appendChild(t); }
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'voc-toast';
+            document.body.appendChild(t);
+        }
         t.textContent = msg;
-        t.style.background = tipo === 'ok' ? '#39A900' : '#dc2626';
-        t.style.color = '#fff';
-        t.style.opacity = '1';
+        t.className = ''; // Limpiar clases
+        t.style.background = ''; // Limpiar estilos heredados si existen
+        t.style.color = '';
+        t.style.opacity = '';
+
+        t.classList.add('show');
+        if (tipo !== 'ok') t.classList.add('bg-error'); // Asumo bg-error en admin.css
+        else t.classList.add('bg-success');
+
         clearTimeout(t._timer);
-        t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+        t._timer = setTimeout(() => {
+            t.classList.remove('show');
+        }, 3000);
     }
 
     // ────────────────────────────────────────────────────────────

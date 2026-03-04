@@ -120,42 +120,37 @@ function mostrarUsuarios(usuarios) {
     // Renderizar después de un pequeño delay para que carguen los estados
     setTimeout(() => {
         tbody.innerHTML = usuarios.map((u, index) => `
-            <tr style="border-bottom: 1px solid #f0f0f0;">
-                <td style="text-align: center; font-weight: 600; color: #666; padding: 12px 8px;">${startIndex + index + 1}</td>
-                <td style="padding: 12px 8px;">${u.nombre || ''} ${u.apellido || ''}</td>
-                <td style="padding: 12px 8px;">${u.correo}</td>
-                <td style="padding: 12px 8px;">${u.telefono || ''}</td>
-                <td style="padding: 12px 8px;"><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
-                <td style="padding: 12px 8px;">
+            <tr class="table-row-divider">
+                <td class="td-index">${startIndex + index + 1}</td>
+                <td>${u.nombre || ''} ${u.apellido || ''}</td>
+                <td>${u.correo}</td>
+                <td>${u.telefono || ''}</td>
+                <td><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
+                <td>
                     <select onchange="cambiarEstadoUsuario('${u.id_usuario}', this.value)" 
-                            style="padding: 4px 8px; border-radius: 4px; border: none; color: white; font-weight: 600;
-                                   background-color: ${esActivo(u.estado) ? '#16a34a' : '#dc2626'};">
-                        <option value="activo" ${esActivo(u.estado) ? 'selected' : ''} style="background: white; color: black; font-weight:normal;">Activo</option>
-                        <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''} style="background: white; color: black; font-weight:normal;">Inactivo</option>
+                            class="status-select-user ${esActivo(u.estado) ? 'bg-success-user' : 'bg-error-user'}">
+                        <option value="activo" ${esActivo(u.estado) ? 'selected' : ''}>Activo</option>
+                        <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''}>Inactivo</option>
                     </select>
                 </td>
-                <td style="text-align: center; padding: 12px 8px;">
-                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                        <i class="fas fa-${u.tiene_biometria ? 'check-circle' : 'times-circle'}" 
-                           style="color: ${u.tiene_biometria ? '#39A900' : '#ef4444'}; font-size: 1.1rem;" 
+                <td class="text-center">
+                    <div class="flex-center-gap">
+                        <i class="fas fa-${u.tiene_biometria ? 'check-circle' : 'times-circle'} ${u.tiene_biometria ? 'color-success' : 'color-error'}" 
                            title="${u.tiene_biometria ? 'Biometría registrada' : 'Sin biometría'}"></i>
                         <button onclick="registrarBiometriaUsuario('${u.id_usuario}')" 
-                                class="btn-primary" 
-                                style="padding: 4px 8px; background: #8b5cf6; border-radius: 4px; font-size: 0.9rem;" 
+                                class="btn-icon-custom btn-purple btn-moderate" 
                                 title="Registrar/Actualizar Biometría">
                             <i class="fas fa-camera"></i>
                         </button>
                     </div>
                 </td>
-                <td style="text-align: center; padding: 12px 8px;">
-                    <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-                        <button onclick="editarUsuario('${u.id_usuario}')" class="btn-primary" 
-                                style="padding: 4px 8px; background: #3b82f6; border-radius: 4px; font-size: 0.9rem;" 
+                <td class="text-center">
+                    <div class="flex-center-gap">
+                        <button onclick="editarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-blue btn-moderate" 
                                 title="Editar Usuario">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="eliminarUsuario('${u.id_usuario}')" class="btn-primary" 
-                                style="padding: 4px 8px; background: #ef4444; border-radius: 4px; font-size: 0.9rem;" 
+                        <button onclick="eliminarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-red btn-moderate" 
                                 title="Eliminar Usuario">
                             <i class="fas fa-trash-alt"></i>
                         </button>
@@ -208,7 +203,7 @@ function editarUsuario(idUsuario) {
     if (!documentoNote) {
         documentoNote = document.createElement('small');
         documentoNote.id = 'documentoChangeNote';
-        documentoNote.style.cssText = 'display: block; color: #ef4444; margin-top: 5px; font-size: 0.85em;';
+        documentoNote.className = 'document-change-note';
         documentoNote.textContent = '⚠ Cambiar el documento requiere confirmación.';
         documentoInput.parentNode.appendChild(documentoNote);
     } else {
@@ -377,8 +372,10 @@ async function exportarUsuarios() {
             <table border="1">
                 <thead>
                     <tr style="background-color: #39A900; color: white;">
-                        <th>Nombre Completo</th>
+                        <th>No.</th>
+                        <th>Usuario</th>
                         <th>Correo</th>
+                        <th>Celular</th>
                         <th>Rol</th>
                         <th>Estado</th>
                     </tr>
@@ -386,13 +383,15 @@ async function exportarUsuarios() {
                 <tbody>
         `;
 
-        result.data.forEach(u => {
+        result.data.forEach((u, index) => {
             table += `
                 <tr>
+                    <td>${index + 1}</td>
                     <td>${u.nombre} ${u.apellido}</td>
                     <td>${u.correo}</td>
-                    <td>${u.rol}</td>
-                    <td>${u.estado}</td>
+                    <td>${u.telefono || 'N/A'}</td>
+                    <td>${u.rol.toUpperCase()}</td>
+                    <td>${u.estado.toUpperCase()}</td>
                 </tr>
             `;
         });
@@ -414,25 +413,13 @@ async function exportarUsuarios() {
 
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
-    toast.className = `toast toast-${tipo}`;
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-    `;
-
     document.body.appendChild(toast);
 
     setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
@@ -496,48 +483,34 @@ async function registrarBiometriaUsuario(idUsuario) {
     // 4. Crear modal de captura facial
     const modal = document.createElement('div');
     modal.id = 'modalBiometriaUsuario';
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        z-index: 10000;
-        align-items: center;
-        justify-content: center;
-    `;
+    modal.className = 'modal-biometria-wrapper';
 
     modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="margin: 0;">Registro Biométrico - ${usuario.nombre} ${usuario.apellido}</h3>
-                <button onclick="cerrarModalBiometriaUsuario()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <div class="biometria-container">
+            <div class="modal-header-flex">
+                <h3 class="modal-title">Registro Biométrico - ${usuario.nombre} ${usuario.apellido}</h3>
+                <button onclick="cerrarModalBiometriaUsuario()" class="btn-close-modal">&times;</button>
             </div>
             
-            <div style="text-align: center; margin-bottom: 15px;">
-                <p style="color: #666; margin: 5px 0; font-size: 0.9rem;">Coloque su rostro dentro del círculo guía</p>
-                <p style="color: #10b981; font-weight: 600; margin: 5px 0; font-size: 0.95rem;" id="estadoDeteccion">Inicializando cámara...</p>
+            <div class="biometria-status-wrap">
+                <p class="biometria-hint">Coloque su rostro dentro del círculo guía</p>
+                <p class="biometria-status-text" id="estadoDeteccion">Inicializando cámara...</p>
             </div>
             
-            <div style="position: relative; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-                <video id="videoBiometriaUsuario" autoplay playsinline style="width: 100%; height: 400px; object-fit: cover;"></video>
-                <canvas id="canvasBiometriaUsuario" style="position: absolute; top: 0; left: 0; width: 100%; height: 400px; pointer-events: none;"></canvas>
-                <div id="overlayGuiaUsuario" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                     width: 250px; height: 300px; border: 4px solid #6b7280; border-radius: 50%; 
-                     transition: border-color 0.3s ease;"></div>
+            <div class="biometria-video-wrap">
+                <video id="videoBiometriaUsuario" autoplay playsinline class="biometria-video"></video>
+                <canvas id="canvasBiometriaUsuario" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                <div id="overlayGuiaUsuario" class="biometria-guide"></div>
             </div>
             
-            <div id="mensajeCapturaUsuario" style="text-align: center; margin-bottom: 15px; min-height: 24px; color: #666; font-size: 0.9rem;"></div>
+            <div id="mensajeCapturaUsuario" class="biometria-message-area"></div>
             
-            <div style="display: flex; gap: 10px; justify-content: center;">
+            <div class="modal-footer-flex">
                 <button id="btnCapturarUsuario" onclick="capturarBiometriaUsuario('${idUsuario}')" 
-                        class="btn-primary" style="padding: 12px 24px; background: #10b981; display: none;" disabled>
+                        class="btn-primary btn-success-capture" style="display: none;" disabled>
                     <i class="fas fa-camera"></i> Capturar Rostro
                 </button>
-                <button onclick="cerrarModalBiometriaUsuario()" class="btn-primary" 
-                        style="padding: 12px 24px; background: #6b7280;">
+                <button onclick="cerrarModalBiometriaUsuario()" class="btn-primary btn-cancel-modal">
                     Cancelar
                 </button>
             </div>

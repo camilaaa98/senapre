@@ -43,7 +43,8 @@
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a href="#" class="menu-link" onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                    <a href="admin-aprendices.html" class="menu-link"
+                        onclick="toggleSubmenu(event, 'submenu-aprendices')">
                         <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
                         <span>Gestionar Aprendices</span>
                         <i class="fas fa-chevron-down submenu-arrow"></i>
@@ -120,29 +121,47 @@
 
             <!-- Tarjetas Admin (Director/Admin/Liderazgo) -->
             <div id="dashboard-admin-cards" class="admin-stats-grid">
+                <!-- Usuarios -->
                 <div class="stat-card verde" onclick="window.location.href='admin-usuarios.html'">
                     <div class="stat-icon verde"><i class="fas fa-users"></i></div>
                     <h3>Usuarios</h3>
                     <div class="stat-num" id="dashTotalUsuarios">--</div>
-                    <p class="stat-desc">Gestionar usuarios del sistema</p>
+                    <div class="stat-detail-grid">
+                        <span class="detail-item"><i class="fas fa-check-circle color-success"></i> Activos: <strong
+                                id="dashUsuariosActivos">0</strong></span>
+                        <span class="detail-item"><i class="fas fa-times-circle color-error"></i> Inactivos: <strong
+                                id="dashUsuariosInactivos">0</strong></span>
+                    </div>
                 </div>
+
+                <!-- Aprendices -->
                 <div class="stat-card azul" onclick="window.location.href='admin-aprendices.html'">
                     <div class="stat-icon azul"><i class="fas fa-user-graduate"></i></div>
                     <h3>Aprendices</h3>
                     <div class="stat-num" id="dashTotalAprendices">--</div>
-                    <p class="stat-desc">Gestionar aprendices matriculados</p>
+                    <div class="stat-detail-list" id="dashAprendicesEstados">
+                        <small>Cargando estados...</small>
+                    </div>
                 </div>
-                <div class="stat-card azul" onclick="window.location.href='admin-programas.html'">
-                    <div class="stat-icon azul"><i class="fas fa-book"></i></div>
-                    <h3>Programas</h3>
-                    <div class="stat-num" id="dashTotalProgramas">--</div>
-                    <p class="stat-desc">Gestionar programas de formación</p>
+
+                <!-- Voceros -->
+                <div class="stat-card lila" onclick="window.location.href='admin-fichas.html'">
+                    <div class="stat-icon lila"><i class="fas fa-bullhorn"></i></div>
+                    <h3>Voceros</h3>
+                    <div class="stat-num" id="dashTotalVoceros">--</div>
+                    <div class="stat-detail-grid">
+                        <span class="detail-item">Principales: <strong id="dashVocerosPrincipales">0</strong></span>
+                        <span class="detail-item">Suplentes: <strong id="dashVocerosSuplentes">0</strong></span>
+                        <span class="detail-item">Enfoque: <strong id="dashVocerosEnfoque">0</strong></span>
+                    </div>
                 </div>
+
+                <!-- Fichas -->
                 <div class="stat-card verde" onclick="window.location.href='admin-fichas.html'">
                     <div class="stat-icon verde"><i class="fas fa-chalkboard"></i></div>
                     <h3>Fichas</h3>
                     <div class="stat-num" id="dashTotalFichas">--</div>
-                    <p class="stat-desc">Gestionar fichas de formación</p>
+                    <p class="stat-desc">Programas activos en el sistema</p>
                 </div>
             </div>
 

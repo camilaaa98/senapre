@@ -57,12 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (oldBtn && oldBtn.textContent.includes('Exportar')) oldBtn.remove();
 
         const btnGroup = document.createElement('div');
-        btnGroup.style.display = 'flex';
-        btnGroup.style.gap = '10px';
+        btnGroup.className = 'flex-gap-sm';
         btnGroup.innerHTML = `
-            <button onclick="exportarExcel()" class="btn-primary" style="padding: 8px 15px; background: #217346;"><i class="fas fa-file-excel"></i> Excel</button>
-            <button onclick="exportarPDF()" class="btn-primary" style="padding: 8px 15px; background: #b30b00;"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button onclick="exportarCSV()" class="btn-primary" style="padding: 8px 15px; background: #2c3e50;"><i class="fas fa-file-csv"></i> CSV</button>
+            <button onclick="exportarExcel()" class="btn-primary btn-excel"><i class="fas fa-file-excel"></i> Excel</button>
+            <button onclick="exportarPDF()" class="btn-primary btn-pdf"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button onclick="exportarCSV()" class="btn-primary btn-csv"><i class="fas fa-file-csv"></i> CSV</button>
         `;
         container.appendChild(btnGroup);
     }
@@ -276,9 +275,9 @@ function mostrarResultados(datos) {
     if (!tbody) return;
 
     if (!datos || datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">No se encontraron resultados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 color-muted">No se encontraron resultados</td></tr>';
         const resumen = document.getElementById('resumenContainer');
-        if (resumen) resumen.style.display = 'none';
+        if (resumen) resumen.classList.add('hidden');
         return;
     }
 
@@ -294,7 +293,7 @@ function mostrarResultados(datos) {
                 <td>${a.documento_aprendiz || '-'}</td>
                 <td>${a.apellido || ''} ${a.nombre || ''}</td>
                 <td>${estadoBadge}</td>
-                <td style="text-align: center; font-weight: 600; color: #374151;">${horaLlegada}</td>
+                <td class="text-center font-bold color-dark">${horaLlegada}</td>
                 <td>${botonExcusa}</td>
             </tr>
         `;
@@ -304,7 +303,7 @@ function mostrarResultados(datos) {
 function mostrarResumen() {
     if (asistenciasActuales.length === 0) {
         const resumen = document.getElementById('resumenContainer');
-        if (resumen) resumen.style.display = 'none';
+        if (resumen) resumen.classList.add('hidden');
         return;
     }
 
@@ -324,36 +323,34 @@ function mostrarResumen() {
     if (elAusentes) elAusentes.textContent = ausentes;
     if (elJustificados) elJustificados.textContent = justificados;
     if (elPorcentaje) elPorcentaje.textContent = porcentaje + '%';
-    if (elResumen) elResumen.style.display = 'grid';
+    if (elResumen) elResumen.classList.remove('hidden');
 }
 
 function getEstadoBadge(estado) {
     if (!estado) return '-';
+    const s = estado.toLowerCase();
+    let cls = 'badge-status ';
+    let icon = '';
 
-    const estadoLower = estado.toLowerCase();
-    let estilo = 'padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px;';
-    let icono = '';
-
-    if (estadoLower.includes('presente') || estadoLower.includes('temprano')) {
-        estilo += 'background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;'; // Verde suave
-        icono = '<i class="fas fa-check-circle"></i>';
-    } else if (estadoLower.includes('ausente')) {
-        estilo += 'background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;'; // Rojo suave
-        icono = '<i class="fas fa-times-circle"></i>';
-    } else if (estadoLower.includes('retardo') || estadoLower.includes('retardado')) {
-        estilo += 'background-color: #FFEA00 !important; color: #000000 !important; border: 1px solid #eab308; box-shadow: 0 0 2px rgba(0,0,0,0.2);'; // Amarillo Intenso Forzado
-        icono = '<i class="fas fa-clock"></i>';
-    } else if (estadoLower.includes('excusa')) {
-        estilo += 'background-color: #ecfccb; color: #365314; border: 1px solid #bef264;'; // Lime
-        icono = '<i class="fas fa-file-medical"></i>';
-    } else if (estadoLower.includes('justificado')) {
-        estilo += 'background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa;'; // Naranja
-        icono = '<i class="fas fa-exclamation-circle"></i>';
+    if (s.includes('presente') || s.includes('temprano')) {
+        cls += 'badge-status-presente';
+        icon = '<i class="fas fa-check-circle"></i>';
+    } else if (s.includes('ausente')) {
+        cls += 'badge-status-ausente';
+        icon = '<i class="fas fa-times-circle"></i>';
+    } else if (s.includes('retardo') || s.includes('retardado')) {
+        cls += 'badge-status-retardo';
+        icon = '<i class="fas fa-clock"></i>';
+    } else if (s.includes('excusa')) {
+        cls += 'badge-status-excusa';
+        icon = '<i class="fas fa-file-medical"></i>';
+    } else if (s.includes('justificado')) {
+        cls += 'badge-status-justificado';
+        icon = '<i class="fas fa-exclamation-circle"></i>';
     } else {
-        estilo += 'background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;'; // Gris
+        cls += 'badge-status-default';
     }
-
-    return `<span style="${estilo}">${icono} ${estado}</span>`;
+    return `<span class="${cls}">${icon} ${estado}</span>`;
 }
 
 function formatearFecha(fecha) {
@@ -380,8 +377,8 @@ function limpiarFiltros() {
     document.getElementById('filtroBuscar').value = '';
     asistenciasActuales = [];
 
-    document.getElementById('tablaResultados').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">Seleccione filtros y haga clic en Buscar</td></tr>';
-    document.getElementById('resumenContainer').style.display = 'none';
+    document.getElementById('tablaResultados').innerHTML = '<tr><td colspan="7" class="text-center py-4 color-muted">Seleccione filtros y haga clic en Buscar</td></tr>';
+    document.getElementById('resumenContainer').classList.add('hidden');
 }
 
 // ========== GESTIÓN DE EXCUSAS ==========
@@ -417,16 +414,15 @@ function generarBotonExcusa(registro) {
         return `
             <button 
                 onclick="abrirModalExcusa('${documento}', '${nombre}', '${estado}', '${fecha}', '${ficha}')" 
-                class="btn btn-sm" 
-                style="background: ${colorBoton}; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;"
+                class="btn btn-sm btn-excusa-upload" 
                 title="Quedan ${diasRestantes} día(s) para subir excusa">
                 <i class="fas fa-file-upload"></i> Subir Excusa
             </button>
-            <small style="display: block; color: #666; margin-top: 5px;">Quedan ${diasRestantes} día(s)</small>
+            <small class="block-text mt-1 color-muted">Quedan ${diasRestantes} día(s)</small>
         `;
     } else {
         return `
-            <span style="color: #999; font-style: italic;">
+            <span class="italic-muted font-small">
                 <i class="fas fa-times-circle"></i> Plazo vencido
             </span>
         `;
@@ -455,7 +451,7 @@ function abrirModalExcusa(documento, nombre, estado, fecha, ficha) {
     // Actualizar modal
     document.getElementById('infoAprendizExcusa').textContent = `${nombre} (${documento})`;
     document.getElementById('tipoExcusaInfo').innerHTML = `
-        <span style="color: ${colorTipo}; font-size: 1.1rem;">
+        <span class="font-large ${tipoExcusa === 'INASISTENCIA' ? 'color-error' : 'color-warning'}">
             <i class="fas fa-${tipoExcusa === 'INASISTENCIA' ? 'user-times' : 'clock'}"></i> 
             ${tipoTexto}
         </span>
@@ -469,10 +465,10 @@ function abrirModalExcusa(documento, nombre, estado, fecha, ficha) {
 
     const mensajeValidacion = document.getElementById('mensajeValidacion');
     if (diasRestantes >= 0) {
-        mensajeValidacion.innerHTML = `<span style="color: #10b981;">✓ Puede subir excusa (quedan ${diasRestantes} día(s))</span>`;
+        mensajeValidacion.innerHTML = `<span class="color-success">✓ Puede subir excusa (quedan ${diasRestantes} día(s))</span>`;
         document.getElementById('btnSubirExcusa').disabled = false;
     } else {
-        mensajeValidacion.innerHTML = `<span style="color: #ef4444;">✗ Plazo vencido (han pasado ${diferenciaDias} días)</span>`;
+        mensajeValidacion.innerHTML = `<span class="color-error">✗ Plazo vencido (han pasado ${diferenciaDias} días)</span>`;
         document.getElementById('btnSubirExcusa').disabled = true;
     }
 
@@ -776,20 +772,13 @@ function exportarCSV() {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-        font-weight: 500;
-    `;
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 // Utility debounce

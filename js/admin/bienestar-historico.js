@@ -75,31 +75,31 @@ function filtrarDetalle() {
     const filtrados = asistenciaActual.filter(a => rol === 'todos' || a.tipo === rol);
 
     if (filtrados.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">No hay registros</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 color-muted">No hay registros</td></tr>';
         return;
     }
 
     tbody.innerHTML = filtrados.map(a => `
-        <tr>
+        <tr class="table-row-divider">
             <td>
-                <div style="font-weight: 600;">${a.nombre} ${a.apellido}</div>
-                <div style="font-size: 0.8rem; color: #666;">${a.documento}</div>
+                <div class="aprendiz-name">${a.nombre} ${a.apellido}</div>
+                <div class="meta-text">${a.documento}</div>
             </td>
-            <td><span class="badge" style="background: #f1f5f9; color: #475569;">${a.tipo}</span></td>
-            <td><span style="font-size: 0.9rem;">${a.detalle}</span></td>
+            <td><span class="badge badge-gray">${a.tipo}</span></td>
+            <td><span class="font-small">${a.detalle}</span></td>
             <td>${getEstadoBadge(a.estado)}</td>
-            <td style="font-size: 0.85rem;">${a.fecha_registro}</td>
-            <td style="font-size: 0.85rem; font-style: italic;">${a.nota || '-'}</td>
+            <td class="font-small td-mono">${a.fecha_registro}</td>
+            <td class="font-small italic-muted">${a.nota || '-'}</td>
         </tr>
     `).join('');
 }
 
 function getEstadoBadge(estado) {
     const s = (estado || '').toLowerCase();
-    if (s === 'asistio') return '<span class="badge" style="background: #dcfce7; color: #166534;">✓ ASISTIÓ</span>';
-    if (s === 'ausente') return '<span class="badge" style="background: #fee2e2; color: #991b1b;">✗ AUSENTE</span>';
-    if (s === 'justificado') return '<span class="badge" style="background: #fef9c3; color: #854d0e;">! EXCUSA</span>';
-    return '<span class="badge" style="background: #f1f5f9; color: #475569;">PENDIENTE</span>';
+    if (s === 'asistio') return '<span class="badge badge-success">✓ ASISTIÓ</span>';
+    if (s === 'ausente') return '<span class="badge badge-error">✗ AUSENTE</span>';
+    if (s === 'justificado') return '<span class="badge badge-warning">! EXCUSA</span>';
+    return '<span class="badge badge-gray">PENDIENTE</span>';
 }
 
 function actualizarGraficaLocal(datos) {
@@ -135,18 +135,18 @@ function actualizarGraficaLocal(datos) {
     const porAsis = total > 0 ? Math.round((counts.asistio / total) * 100) : 0;
 
     met.innerHTML = `
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-            <div style="font-size: 0.9rem; color: #64748b;">PORCENTAJE DE ASISTENCIA</div>
-            <div style="font-size: 2rem; font-weight: 800; color: #10b981;">${porAsis}%</div>
+        <div class="metric-card-main">
+            <div class="metric-label">PORCENTAJE DE ASISTENCIA</div>
+            <div class="metric-value color-success">${porAsis}%</div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div style="background: #f8fafc; padding: 10px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 0.8rem; color: #64748b;">TOTAL LÍDERES</div>
-                <div style="font-size: 1.2rem; font-weight: 700;">${total}</div>
+        <div class="metric-grid-secondary">
+            <div class="metric-card-sm">
+                <div class="metric-label-sm">TOTAL LÍDERES</div>
+                <div class="metric-value-sm">${total}</div>
             </div>
-            <div style="background: #f8fafc; padding: 10px; border-radius: 8px; text-align: center;">
-                <div style="font-size: 0.8rem; color: #64748b;">FALTANTES</div>
-                <div style="font-size: 1.2rem; font-weight: 700; color: #ef4444;">${counts.ausente}</div>
+            <div class="metric-card-sm">
+                <div class="metric-label-sm">FALTANTES</div>
+                <div class="metric-value-sm color-error">${counts.ausente}</div>
             </div>
         </div>
     `;

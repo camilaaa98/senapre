@@ -52,9 +52,9 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } elseif (empty($tabla_poblacion) && empty($ficha)) {
-            // EXCLUIR estados de inactividad total SOLO si no se filtra por FICHA o POBLACIÓN
-            // Queremos que el vocero vea TODO en su ficha, incluso los cancelados si los hay.
+        } elseif (empty($tabla_poblacion) && empty($ficha) && empty($poblacion) && empty($search)) {
+            // EXCLUIR estados de inactividad total SOLO si no hay filtros activos
+            // Si el usuario busca algo específico, queremos que lo encuentre aunque sea cancelado.
             $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA')";
         }
 

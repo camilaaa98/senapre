@@ -48,20 +48,17 @@ function mostrarAlertas(alertasCount) {
     const container = document.getElementById('alertasContainer');
 
     if (alertasCount > 0) {
-        // En una implementación real, aquí iteraríamos sobre la lista de aprendices en riesgo
-        // Como el endpoint actual solo devuelve el conteo para simplificar, mostraremos un mensaje genérico
-        // O podríamos hacer otra llamada para obtener los detalles.
         container.innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-                <i class="fas fa-exclamation-triangle fa-3x" style="color: #ef4444; margin-bottom: 15px;"></i>
+            <div class="text-center p-4">
+                <i class="fas fa-exclamation-triangle fa-3x color-error alert-icon"></i>
                 <p>Tiene <strong>${alertasCount}</strong> aprendices con baja asistencia.</p>
-                <a href="instructor-reportes.html" class="btn-primary" style="display: inline-block; margin-top: 10px;">Ver Reporte Detallado</a>
+                <a href="instructor-reportes.html" class="btn-primary inline-block mt-2">Ver Reporte Detallado</a>
             </div>
         `;
     } else {
         container.innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-                <i class="fas fa-check-circle fa-3x" style="color: #10b981; margin-bottom: 15px;"></i>
+            <div class="text-center p-4">
+                <i class="fas fa-check-circle fa-3x color-success alert-icon"></i>
                 <p>No hay alertas de asistencia.</p>
             </div>
         `;

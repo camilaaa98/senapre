@@ -32,12 +32,12 @@ async function cargarResponsable(area) {
         const loggedUser = authSystem.getCurrentUser();
 
         if (result.success && result.data) {
-            element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span style="font-size: 0.75rem; color: #64748b;">${result.data.correo}</span>`;
+            element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span class="meta-text">${result.data.correo}</span>`;
             if (btnAssign) btnAssign.innerHTML = '<i class="fas fa-user-edit"></i> Cambiar Responsable';
 
             // REGLA: Jefe de bienestar NO puede auto-asignarse (si es el responsable actual del area jefe_bienestar)
             if (area === 'jefe_bienestar' && loggedUser && loggedUser.id_usuario == result.data.id_usuario) {
-                if (btnAssign) btnAssign.style.display = 'none';
+                if (btnAssign) btnAssign.classList.add('hidden');
             }
         } else {
             element.textContent = 'Sin asignar';

@@ -43,34 +43,34 @@ function renderizarTabla(idTabla, datos) {
     // La fila renderizada es lo que cambiamos aquí.
 
     tbody.innerHTML = datos.map(e => `
-        <tr class="hover-row">
+        <tr class="hover-row table-row-divider">
             <td>${formatearFecha(e.fecha_falta)}</td>
             <td>
-                <div style="font-weight: 500;">${e.nombre_aprendiz || 'Desconocido'}</div>
-                <div style="font-size: 0.85rem; color: #6b7280;">${e.documento}</div>
+                <div class="aprendiz-name">${e.nombre_aprendiz || 'Desconocido'}</div>
+                <div class="meta-text">${e.documento}</div>
             </td>
-            <td>${e.numero_ficha}</td>
+            <td class="td-mono">${e.numero_ficha}</td>
             <td>
-                <div style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${e.motivo}">
+                <div class="motivo-wrap" title="${e.motivo}">
                     ${e.motivo}
                 </div>
             </td>
             <td class="text-center">
                 ${e.archivo_adjunto ?
-            `<button onclick="verArchivo('${e.archivo_adjunto}')" class="btn-icon" style="color: #ef4444;" title="Ver PDF">
+            `<button onclick="verArchivo('${e.archivo_adjunto}')" class="btn-icon color-error" title="Ver PDF">
                         <i class="fas fa-file-pdf fa-lg"></i>
                     </button>` :
-            '<span style="color:#ccc">-</span>'
+            '<span class="color-muted">-</span>'
         }
             </td>
             <td>
-                <span class="badge" style="background: #f59e0b; color: white;">PENDIENTE</span>
+                <span class="badge badge-pending">PENDIENTE</span>
             </td>
-            <td style="display: flex; gap: 5px; justify-content: center;">
-                <button onclick="procesarExcusaRapida(${e.id_excusa}, 'APROBADA')" class="btn-success" style="padding: 5px 10px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Aprobar (SI)">
+            <td class="flex-gap-sm">
+                <button onclick="procesarExcusaRapida(${e.id_excusa}, 'APROBADA')" class="btn-success btn-sm-custom" title="Aprobar (SI)">
                     SI
                 </button>
-                <button onclick="procesarExcusaRapida(${e.id_excusa}, 'RECHAZADA')" class="btn-danger" style="padding: 5px 10px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Rechazar (NO)">
+                <button onclick="procesarExcusaRapida(${e.id_excusa}, 'RECHAZADA')" class="btn-danger btn-sm-custom" title="Rechazar (NO)">
                     NO
                 </button>
             </td>
@@ -143,7 +143,7 @@ function limpiarFiltrosExcusas() {
 }
 
 function mostrarCargandoExcusas() {
-    const loading = '<tr><td colspan="7" class="text-center" style="padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Cargando excusas...</td></tr>';
+    const loading = '<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Cargando excusas...</td></tr>';
     document.getElementById('tablaExcusasInasistencia').innerHTML = loading;
     document.getElementById('tablaExcusasLlegadaTarde').innerHTML = loading;
 }
@@ -178,7 +178,7 @@ function actualizarPaginacionExcusas(idContainer, totalItems, paginaActual, func
         return;
     }
 
-    let html = `<div class="pagination-wrapper" style="margin-top:15px;">`;
+    let html = `<div class="pagination-wrapper mt-4">`;
 
     // Anterior
     html += `<button onclick="${funcName}(${paginaActual - 1})" 
@@ -213,7 +213,7 @@ function actualizarPaginacionExcusas(idContainer, totalItems, paginaActual, func
     // Replace the placeholder loop part if I wrote it wrong above. 
     // Actually I'll just write it correctly here.
 
-    let finalHtml = `<div class="pagination-wrapper" style="margin-top:15px;">`;
+    let finalHtml = `<div class="pagination-wrapper mt-4">`;
     finalHtml += `<button onclick="${funcName}(${paginaActual - 1})" class="btn-pagination ${paginaActual === 1 ? 'disabled' : ''}" ${paginaActual === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
 
     if (start > 1) {
@@ -250,31 +250,31 @@ function renderizarTabla(idTabla, datos) {
     }
 
     tbody.innerHTML = datos.map(e => `
-        <tr class="hover-row">
+        <tr class="hover-row table-row-divider">
             <td>${formatearFecha(e.fecha_falta)}</td>
             <td>
-                <div style="font-weight: 500;">${e.nombre_aprendiz || 'Desconocido'}</div>
-                <div style="font-size: 0.85rem; color: #6b7280;">${e.documento}</div>
+                <div class="aprendiz-name">${e.nombre_aprendiz || 'Desconocido'}</div>
+                <div class="meta-text">${e.documento}</div>
             </td>
-            <td>${e.numero_ficha}</td>
+            <td class="td-mono">${e.numero_ficha}</td>
             <td>
-                <div style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${e.motivo}">
+                <div class="motivo-wrap" title="${e.motivo}">
                     ${e.motivo}
                 </div>
             </td>
             <td class="text-center">
                 ${e.archivo_adjunto ?
-            `<button onclick="verArchivo('${e.archivo_adjunto}')" class="btn-icon" style="color: #ef4444;" title="Ver PDF">
+            `<button onclick="verArchivo('${e.archivo_adjunto}')" class="btn-icon color-error" title="Ver PDF">
                         <i class="fas fa-file-pdf fa-lg"></i>
                     </button>` :
-            '<span style="color:#ccc">-</span>'
+            '<span class="color-muted">-</span>'
         }
             </td>
             <td>
-                <span class="badge" style="background: #f59e0b; color: white;">PENDIENTE</span>
+                <span class="badge badge-pending">PENDIENTE</span>
             </td>
             <td>
-                <button onclick="abrirModalEvaluacion(${e.id_excusa})" class="btn-primary" style="padding: 5px 10px; font-size: 0.9rem;">
+                <button onclick="abrirModalEvaluacion(${e.id_excusa})" class="btn-primary btn-sm-custom">
                     Evaluar
                 </button>
             </td>
@@ -294,23 +294,13 @@ function cambiarTabExcusas(tipo) {
     if (tipo === 'INASISTENCIA') {
         tabInasistencia.classList.add('active');
         tabLlegada.classList.remove('active');
-        tabInasistencia.style.borderBottomColor = '#39A900';
-        tabInasistencia.style.color = '#39A900';
-        tabLlegada.style.borderBottomColor = 'transparent';
-        tabLlegada.style.color = '#6b7280';
-
-        panelInasistencia.style.display = 'block';
-        panelLlegada.style.display = 'none';
+        panelInasistencia.classList.add('active');
+        panelLlegada.classList.remove('active');
     } else {
         tabInasistencia.classList.remove('active');
         tabLlegada.classList.add('active');
-        tabLlegada.style.borderBottomColor = '#39A900';
-        tabLlegada.style.color = '#39A900';
-        tabInasistencia.style.borderBottomColor = 'transparent';
-        tabInasistencia.style.color = '#6b7280';
-
-        panelInasistencia.style.display = 'none';
-        panelLlegada.style.display = 'block';
+        panelInasistencia.classList.remove('active');
+        panelLlegada.classList.add('active');
     }
 }
 
@@ -345,14 +335,7 @@ window.abrirModalEvaluacion = function (idExcusa) {
 
     // Reset botones
     document.querySelectorAll('.btn-decision').forEach(b => {
-        b.style.borderColor = '#d1d5db';
-        b.style.background = 'white';
-        const icon = b.querySelector('i');
-        if (icon) {
-            // Restaurar colores originales de los iconos
-            if (b.id === 'btnAprobar') icon.style.color = '#10b981';
-            if (b.id === 'btnRechazar') icon.style.color = '#ef4444';
-        }
+        b.classList.remove('approved', 'rejected');
     });
 
     // Mostrar info
@@ -389,18 +372,14 @@ window.setDecision = function (decision) {
     if (!btnAprobar || !btnRechazar) return;
 
     // Reset styles
-    btnAprobar.style.background = 'white';
-    btnAprobar.style.borderColor = '#d1d5db';
-    btnRechazar.style.background = 'white';
-    btnRechazar.style.borderColor = '#d1d5db';
+    btnAprobar.classList.remove('approved');
+    btnRechazar.classList.remove('rejected');
 
     // Apply styles to selected
     if (decision === 'APROBADA') {
-        btnAprobar.style.background = '#d1fae5';
-        btnAprobar.style.borderColor = '#10b981';
+        btnAprobar.classList.add('approved');
     } else {
-        btnRechazar.style.background = '#fee2e2';
-        btnRechazar.style.borderColor = '#ef4444';
+        btnRechazar.classList.add('rejected');
     }
 
     validarFormularioEvaluacion();
@@ -413,20 +392,16 @@ window.validarFormularioEvaluacion = function () { // Exponerla aunque sea usada
     validarFormularioEvaluacion();
 }
 
-function validarFormularioEvaluacion() {
-    const obsInput = document.getElementById('observacionesEvaluacion');
-    const btn = document.getElementById('btnConfirmarEval');
-
-    if (!obsInput || !btn) return;
-
-    const obs = obsInput.value.trim();
-
-    // Habilitar si hay decisión
-    if (decisionActual && obs.length > 0) {
-        btn.disabled = false;
-    } else {
-        btn.disabled = true;
-    }
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const toast = document.createElement('div');
+    toast.textContent = mensaje;
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 /**

@@ -296,6 +296,37 @@ async function cargarAprendices(pagina = 1) {
             todosAprendices = result.data;
             paginaActual = result.pagination.page;
             totalPaginas = result.pagination.pages;
+
+            // Ajustar cabeceras dinámicamente
+            const user = authSystem.getCurrentUser();
+            const esVocero = user && user.rol.toLowerCase() === 'vocero';
+            const thead = document.querySelector('.table thead tr');
+            if (thead) {
+                if (esVocero) {
+                    thead.innerHTML = `
+                        <th>Documento</th>
+                        <th>Nombre Completo</th>
+                        <th>Población</th>
+                        <th>Correo</th>
+                        <th>Celular</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    `;
+                } else {
+                    thead.innerHTML = `
+                        <th>Documento</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Población</th>
+                        <th>Correo</th>
+                        <th>Celular</th>
+                        <th>Ficha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    `;
+                }
+            }
+
             mostrarAprendices(todosAprendices);
             actualizarPaginacion(result.pagination);
         } else {
@@ -363,32 +394,60 @@ function mostrarAprendices(aprendices) {
         } else {
             btnEditar = `
                 <button onclick="editarAprendiz('${a.documento}')" 
-                        class="btn-icon-custom btn-purple" 
+                        class="btn-icon-custom btn-purple btn-moderate" 
                         title="Editar Datos">
                     <i class="fas fa-edit"></i>
                 </button>`;
         }
 
-        // Generar badges de población
-        let poblacionBadges = '';
-        if (a.mujer == 1) poblacionBadges += '<span class="badge" style="background:#a855f7; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="Mujer">M</span>';
-        if (a.indigena == 1) poblacionBadges += '<span class="badge" style="background:#84cc16; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="Indígena">I</span>';
-        if (a.narp == 1) poblacionBadges += '<span class="badge" style="background:#000; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="NARP">N</span>';
-        if (a.campesino == 1) poblacionBadges += '<span class="badge" style="background:#6B8E23; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="Campesino">C</span>';
-        if (a.lgbtiq == 1) poblacionBadges += '<span class="badge" style="background:#f97316; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="LGBTIQ+">L</span>';
-        if (a.discapacidad == 1) poblacionBadges += '<span class="badge" style="background:#4A90E2; color:white; font-size:0.6rem; margin-right:2px; padding: 2px 5px;" title="Discapacidad">D</span>';
+        // Generar badges o inputs de población según rol
+        let poblacionCol = '';
+        const user = authSystem.getCurrentUser();
+        const esVocero = user && user.rol.toLowerCase() === 'vocero';
 
-        if (!poblacionBadges && a.tipo_poblacion) poblacionBadges = `<span style="font-size:0.75rem; color:#64748b;">${a.tipo_poblacion}</span>`;
+        if (esVocero) {
+            // Checkboxes interactivos para Voceros
+            const cats = [
+                { id: 'mujer', label: 'M', title: 'Mujer', color: 'bg-mujer' },
+                { id: 'indigena', label: 'I', title: 'Indígena', color: 'bg-indigena' },
+                { id: 'narp', label: 'N', title: 'NARP', color: 'bg-narp' },
+                { id: 'campesino', label: 'C', title: 'Campesino', color: 'bg-campesino' },
+                { id: 'lgbtiq', label: 'L', title: 'LGBTIQ+', color: 'bg-lgbtiq' },
+                { id: 'discapacidad', label: 'D', title: 'Discapacidad', color: 'bg-discapacidad' }
+            ];
+
+            poblacionCol = '<div class="poblacion-toggles-inline">';
+            cats.forEach(c => {
+                const checked = a[c.id] == 1 ? 'checked' : '';
+                poblacionCol += `
+                    <label class="pob-toggle-label ${c.color}" title="${c.title}">
+                        <input type="checkbox" onchange="togglePoblacionAprendiz('${a.documento}', '${c.id}', this.checked)" ${checked}>
+                        <span>${c.label}</span>
+                    </label>
+                `;
+            });
+            poblacionCol += '</div>';
+        } else {
+            // Badges estáticos para otros roles
+            if (a.mujer == 1) poblacionCol += '<span class="badge badge-pob bg-mujer" title="Mujer">M</span>';
+            if (a.indigena == 1) poblacionCol += '<span class="badge badge-pob bg-indigena" title="Indígena">I</span>';
+            if (a.narp == 1) poblacionCol += '<span class="badge badge-pob bg-narp" title="NARP">N</span>';
+            if (a.campesino == 1) poblacionCol += '<span class="badge badge-pob bg-campesino" title="Campesino">C</span>';
+            if (a.lgbtiq == 1) poblacionCol += '<span class="badge badge-pob bg-lgbtiq" title="LGBTIQ+">L</span>';
+            if (a.discapacidad == 1) poblacionCol += '<span class="badge badge-pob bg-discapacidad" title="Discapacidad">D</span>';
+
+            if (!poblacionCol && a.tipo_poblacion) poblacionCol = `<span class="color-muted font-small">${a.tipo_poblacion}</span>`;
+            if (!poblacionCol) poblacionCol = '<span style="color:#cbd5e1;">-</span>';
+        }
 
         return `
             <tr class="hover-row">
                 <td class="font-medium">${a.documento}</td>
-                <td>${a.nombre || a.nombres}</td>
-                <td>${a.apellido || a.apellidos}</td>
-                <td>${poblacionBadges || '<span style="color:#cbd5e1;">-</span>'}</td>
+                <td><strong>${a.nombre || a.nombres} ${a.apellido || a.apellidos}</strong></td>
+                <td>${poblacionCol}</td>
                 <td class="col-correo" title="${a.correo || ''}">${a.correo || ''}</td>
                 <td>${a.celular || a.telefono || ''}</td>
-                <td><span class="badge badge-ficha">${a.numero_ficha || a.ficha_id || 'N/A'}</span></td>
+                ${!esVocero ? `<td><span class="badge badge-ficha">${a.numero_ficha || a.ficha_id || 'N/A'}</span></td>` : ''}
                 <td>${estadoSelect}</td>
                 <td class="text-center action-buttons-wrapper">
                     <!-- Botón Biometría (oculto para inactivos) -->
@@ -607,49 +666,35 @@ async function registrarBiometriaAprendiz(documento) {
     modal.id = 'modalBiometriaAprendiz';
 
     // Estilos exactos de usuarios.js
-    modal.style.cssText = `
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        z-index: 10000;
-        align-items: center;
-        justify-content: center;
-    `;
+    modal.className = 'modal-biometria-wrapper';
 
     // HTML interno exacto de usuarios.js (adaptado solo nombre/ID variables)
     modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="margin: 0;">Registro Biométrico - ${aprendiz.nombre} ${aprendiz.apellido}</h3>
-                <button onclick="cerrarModalBiometriaAprendiz()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        <div class="biometria-container">
+            <div class="modal-header-flex">
+                <h3 class="modal-title">Registro Biométrico - ${aprendiz.nombre} ${aprendiz.apellido}</h3>
+                <button onclick="cerrarModalBiometriaAprendiz()" class="btn-close-modal">&times;</button>
             </div>
             
-            <div style="text-align: center; margin-bottom: 15px;">
-                <p style="color: #666; margin: 5px 0; font-size: 0.9rem;">Coloque su rostro dentro del círculo guía</p>
-                <p style="color: #10b981; font-weight: 600; margin: 5px 0; font-size: 0.95rem;" id="estadoDeteccion">Inicializando cámara...</p>
+            <div class="biometria-status-wrap">
+                <p class="biometria-hint">Coloque su rostro dentro del círculo guía</p>
+                <p class="biometria-status-text" id="estadoDeteccion">Inicializando cámara...</p>
             </div>
             
-            <div style="position: relative; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">
-                <video id="videoBiometriaAprendiz" autoplay playsinline style="width: 100%; height: 400px; object-fit: cover;"></video>
-                <canvas id="canvasBiometriaAprendiz" style="position: absolute; top: 0; left: 0; width: 100%; height: 400px; pointer-events: none;"></canvas>
-                <div id="overlayGuiaAprendiz" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                     width: 250px; height: 300px; border: 4px solid #6b7280; border-radius: 50%; 
-                     transition: border-color 0.3s ease;"></div>
+            <div class="biometria-video-wrap">
+                <video id="videoBiometriaAprendiz" autoplay playsinline class="biometria-video"></video>
+                <canvas id="canvasBiometriaAprendiz" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                <div id="overlayGuiaAprendiz" class="biometria-guide"></div>
             </div>
             
-            <div id="mensajeCapturaAprendiz" style="text-align: center; margin-bottom: 15px; min-height: 24px; color: #666; font-size: 0.9rem;"></div>
+            <div id="mensajeCapturaAprendiz" class="biometria-message-area"></div>
             
-            <div style="display: flex; gap: 10px; justify-content: center;">
+            <div class="modal-footer-flex">
                 <button id="btnCapturarAprendiz" onclick="capturarBiometriaAprendiz('${documento}')" 
-                        class="btn-primary" style="padding: 12px 24px; background: #10b981; display: none;" disabled>
+                        class="btn-primary btn-success-capture" style="display: none;" disabled>
                     <i class="fas fa-camera"></i> Capturar Rostro
                 </button>
-                <button onclick="cerrarModalBiometriaAprendiz()" class="btn-primary" 
-                        style="padding: 12px 24px; background: #6b7280;">
+                <button onclick="cerrarModalBiometriaAprendiz()" class="btn-primary btn-cancel-modal">
                     Cancelar
                 </button>
             </div>
@@ -813,6 +858,43 @@ function cerrarModalBiometriaAprendiz() {
 
 // ========== STATS & UTILS ==========
 
+/**
+ * Activa/Desactiva una categoría de población para un aprendiz en tiempo real.
+ */
+async function togglePoblacionAprendiz(documento, campo, valor) {
+    try {
+        const action = valor ? 'POST' : 'DELETE';
+        const url = action === 'POST' ? 'api/poblacion.php' : `api/poblacion.php?documento=${documento}&poblacion=${campo}`;
+
+        const options = {
+            method: action,
+            headers: { 'Content-Type': 'application/json' }
+        };
+
+        if (action === 'POST') {
+            options.body = JSON.stringify({ documento, poblacion: campo });
+        }
+
+        const res = await fetch(url, options);
+        const result = await res.json();
+
+        if (result.success) {
+            // Feedback sutil
+            mostrarNotificacion(`Población actualizada`, 'success');
+            // Opcional: Recargar estadísticas si la sección de población está visible
+            if (document.getElementById('seccion-poblacion')?.style.display === 'block') {
+                cargarEstadisticasPoblacion();
+            }
+        } else {
+            mostrarNotificacion(result.message, 'error');
+            // Revertir checkbox si falló? (Requiere recargar tabla o pasar el elemento UI)
+        }
+    } catch (e) {
+        console.error(e);
+        mostrarNotificacion('Error al actualizar población', 'error');
+    }
+}
+
 function cargarEstadisticasPoblacion() {
     const user = authSystem.getCurrentUser();
     let url = 'api/aprendices.php?limit=-1';
@@ -960,8 +1042,10 @@ async function exportarAprendicesPDF() {
             a.documento,
             (a.nombre || a.nombres || '').toUpperCase(),
             (a.apellido || a.apellidos || '').toUpperCase(),
+            (a.tipo_poblacion || 'SIN ESPECIFICAR').toUpperCase(),
+            (a.correo || 'N/A').toLowerCase(),
+            a.celular || a.telefono || 'N/A',
             a.numero_ficha || a.ficha_id || 'N/A',
-            (a.nombre_programa || 'PROGRAMA NO ASIGNADO').toUpperCase(),
             (a.estado || '').toUpperCase()
         ]);
 
@@ -1013,19 +1097,21 @@ async function exportarAprendicesPDF() {
 
         doc.autoTable({
             startY: 55,
-            head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'FICHA', 'PROGRAMA', 'ESTADO']],
+            head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
             body: rows,
             theme: 'grid',
             headStyles: { fillColor: [57, 169, 0], textColor: [255, 255, 255], halign: 'center' },
             columnStyles: {
-                0: { halign: 'center', cellWidth: 35 },
-                1: { cellWidth: 45 },
-                2: { cellWidth: 45 },
-                3: { halign: 'center', cellWidth: 30 },
-                4: { cellWidth: 80 },
-                5: { halign: 'center', cellWidth: 30 }
+                0: { halign: 'center', cellWidth: 25 },
+                1: { cellWidth: 35 },
+                2: { cellWidth: 35 },
+                3: { cellWidth: 25 },
+                4: { cellWidth: 50 },
+                5: { halign: 'center', cellWidth: 30 },
+                6: { halign: 'center', cellWidth: 25 },
+                7: { halign: 'center', cellWidth: 30 }
             },
-            styles: { fontSize: 9, cellPadding: 3 },
+            styles: { fontSize: 8, cellPadding: 2 },
             margin: { left: 15, right: 15 }
         });
 
@@ -1385,58 +1471,82 @@ function mostrarNotificacion(m, t = 'info') {
 }
 function debounce(f, w) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => f(...a), w); } }
 
-function exportarAprendices() {
-    if (!todosAprendices || todosAprendices.length === 0) {
-        mostrarNotificacion('No hay aprendices para exportar', 'warning');
-        return;
-    }
+async function exportarAprendices() {
+    try {
+        mostrarNotificacion('Generando archivo de aprendices...', 'info');
 
-    let table = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="UTF-8"></head>
-        <body>
-            <table border="1">
-                <tr>
-                    <th style="background-color: #39A900; color: white;">Documento</th>
-                    <th style="background-color: #39A900; color: white;">Nombres</th>
-                    <th style="background-color: #39A900; color: white;">Apellidos</th>
-                    <th style="background-color: #39A900; color: white;">Correo</th>
-                    <th style="background-color: #39A900; color: white;">Celular</th>
-                    <th style="background-color: #39A900; color: white;">Ficha</th>
-                    <th style="background-color: #39A900; color: white;">Estado</th>
-                </tr>
-    `;
+        // Obtener filtros actuales
+        const search = document.getElementById('filtroSearch')?.value || '';
+        const ficha = document.getElementById('filtroFicha')?.value || '';
+        const estado = document.getElementById('filtroEstado')?.value || '';
 
-    todosAprendices.forEach(a => {
-        // Determinar color según estado
-        let estadoColor = '#666666'; // Default gris
-        const est = (a.estado || '').toUpperCase();
-        if (est === 'LECTIVA') estadoColor = '#16a34a'; // Verde oscuro
-        else if (est === 'INDUCCION') estadoColor = '#ca8a04'; // Amarillo oscuro
-        else if (est === 'POR CERTIFICAR') estadoColor = '#2563eb'; // Azul oscuro
-        else if (est === 'CANCELADO') estadoColor = '#dc2626'; // Rojo oscuro
-        else if (est === 'RETIRADO') estadoColor = '#ea580c'; // Naranja oscuro
+        // Solicitar TODOS los registros que coincidan con el filtro
+        let url = `api/aprendices.php?limit=-1`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (ficha) url += `&ficha=${encodeURIComponent(ficha)}`;
+        if (estado) url += `&estado=${encodeURIComponent(estado)}`;
 
-        table += `
-            <tr>
-                <td style="mso-number-format:'@'">${a.documento}</td>
-                <td>${a.nombre}</td>
-                <td>${a.apellido}</td>
-                <td>${a.correo}</td>
-                <td style="mso-number-format:'@'">${a.celular || ''}</td>
-                <td>${a.numero_ficha || ''}</td>
-                <td style="background-color: ${estadoColor}; color: white; font-weight: bold;">${a.estado}</td>
-            </tr>
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (!result.success || !result.data || result.data.length === 0) {
+            mostrarNotificacion('No hay datos para exportar', 'warning');
+            return;
+        }
+
+        let table = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="UTF-8"></head>
+            <body>
+                <table border="1">
+                    <thead>
+                        <tr style="background-color: #39A900; color: white;">
+                            <th>Documento</th>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Correo</th>
+                            <th>Celular</th>
+                            <th>Ficha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
-    });
 
-    table += '</table></body></html>';
+        result.data.forEach(a => {
+            let estadoColor = '#666666';
+            const est = (a.estado || '').toUpperCase();
+            if (est === 'LECTIVA') estadoColor = '#16a34a';
+            else if (est === 'INDUCCION') estadoColor = '#ca8a04';
+            else if (est === 'POR CERTIFICAR') estadoColor = '#2563eb';
+            else if (est === 'CANCELADO') estadoColor = '#dc2626';
+            else if (est === 'RETIRADO') estadoColor = '#ea580c';
 
-    const blob = new Blob(['\uFEFF', table], { type: 'application/vnd.ms-excel;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'Reporte_Aprendices.xls';
-    link.click();
+            table += `
+                <tr>
+                    <td style="mso-number-format:'@'">${a.documento}</td>
+                    <td>${a.nombre || a.nombres}</td>
+                    <td>${a.apellido || a.apellidos}</td>
+                    <td>${a.correo || 'N/A'}</td>
+                    <td style="mso-number-format:'@'">${a.celular || a.telefono || ''}</td>
+                    <td>${a.numero_ficha || a.ficha_id || ''}</td>
+                    <td style="background-color: ${estadoColor}; color: white; font-weight: bold;">${a.estado}</td>
+                </tr>
+            `;
+        });
+
+        table += '</tbody></table></body></html>';
+
+        const blob = new Blob(['\uFEFF', table], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `Reporte_Aprendices_${new Date().toISOString().split('T')[0]}.xls`;
+        link.click();
+        mostrarNotificacion('Archivo exportado exitosamente', 'success');
+    } catch (error) {
+        console.error('Error al exportar Excel:', error);
+        mostrarNotificacion('Error al generar el archivo', 'error');
+    }
 }
 
 // Función para actualizar estado directamente desde la tabla (Dropdown)

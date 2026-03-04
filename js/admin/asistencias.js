@@ -171,15 +171,15 @@ function mostrarResultados(datos) {
     const tbody = document.getElementById('tablaResultados');
 
     if (!datos || datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">No se encontraron resultados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 color-muted">No se encontraron resultados</td></tr>';
         return;
     }
 
     tbody.innerHTML = datos.map(a => `
-        <tr>
+        <tr class="table-row-divider">
             <td>${formatearFecha(a.fecha)}</td>
-            <td>${a.numero_ficha || '-'}</td>
-            <td>${a.documento_aprendiz || '-'}</td>
+            <td class="td-mono">${a.numero_ficha || '-'}</td>
+            <td class="td-mono">${a.documento_aprendiz || '-'}</td>
             <td>${a.apellido || ''} ${a.nombre || ''}</td>
             <td>${getEstadoBadge(a.estado)}</td>
             <td>${a.observaciones || '-'}</td>
@@ -227,7 +227,7 @@ async function exportarExcel() {
         let table = `
             <table border="1">
                 <thead>
-                    <tr style="background-color: #39A900; color: white;">
+                    <tr class="export-header">
                         <th>Fecha</th>
                         <th>Ficha</th>
                         <th>Documento</th>
@@ -272,18 +272,11 @@ async function exportarExcel() {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-    `;
-
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }

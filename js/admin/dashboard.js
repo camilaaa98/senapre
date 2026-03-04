@@ -40,45 +40,69 @@ document.addEventListener('DOMContentLoaded', () => {
 async function cargarEstadisticas() {
     try {
         const user = typeof authSystem !== 'undefined' ? authSystem.getCurrentUser() : JSON.parse(localStorage.getItem('user'));
-        console.group("DEBUG DASHBOARD: Estadísticas");
-        console.log("1. Usuario recuperado:", user);
-
         let params = '';
         if (user && (user.rol || '').toLowerCase() === 'vocero') {
             const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
-            console.log("2. Scopes detectados:", scopes);
             const scopeFicha = scopes.find(s => s.tipo === 'principal' || s.tipo === 'suplente');
             const scopeEnfoque = scopes.find(s => s.tipo === 'enfoque');
 
-            if (scopeFicha) {
-                params = `?ficha=${scopeFicha.ficha}`;
-                console.log("3. Parametrizando Ficha:", scopeFicha.ficha);
-            } else if (scopeEnfoque) {
-                params = `?tabla_poblacion=${scopeEnfoque.poblacion}`;
-                console.log("3. Parametrizando Población:", scopeEnfoque.poblacion);
-            }
+            if (scopeFicha) params = `?ficha=${scopeFicha.ficha}`;
+            else if (scopeEnfoque) params = `?tabla_poblacion=${scopeEnfoque.poblacion}`;
         }
 
         const url = `api/reportes.php${params}`;
-        console.log("4. URL Final:", url);
-
         const response = await fetch(url);
         const result = await response.json();
-        console.log("5. Resultado API:", result);
-        console.groupEnd();
 
         if (result.success) {
             const data = result.data?.resumen || {};
 
-            // Actualizar contadores con animación
-            animarContador('dashTotalUsuarios', data.usuarios || 0);
-            animarContador('dashTotalAprendices', data.aprendices || 0);
-            animarContador('dashTotalProgramas', data.programas || 0);
-            animarContador('dashTotalFichas', data.fichas || 0);
+            // Totales Principales con Animación
+            if (data.usuarios !== undefined) animarContador('dashTotalUsuarios', data.usuarios);
+            if (data.aprendices !== undefined) animarContador('dashTotalAprendices', data.aprendices);
+            if (data.programas !== undefined) animarContador('dashTotalProgramas', data.programas);
+            if (data.fichas !== undefined) animarContador('dashTotalFichas', data.fichas);
+
+            // Detalle Usuarios (Activos/Inactivos)
+            if (document.getElementById('dashUsuariosActivos')) {
+                document.getElementById('dashUsuariosActivos').textContent = data.usuarios_activos || 0;
+                document.getElementById('dashUsuariosInactivos').textContent = data.usuarios_inactivos || 0;
+            }
+
+            // Detalle Voceros
+            if (document.getElementById('dashTotalVoceros')) {
+                const totalVoceros = (data.voceros_principales || 0) + (data.voceros_suplentes || 0) + (data.voceros_enfoque || 0);
+                animarContador('dashTotalVoceros', totalVoceros);
+                if (document.getElementById('dashVocerosPrincipales')) document.getElementById('dashVocerosPrincipales').textContent = data.voceros_principales || 0;
+                if (document.getElementById('dashVocerosSuplentes')) document.getElementById('dashVocerosSuplentes').textContent = data.voceros_suplentes || 0;
+                if (document.getElementById('dashVocerosEnfoque')) document.getElementById('dashVocerosEnfoque').textContent = data.voceros_enfoque || 0;
+            }
+
+            // Detalle Aprendices por Estado
+            const containerEstados = document.getElementById('dashAprendicesEstados');
+            if (containerEstados && data.aprendices_detalle) {
+                containerEstados.innerHTML = data.aprendices_detalle.map(est => {
+                    const colorClass = getEstadoColorClass(est.estado);
+                    return `
+                        <span class="detail-item">
+                            <i class="fas fa-circle ${colorClass}" style="font-size: 0.6rem;"></i> 
+                            ${est.estado}: <strong>${est.cantidad}</strong>
+                        </span>
+                    `;
+                }).join('');
+            }
         }
     } catch (error) {
         console.error('Error cargando estadísticas:', error);
     }
+}
+
+function getEstadoColorClass(estado) {
+    const est = (estado || '').toUpperCase();
+    if (est === 'EN FORMACION' || est === 'LECTIVA' || est === 'PRODUCTIVA') return 'color-success';
+    if (est === 'RETIRADO' || est === 'CANCELADO' || est === 'RETIRO VOLUNTARIO') return 'color-error';
+    if (est === 'APLAZADO' || est === 'TRASLADO') return 'color-warning';
+    return 'color-muted';
 }
 
 async function cargarGraficaAprendices() {

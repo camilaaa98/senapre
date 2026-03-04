@@ -124,7 +124,7 @@ const BienestarDashboard = (() => {
 
         const filas = paginaData.map((a, i) => {
             const est = (a.estado || '').toUpperCase();
-            const bc = { LECTIVA: 'b-lectiva', CANCELADO: 'b-cancelado', RETIRADO: 'b-retirado' }[est] || 'b-otro';
+            const bc = { LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado' }[est] || 'badge-default';
             return `<tr>
                 <td>${inicio + i + 1}</td>
                 <td>${a.documento || '—'}</td>

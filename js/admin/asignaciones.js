@@ -50,7 +50,7 @@ function mostrarAsignaciones(datos) {
     const tbody = document.getElementById('tablaAsignaciones');
 
     if (datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay asignaciones activas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 color-muted">No hay asignaciones activas</td></tr>';
         return;
     }
 
@@ -68,16 +68,16 @@ function mostrarAsignaciones(datos) {
     });
 
     tbody.innerHTML = Object.values(agrupadas).map(a => `
-        <tr>
-            <td>${a.numero_ficha}</td>
+        <tr class="table-row-divider">
+            <td class="td-mono">${a.numero_ficha}</td>
             <td>${a.nombre_instructor || 'N/A'}</td>
-            <td>${a.fechas.length} fecha(s) asignada(s)</td>
-            <td>${a.hora_inicio} - ${a.hora_fin}</td>
-            <td>
-                <button onclick="verDetalles('${a.id_usuario}', '${a.numero_ficha}')" class="btn-primary" style="padding: 5px 10px; background: #3b82f6;" title="Ver detalles">
+            <td><span class="badge badge-info">${a.fechas.length} fecha(s)</span></td>
+            <td><span class="td-mono">${a.hora_inicio} - ${a.hora_fin}</span></td>
+            <td class="flex-center-gap">
+                <button onclick="verDetalles('${a.id_usuario}', '${a.numero_ficha}')" class="btn-icon btn-blue" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button onclick="eliminarAsignaciones('${a.id_usuario}', '${a.numero_ficha}')" class="btn-primary" style="padding: 5px 10px; background: #ef4444;" title="Eliminar">
+                <button onclick="eliminarAsignaciones('${a.id_usuario}', '${a.numero_ficha}')" class="btn-icon btn-red" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -259,7 +259,7 @@ async function exportarAsignaciones() {
         let table = `
             <table border="1">
                 <thead>
-                    <tr style="background-color: #39A900; color: white;">
+                    <tr class="export-header">
                         <th>Ficha</th>
                         <th>Programa</th>
                         <th>Jornada</th>
@@ -307,18 +307,11 @@ function verDetalles(idUsuario, numeroFicha) {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-    `;
-
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }

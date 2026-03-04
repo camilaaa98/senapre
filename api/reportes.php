@@ -37,8 +37,8 @@ try {
         $tablasPermitidas = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
         if (in_array(strtolower($tabla_poblacion), $tablasPermitidas)) {
             $tableName = strtolower($tabla_poblacion);
-            $where = " WHERE documento IN (SELECT documento FROM \"$tableName\")";
-            $whereA = " WHERE a.documento IN (SELECT documento FROM \"$tableName\")";
+            $where = " WHERE documento IN (SELECT documento FROM $tableName)";
+            $whereA = " WHERE a.documento IN (SELECT documento FROM $tableName)";
         }
     }
 
@@ -48,37 +48,60 @@ try {
     $stmt->execute($params);
     $totalAprendices = $stmt->fetch()['total'];
 
+    // 1.1 Desglose de Aprendices por Estado (para el resumen)
+    $stmt = $conn->prepare("SELECT estado, COUNT(*) as cantidad FROM aprendices $where GROUP BY estado");
+    $stmt->execute($params);
+    $aprendicesDetalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     $totalFichas = 0;
     if (!empty($ficha)) {
-        $totalFichas = 1; // Solo su ficha
+        $totalFichas = 1;
     } else {
         $totalFichas = safeQuery($conn, "SELECT COUNT(*) as total FROM fichas");
     }
 
-    // Para voceros, usuarios e instructores se limitan a los relevantes de la ficha si es posible, 
-    // pero por ahora mantendremos coherencia con el total de aprendices.
+    // 2. Usuarios y Estados
+    $usuariosActivos = 0;
+    $usuariosInactivos = 0;
     $totalInstructores = 0;
     $totalUsuarios = 0;
-    $totalProgramas = 0;
 
-    if (!empty($ficha)) {
-        // Si hay ficha, solo contamos lo relacionado a esa ficha
-        $totalUsuarios = $totalAprendices; // Solo sus aprendices son "usuarios" visibles
-        $totalInstructores = safeQuery($conn, "SELECT COUNT(DISTINCT id_usuario) as total FROM instructores"); // Instructores son generales o por ficha si tuviéramos tabla relación
-        $totalProgramas = 1; // El programa de su ficha
-    } else {
+    if (empty($ficha)) {
+        $usuariosActivos = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios WHERE estado = 'activo'");
+        $usuariosInactivos = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios WHERE estado = 'inactivo'");
         $totalInstructores = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios WHERE rol = 'instructor'");
         $totalUsuarios = safeQuery($conn, "SELECT COUNT(*) as total FROM usuarios");
-        $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
+    } else {
+        // En contexto de ficha, simplificamos o usamos datos de aprendices
+        $usuariosActivos = $totalAprendices; 
+        $totalUsuarios = $totalAprendices;
     }
+
+    // 3. Voceros
+    $vocerosPrincipales = 0;
+    $vocerosSuplentes = 0;
+    $vocerosEnfoque = 0;
+
+    try {
+        // Voceros de fichas (principales y suplentes)
+        $stmtV = $conn->query("SELECT 
+            SUM(CASE WHEN vocero_principal IS NOT NULL AND vocero_principal != '' THEN 1 ELSE 0 END) as principales,
+            SUM(CASE WHEN vocero_suplente IS NOT NULL AND vocero_suplente != '' THEN 1 ELSE 0 END) as suplentes
+            FROM fichas");
+        $rowV = $stmtV->fetch(PDO::FETCH_ASSOC);
+        $vocerosPrincipales = $rowV['principales'] ?? 0;
+        $vocerosSuplentes = $rowV['suplentes'] ?? 0;
+
+        // Voceros de enfoque diferencial (tabla aparte)
+        $vocerosEnfoque = safeQuery($conn, "SELECT COUNT(*) as total FROM voceros_enfoque");
+    } catch (Exception $e) {}
+
+    $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
     
-    // 4. Aprendices por Estado
-    $aprendicesPorEstado = [];
-    $stmt = $conn->prepare("SELECT estado, COUNT(*) as cantidad FROM aprendices $where GROUP BY estado");
-    $stmt->execute($params);
-    $aprendicesPorEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 4. Aprendices por Estado (para la gráfica)
+    $aprendicesPorEstado = $aprendicesDetalle;
     
-    // 5. Fichas por Programa (Ocultar si es vocero de una sola ficha)
+    // 5. Fichas por Programa
     $fichasPorPrograma = [];
     if (empty($ficha)) {
         try {
@@ -113,9 +136,15 @@ try {
         'data' => [
             'resumen' => [
                 'aprendices' => $totalAprendices,
+                'aprendices_detalle' => $aprendicesDetalle,
                 'fichas' => $totalFichas,
                 'instructores' => $totalInstructores,
                 'usuarios' => $totalUsuarios,
+                'usuarios_activos' => $usuariosActivos,
+                'usuarios_inactivos' => $usuariosInactivos,
+                'voceros_principales' => $vocerosPrincipales,
+                'voceros_suplentes' => $vocerosSuplentes,
+                'voceros_enfoque' => $vocerosEnfoque,
                 'programas' => $totalProgramas
             ],
             'aprendices_estado' => $aprendicesPorEstado,

@@ -138,8 +138,8 @@ async function cargarAprendices() {
         }));
 
         mostrarAprendices(aprendicesActuales);
-        document.getElementById('accionesRapidas').style.display = 'block';
-        document.getElementById('listaAprendices').style.display = 'block';
+        document.getElementById('accionesRapidas').classList.remove('hidden');
+        document.getElementById('listaAprendices').classList.remove('hidden');
 
     } catch (error) {
         console.error('Error:', error);
@@ -152,7 +152,7 @@ function mostrarAprendices(aprendices) {
     document.getElementById('contadorAprendices').textContent = `${aprendices.length} aprendices`;
 
     if (aprendices.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No hay aprendices en esta ficha</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No hay aprendices en esta ficha</td></tr>';
         return;
     }
 
@@ -165,23 +165,19 @@ function mostrarAprendices(aprendices) {
         switch (ap.estado) {
             case 'Presente':
                 filaClass = 'table-success';
-                badgeClass = 'badge';
-                badgeStyle = 'background: #39A900; color: white;'; // Verde biche
+                badgeClass = 'badge badge-status badge-status-presente';
                 break;
             case 'Retardado':
             case 'Retardo':
-                badgeClass = 'badge';
-                badgeStyle = 'background: #fbbf24; color: #332;'; // Amarillo
+                badgeClass = 'badge badge-status badge-status-retardo';
                 break;
             case 'Con Excusa':
             case 'Justificado':
-                badgeClass = 'badge';
-                badgeStyle = 'background: #d97706; color: white;'; // Naranja oscuro
+                badgeClass = 'badge badge-status badge-status-excusa';
                 break;
             case 'Ausente':
             default:
-                badgeClass = 'badge';
-                badgeStyle = 'background: #ef4444; color: white;'; // Rojo
+                badgeClass = 'badge badge-status badge-status-ausente';
                 break;
         }
 
@@ -191,8 +187,8 @@ function mostrarAprendices(aprendices) {
             <td>${ap.documento}</td>
             <td>
                 ${ap.apellido} ${ap.nombre}
-                <i class="fas fa-check-circle text-success" id="check_${ap.documento}" 
-                   style="display: ${ap.estado === 'Presente' ? 'inline-block' : 'none'}; margin-left: 10px; color: #39A900;"></i>
+                <i class="fas fa-check-circle color-success" id="check_${ap.documento}" 
+                   style="display: ${ap.estado === 'Presente' ? 'inline-block' : 'none'}; margin-left: 10px;"></i>
             </td>
             <td>
                 <input type="text" class="form-control form-control-sm" 
@@ -200,8 +196,8 @@ function mostrarAprendices(aprendices) {
                     value="${ap.observaciones || ''}"
                     id="obs_${ap.documento}">
             </td>
-            <td style="text-align: center;">
-                <span class="${badgeClass}" style="${badgeStyle}" id="estado_badge_${ap.documento}">
+            <td class="text-center">
+                <span class="${badgeClass}" id="estado_badge_${ap.documento}">
                     ${ap.estado || 'Ausente'}
                 </span>
                 <input type="hidden" id="estado_input_${ap.documento}" value="${ap.estado || 'Ausente'}">
@@ -217,7 +213,8 @@ function filtrarAprendices() {
 
     filas.forEach(fila => {
         const texto = fila.innerText.toLowerCase();
-        fila.style.display = texto.includes(busqueda) ? '' : 'none';
+        if (texto.includes(busqueda)) fila.classList.remove('hidden');
+        else fila.classList.add('hidden');
     });
 }
 
@@ -238,7 +235,7 @@ async function iniciarReconocimientoGrupal() {
     titulo.textContent = `Reconocimiento Grupal`;
     instruccion.textContent = `Escaneando rostros continuamente...`;
     mensaje.textContent = 'Buscando rostros...';
-    mensaje.style.color = '#3b82f6';
+    mensaje.classList.add('color-blue');
 
     // Ocultar botón de captura manual en modo grupal, es automático
     btn.style.display = 'none';
@@ -276,7 +273,7 @@ async function tomarAsistenciaIndividual() {
     titulo.textContent = `Asistencia Individual Automática`;
     instruccion.textContent = `Mire a la cámara para registrar su asistencia`;
     mensaje.textContent = 'Buscando rostro...';
-    mensaje.style.color = '#3b82f6';
+    mensaje.classList.add('color-blue');
 
     // Ocultar botón, ahora es automático
     if (btn) btn.style.display = 'none';
@@ -326,7 +323,7 @@ async function detectarBucle(video, esIndividual = false) {
 
         if (facesValidos.length > 0) {
             mensaje.textContent = `Procesando ${facesValidos.length} rostro(s)...`;
-            mensaje.style.color = '#3b82f6';
+            mensaje.classList.add('color-blue');
 
             for (const face of facesValidos) {
                 try {
@@ -347,7 +344,7 @@ async function detectarBucle(video, esIndividual = false) {
 
                         if (verif.success && verif.match) {
                             mensaje.textContent = 'Instructor Verificado';
-                            mensaje.style.color = '#10b981';
+                            mensaje.classList.add('color-success');
 
                             // Detener bucle y proceder
                             modoGrupalActivo = false;
@@ -382,14 +379,14 @@ async function detectarBucle(video, esIndividual = false) {
                                 if (aprendizExistente && aprendizExistente.estado && aprendizExistente.estado !== 'Ausente') {
                                     // Mostrar mensaje informativo en azul oscuro pero NO bloquear
                                     mensaje.textContent = `✓ ${nombreCompleto} - ${aprendizExistente.estado}`;
-                                    mensaje.style.color = '#1e40af'; // Azul oscuro
+                                    mensaje.classList.add('color-blue-dark');
                                     console.log(`ℹ️ ${nombreCompleto} ya tiene asistencia: ${aprendizExistente.estado}`);
                                     // NO RETURN - Continuar procesando otros rostros
                                     continue; // Saltar al siguiente rostro en el bucle
                                 }
 
                                 mensaje.textContent = `Identificado: ${nombreCompleto}`;
-                                mensaje.style.color = '#10b981';
+                                mensaje.classList.add('color-success');
                                 console.log(`Marcando asistencia automática para: ${nombreCompleto}`);
 
                                 // Calcular estado basado en hora actual
@@ -406,7 +403,7 @@ async function detectarBucle(video, esIndividual = false) {
 
                             } else {
                                 mensaje.textContent = `Aprendiz identificado (${nombreCompleto}) pero NO pertenece a esta ficha.`;
-                                mensaje.style.color = '#10b981';
+                                mensaje.classList.add('color-success');
                             }
                         }
                     }
@@ -417,7 +414,7 @@ async function detectarBucle(video, esIndividual = false) {
         } else {
             if (mensaje.textContent.includes('Procesando')) {
                 mensaje.textContent = 'Buscando rostros...';
-                mensaje.style.color = '#6b7280';
+                mensaje.classList.add('color-muted');
             }
         }
 
@@ -461,14 +458,14 @@ async function capturarRostroAsistencia() {
 
     if (btn) btn.disabled = true;
     mensaje.textContent = 'Procesando...';
-    mensaje.style.color = '#3b82f6';
+    mensaje.classList.add('color-blue');
 
     try {
         const resultado = await capturarRostro(video);
 
         if (!resultado.success) {
             mensaje.textContent = resultado.mensaje;
-            mensaje.style.color = '#ef4444';
+            mensaje.classList.add('color-error');
             if (btn) btn.disabled = false;
             return;
         }
@@ -490,15 +487,16 @@ async function capturarRostroAsistencia() {
 
             if (verif.success && verif.match) {
                 mensaje.textContent = 'Instructor Verificado';
-                mensaje.style.color = '#10b981';
+                mensaje.classList.add('color-success');
                 setTimeout(() => {
                     cerrarModalBiometria();
                     procederGuardadoFinal();
                 }, 1000);
             } else {
                 mensaje.textContent = 'No coincide con el instructor';
-                mensaje.style.color = '#ef4444';
+                mensaje.classList.add('color-error');
                 if (btn) btn.disabled = false;
+                return;
             }
             return;
         }
@@ -525,7 +523,7 @@ async function capturarRostroAsistencia() {
                 const aprendizExistente = aprendicesActuales.find(a => a.documento == data.documento);
                 if (aprendizExistente && aprendizExistente.estado && aprendizExistente.estado !== 'Ausente') {
                     mensaje.textContent = `✓ ${data.nombre} ${data.apellido} - ${aprendizExistente.estado}`;
-                    mensaje.style.color = '#1e40af'; // Azul oscuro
+                    mensaje.classList.add('color-blue-dark');
                     mostrarNotificacion(`${data.nombre} ${data.apellido} ya tiene asistencia registrada como "${aprendizExistente.estado}"`, 'info');
                     if (btn) btn.disabled = false;
                     return;
@@ -537,11 +535,11 @@ async function capturarRostroAsistencia() {
                 const estadoCalculado = calcularEstadoAsistencia(fichaActual);
                 marcarAsistenciaAprendiz(data.documento, estadoCalculado);
                 mensaje.textContent = `Identificado: ${data.nombre} ${data.apellido} - ${estadoCalculado}`;
-                mensaje.style.color = '#10b981'; // Verde Biche
+                mensaje.classList.add('color-success');
                 setTimeout(() => cerrarModalBiometria(), 1500);
             } else {
                 mensaje.textContent = `Aprendiz identificado (${data.nombre} ${data.apellido}) pero NO pertenece a esta ficha.`;
-                mensaje.style.color = '#10b981';
+                mensaje.classList.add('color-success');
                 if (btn) btn.disabled = false;
             }
         }
@@ -549,6 +547,7 @@ async function capturarRostroAsistencia() {
     } catch (error) {
         console.error('Error verificación:', error);
         mensaje.textContent = 'Error técnico';
+        mensaje.classList.add('color-error');
         if (btn) btn.disabled = false;
     }
 }
@@ -583,26 +582,22 @@ function marcarAsistenciaAprendiz(documento, estadoNuevo) {
         switch (estadoNuevo) {
             case 'Presente':
                 fila.classList.add('table-success');
-                badge.className = 'badge';
-                badge.style = 'background: #39A900; color: white;'; // Verde biche
+                badge.className = 'badge badge-status badge-status-presente';
                 badge.textContent = 'Presente';
                 break;
             case 'Retardado':
             case 'Retardo':
-                badge.className = 'badge';
-                badge.style = 'background: #fbbf24; color: #332;'; // Amarillo
+                badge.className = 'badge badge-status badge-status-retardo';
                 badge.textContent = estadoNuevo;
                 break;
             case 'Con Excusa':
             case 'Justificado':
-                badge.className = 'badge';
-                badge.style = 'background: #d97706; color: white;'; // Naranja oscuro
+                badge.className = 'badge badge-status badge-status-excusa';
                 badge.textContent = estadoNuevo;
                 break;
             case 'Ausente':
             default:
-                badge.className = 'badge';
-                badge.style = 'background: #ef4444; color: white;'; // Rojo
+                badge.className = 'badge badge-status badge-status-ausente';
                 badge.textContent = estadoNuevo || 'Ausente';
                 break;
         }
@@ -613,7 +608,6 @@ function marcarAsistenciaAprendiz(documento, estadoNuevo) {
         const checkIcon = document.getElementById(`check_${documento}`);
         if (checkIcon) {
             checkIcon.style.display = estadoNuevo === 'Presente' ? 'inline-block' : 'none';
-            checkIcon.style.color = '#39A900'; // Verde biche
         }
     }
 }
@@ -646,7 +640,7 @@ async function guardarAsistencia() {
     titulo.textContent = `Verificación de Instructor`;
     instruccion.textContent = `${user.nombre} ${user.apellido}`;
     mensaje.textContent = 'Verificando identidad...';
-    mensaje.style.color = '#3b82f6';
+    mensaje.classList.add('color-blue');
 
     // Ocultar botón para flujo automático
     if (btn) btn.style.display = 'none';
@@ -741,39 +735,14 @@ async function procederGuardadoFinal() {
 
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
-    // Crear elemento de notificación
-    const notif = document.createElement('div');
-    notif.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        z-index: 10001;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        animation: slideIn 0.3s ease-out;
-        max-width: 400px;
-    `;
-
-    // Colores según el tipo
-    const colores = {
-        'success': '#10b981',
-        'error': '#ef4444',
-        'warning': '#f59e0b',
-        'info': '#3b82f6'
-    };
-
-    notif.style.background = colores[tipo] || colores.info;
-    notif.textContent = mensaje;
-
-    document.body.appendChild(notif);
-
-    // Auto-remover después de 4 segundos
+    const toast = document.createElement('div');
+    toast.textContent = mensaje;
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
+    document.body.appendChild(toast);
     setTimeout(() => {
-        notif.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => notif.remove(), 300);
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
 

@@ -104,15 +104,20 @@ class AuthSystem {
     redirectToDashboard() {
         if (!this.currentUser) return;
         const rol = this.currentUser.rol.toLowerCase();
-        // Cada rol va a su página exclusiva
+
+        // Función interna para ofuscar (cifrado simple solicitado)
+        const encrypt = (path) => btoa(path);
+
         if (rol === 'vocero') {
-            window.location.href = 'vocero-dashboard.html';
+            window.location.href = encrypt('vocero-dashboard.html');
         } else if (rol === 'bienestar') {
-            window.location.href = 'bienestar-aprendiz.html';
+            const user = this.currentUser;
+            const esRespLiderazgo = user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes');
+            window.location.href = esRespLiderazgo ? encrypt('admin-bienestar-historico.html') : encrypt('bienestar-aprendiz.html');
         } else if (rol === 'instructor') {
-            window.location.href = 'instructor-dashboard.html';
+            window.location.href = encrypt('instructor-dashboard.html');
         } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            window.location.href = 'admin-dashboard.html';
+            window.location.href = encrypt('admin-dashboard.html');
         }
     }
 }
@@ -125,46 +130,24 @@ function initGlobalNavigation() {
         const isLogin = window.location.pathname.includes('index.html');
 
         if (header && !isDashboard && !isLogin) {
-            // Verificar si ya existe un botón de volver para no duplicar
-            if (header.querySelector('.btn-back-global')) return;
+            if (header.querySelector('.btn-back-professional')) return;
 
-            const btnBack = document.createElement('button');
-            btnBack.className = 'btn-back-global';
+            const btnBack = document.createElement('a');
+            btnBack.className = 'btn-back-professional';
+            btnBack.href = '#';
             btnBack.innerHTML = '<i class="fas fa-arrow-left"></i> Volver';
-            btnBack.onclick = () => window.history.back();
+            btnBack.onclick = (e) => {
+                e.preventDefault();
+                window.history.back();
+            };
 
-            // Estilos rápidos para el botón (pueden moverse a CSS)
-            btnBack.style.cssText = `
-                padding: 8px 15px;
-                background: #f1f5f9;
-                border: 1px solid #e2e8f0;
-                border-radius: 6px;
-                color: #475569;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 0.9rem;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.2s;
-                margin-right: 15px;
-            `;
+            // Contenedor para alinear a la derecha si es necesario
+            btnBack.style.marginLeft = 'auto';
 
-            btnBack.onmouseover = () => { btnBack.style.background = '#e2e8f0'; };
-            btnBack.onmouseout = () => { btnBack.style.background = '#f1f5f9'; };
-
-            // Insertar al principio del header
-            header.prepend(btnBack);
+            header.appendChild(btnBack);
             header.style.display = 'flex';
             header.style.alignItems = 'center';
-            header.style.justifyContent = 'flex-start'; // Mantener alineación a la izquierda si hay botón
-
-            // Ajustar el título para que no quede pegado si está centrado
-            const title = header.querySelector('.content-title') || header.querySelector('.page-title');
-            if (title) {
-                title.style.margin = '0 auto'; // Centrar título respecto al espacio restante
-                title.style.transform = 'translateX(-40px)'; // Compensa visualmente el botón a la izquierda (aprox)
-            }
+            header.style.gap = '15px';
         }
     });
 }
@@ -188,17 +171,38 @@ function debounce(func, wait) {
 
 // Global Sidebar Toggle Submenu
 function toggleSubmenu(event, submenuId) {
-    if (event) event.preventDefault();
     const submenu = document.getElementById(submenuId);
     if (!submenu) return;
 
     const parent = submenu.closest('.menu-item');
     if (!parent) return;
 
+    const link = parent.querySelector('.menu-link');
+    const href = link?.getAttribute('href');
+
+    // Si clicamos el padre y ya está abierto, y el href no es '#', permitimos la navegación
+    // Si no estamos en la página del href, permitimos la navegación
+    const isCurrentPage = href && window.location.pathname.endsWith(href);
+
+    if (event) {
+        if (href && href !== '#' && !isCurrentPage) {
+            // Permitir navegación natural si no es la página actual
+            return;
+        }
+        event.preventDefault();
+    }
+
     if (submenu.classList.contains('show')) {
         submenu.classList.remove('show');
         parent.classList.remove('open');
     } else {
+        // Cerrar otros submenús abiertos (opcional, para limpieza)
+        document.querySelectorAll('.submenu.show').forEach(s => {
+            if (s.id !== submenuId) {
+                s.classList.remove('show');
+                s.closest('.menu-item')?.classList.remove('open');
+            }
+        });
         submenu.classList.add('show');
         parent.classList.add('open');
     }
@@ -268,10 +272,10 @@ function aplicarRestriccionesDeRol() {
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
                 mainContent.innerHTML = `
-                    <div class="content-header" style="text-align: center; margin-top: 50px;">
+                    <div class="content-header content-center">
                         <h1 class="content-title">Panel en Construcción</h1>
                         <p class="content-description">Hola ${user.nombre}, tu área asignada (${bienestar.join(', ')}) aún se encuentra en desarrollo.</p>
-                        <i class="fas fa-tools" style="font-size: 5rem; color: #cbd5e1; margin-top: 30px;"></i>
+                        <i class="fas fa-tools icon-tools-large"></i>
                     </div>
                 `;
             }
@@ -291,6 +295,9 @@ function aplicarRestriccionesDeRol() {
     if ((esJefeBienestar || esRespLiderazgo) && !esDirector) {
         filtrarDashboardParaBienestar(esRespLiderazgo);
         ocultarMenusRestringidos(false, esRespLiderazgo, esDirector);
+    } else if (esDirector) {
+        // Asegurar que el director vea todo el menú
+        ocultarMenusRestringidos(false, false, true);
     }
 }
 
@@ -440,9 +447,9 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            // Resp. Liderazgo ahora incluye Aprendices
-            permitido = text.includes('dashboard') ||
-                text.includes('aprendices') ||
+            // Rol Liderazgo: Solo Gestión de Asistencias e Historial
+            // NO puede ver el Dashboard administrativo ni "Gestionar Aprendices" ni el Dashboard de Bienestar
+            permitido = text.includes('bienestar') ||
                 text.includes('cerrar sesión');
         }
 

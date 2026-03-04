@@ -223,20 +223,19 @@ function mostrarFichas(fichas) {
     const tbody = document.getElementById('tablaFichas');
 
     if (!fichas || fichas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay fichas registradas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center color-muted">No hay fichas registradas</td></tr>';
         return;
     }
 
     tbody.innerHTML = fichas.map(f => {
         const claseEstado = `status-${(f.estado || '').toLowerCase().replace(/ /g, '-')}`;
         return `
-        <tr>
-            <td style="font-weight: bold;">${f.numero_ficha}</td>
+        <tr class="table-row-divider">
+            <td class="td-mono">${f.numero_ficha}</td>
             <td>${f.nombre_programa || 'N/A'}</td>
             <td>
                 <select onchange="cambiarTipoFormacion('${f.numero_ficha}', this.value)"
-                        class="form-control"
-                        style="padding: 5px; font-size: 0.85rem; width: 100%;">
+                        class="form-select-custom td-mono">
                     <option value="">Sin asignar</option>
                     ${todosTiposFormacion.map(t => `
                         <option value="${t.nombre}" ${f.tipoFormacion == t.nombre ? 'selected' : ''}>
@@ -248,8 +247,7 @@ function mostrarFichas(fichas) {
             <td>${f.jornada || 'N/A'}</td>
             <td>
                 <select onchange="cambiarInstructorLider('${f.numero_ficha}', this.value)" 
-                        class="form-control" 
-                        style="padding: 5px; font-size: 0.85rem; width: 100%;">
+                        class="form-select-custom">
                     <option value="">Sin asignar</option>
                     ${todosInstructores.map(i => `
                         <option value="${i.id_usuario}" ${f.instructor_lider == i.id_usuario ? 'selected' : ''}>
@@ -263,8 +261,7 @@ function mostrarFichas(fichas) {
                 <select id="vocero-principal-${f.numero_ficha}"
                         onfocus="cargarCandidatosVocero('${f.numero_ficha}', this)"
                         onchange="cambiarVocero('${f.numero_ficha}', 'vocero_principal', this.value)"
-                        class="form-control"
-                        style="padding: 5px; font-size: 0.85rem; width: 100%;">
+                        class="form-select-custom">
                     <option value="${f.id_vocero_principal || ''}">${f.nombre_vocero_principal || 'Sin asignar'}</option>
                 </select>
             </td>
@@ -273,8 +270,7 @@ function mostrarFichas(fichas) {
                  <select id="vocero-suplente-${f.numero_ficha}"
                         onfocus="cargarCandidatosVocero('${f.numero_ficha}', this)"
                         onchange="cambiarVocero('${f.numero_ficha}', 'vocero_suplente', this.value)"
-                        class="form-control"
-                        style="padding: 5px; font-size: 0.85rem; width: 100%;">
+                        class="form-select-custom">
                     <option value="${f.id_vocero_suplente || ''}">${f.nombre_vocero_suplente || 'Sin asignar'}</option>
                 </select>
             </td>
@@ -350,7 +346,7 @@ async function cargarCandidatosVocero(ficha, selectElement) {
             opt.value = currentValue;
             opt.textContent = originalText; // Nombre original que venía del servidor
             opt.selected = true;
-            opt.style.color = 'red'; // Indicar anomalía
+            opt.className = 'color-error font-bold'; // Indicar anomalía con clase
             selectElement.appendChild(opt);
         }
 
@@ -590,7 +586,7 @@ async function exportarFichas() {
         let table = `
             <table border="1">
                 <thead>
-                    <tr style="background-color: #39A900; color: white;">
+                    <tr class="export-header">
                         <th>Número Ficha</th>
                         <th>Programa</th>
                         <th>Jornada</th>
@@ -631,18 +627,11 @@ async function exportarFichas() {
 function mostrarNotificacion(mensaje, tipo = 'info') {
     const toast = document.createElement('div');
     toast.textContent = mensaje;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#3b82f6'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-    `;
-
+    toast.className = `toast-notification toast-${tipo === 'info' ? 'blue' : tipo}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
