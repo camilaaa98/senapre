@@ -59,12 +59,15 @@ try {
 
     // GET - Listar asignaciones
     if ($method === 'GET') {
+        $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
+        $joinUsuario = $isPg ? "JOIN usuarios u ON a.id_usuario = CAST(u.id_usuario AS TEXT)" : "JOIN usuarios u ON a.id_usuario = u.id_usuario";
+
         $sql = "SELECT a.*, 
                        u.nombre || ' ' || u.apellido as nombre_instructor,
                        f.nombre_programa,
                        f.jornada
                 FROM asignacion_instructores a
-                JOIN usuarios u ON a.id_usuario = u.id_usuario
+                $joinUsuario
                 JOIN fichas f ON a.numero_ficha = f.numero_ficha
                 ORDER BY a.numero_ficha, a.dias_formacion";
         
