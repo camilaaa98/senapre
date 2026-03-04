@@ -88,6 +88,7 @@
                 <table class="data-table" id="tablaLideres">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Documento</th>
                             <th>Aprendiz</th>
                             <th>Tipo de Líder</th>
@@ -99,7 +100,7 @@
                     </thead>
                     <tbody id="tbodyLideres">
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 30px;">Cargando líderes...</td>
+                            <td colspan="8" style="text-align: center; padding: 30px;">Cargando líderes...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -275,11 +276,14 @@
         function renderLideres(data) {
             const tbody = document.getElementById('tbodyLideres');
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">No hay líderes para mostrar</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">No hay líderes para mostrar</td></tr>';
                 return;
             }
-            tbody.innerHTML = data.map(l => `
+            tbody.innerHTML = data.map((l, index) => {
+                const itemNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+                return `
                 <tr>
+                    <td style="color: #64748b; font-weight: 600;">${itemNumber}</td>
                     <td class="td-mono">${l.documento}</td>
                     <td><strong>${l.nombre} ${l.apellido}</strong></td>
                     <td><span class="badge" style="background: var(--sena-green, #39A900); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${l.tipo}</span></td>
@@ -299,7 +303,7 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function updatePaginationInfo() {
