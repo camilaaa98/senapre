@@ -99,5 +99,44 @@
     font-weight: 600;
     border: none;
     cursor: pointer;
-    margin-top: 8px;
-}
+
+    /* ── Accesos Rápidos Premium ───────────────── */
+    .bienestar-quick-access {
+        margin-bottom: 30px;
+    }
+
+    .quick-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .quick-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border-color: #39A900;
+    }
+
+    .quick-card i {
+        font-size: 2rem;
+        color: #39A900;
+    }
+
+    .quick-card h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #00324D;
+    }
+
+    .quick-card p {
+        margin: 5px 0 0;
+        font-size: 0.85rem;
+        color: #64748b;
+    }

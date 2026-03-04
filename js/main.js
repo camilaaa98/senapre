@@ -447,10 +447,10 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            // Rol Liderazgo: Solo Gestión de Asistencias e Historial
-            // NO puede ver el Dashboard administrativo ni "Gestionar Aprendices" ni el Dashboard de Bienestar
-            permitido = text.includes('bienestar') ||
-                text.includes('cerrar sesión');
+            // Rol Liderazgo: Ocultar Dashboard de Director (primer item) 
+            // Solo permitir Bienestar, Gestión de Aprendices (si tiene permisos) y reportes específicos
+            permitido = (text.includes('bienestar') || text.includes('aprendices') || text.includes('asistencias') || text.includes('reportes') || text.includes('cerrar sesión'))
+                && !text.includes('home') && !item.querySelector('.fa-home');
         }
 
         if (!permitido) {

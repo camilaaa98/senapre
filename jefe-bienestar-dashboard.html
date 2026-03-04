@@ -39,6 +39,12 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="admin-aprendices.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="admin-aprendices.html#poblacion" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-users"></i></div>
                         <span>Tipo de Población</span>
@@ -71,9 +77,36 @@
                 </div>
             </div>
 
+            <!-- Accesos Rápidos Premium -->
+            <div class="bienestar-quick-access"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div class="quick-card" onclick="window.location.href='admin-aprendices.html'">
+                    <i class="fas fa-user-graduate"></i>
+                    <div>
+                        <h4>Gestión de Aprendices</h4>
+                        <p>Administración completa y estados</p>
+                    </div>
+                </div>
+                <div class="quick-card" onclick="window.location.href='admin-reportes.html'">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <h4>Reportes Generales</h4>
+                        <p>Estadísticas y descargas PDF/Excel</p>
+                    </div>
+                </div>
+                <div class="quick-card" onclick="window.location.href='admin-aprendices.html#excusas'">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <div>
+                        <h4>Control de Excusas</h4>
+                        <p>Validación de soportes médicos</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="bienestar-grid">
                 <!-- Área: Jefe de Bienestar (NUEVO) -->
-                <div class="area-card" style="border-top-color: #00324D; grid-column: span 1 / -1;">
+                <div class="area-card"
+                    style="border-top-color: #00324D; grid-column: span 1 / -1; margin-bottom: 20px;">
                     <div style="display: flex; align-items: flex-start; gap: 20px;">
                         <div class="area-icon" style="background: #e0f2fe; color: #00324D; width: 60px; height: 60px;">
                             <i class="fas fa-user-tie"></i>
@@ -81,14 +114,14 @@
                         <div style="flex-grow: 1;">
                             <div class="area-title" style="font-size: 1.5rem;">Jefe de Bienestar del Aprendiz</div>
                             <div class="area-desc">Responsable principal de la coordinación de todas las sub-áreas de
-                                bienestar institucional. Supervisa a los responsables de área.</div>
+                                bienestar institucional. Supervisa a los responsables de área y gestiona la base de
+                                aprendices.</div>
                         </div>
                         <div style="width: 300px;">
                             <div class="responsable-info" id="info-jefe-bienestar">
                                 <i class="fas fa-id-card"></i>
                                 <p class="responsable-name">Cargando jefe...</p>
                             </div>
-                            <!-- Botón de delegación removido en este panel -->
                         </div>
                     </div>
                 </div>
