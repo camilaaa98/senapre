@@ -26,27 +26,28 @@ try {
     $conn = $database->getConnection();
 
     foreach ($destinatarios as $dest) {
+        $exitoEnvio = false;
+        
         if ($modo === 'email' && !empty($dest['email'])) {
-            // INTEGRACIÓN REAL PHPMailer (Ejemplo conceptual de lo que ejecutaría el servidor)
-            /*
-            $mail = new PHPMailer(true);
-            $mail->setFrom('bienestar@sena.edu.co', 'Bienestar SenApre');
-            $mail->addAddress($dest['email'], $dest['nombre']);
-            $mail->Subject = $asunto;
-            $mail->Body = $cuerpo;
-            $mail->send();
-            */
-            $enviados++;
+            // ENVÍO REAL MEDIANTE FUNCIÓN MAIL DE PHP
+            $headers = "From: SenApre Bienestar <noreply@senapre.onrender.com>\r\n";
+            $headers .= "Reply-To: bienestar@sena.edu.co\r\n";
+            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+            
+            if (@mail($dest['email'], $asunto, $cuerpo, $headers)) {
+                $enviados++;
+                $exitoEnvio = true;
+            }
         } 
         elseif ($modo === 'whatsapp' && !empty($dest['tel'])) {
-            // INTEGRACIÓN REAL WHATSAPP API
-            // Aquí se enviaría una petición a un proveedor de API de WhatsApp (como Twilio o Green-API)
-            // O se genera un log para que el frontend abra las ventanas si es manual masivo
+            // Para WhatsApp en este entorno, registramos el envío
+            // Un sistema real usaría Twilio, Green-API, o WhatsApp Business API
             $enviados++;
+            $exitoEnvio = true;
         }
 
-        // NOTIFICACIÓN AUTOMÁTICA AL INSTRUCTOR LÍDER
-        if (!empty($dest['documento'])) {
+        // NOTIFICACIÓN AL INSTRUCTOR LÍDER (Real)
+        if ($exitoEnvio && !empty($dest['documento'])) {
             notificarInstructorLider($dest['documento'], $asunto, $cuerpo, $conn);
         }
     }
@@ -76,13 +77,16 @@ function notificarInstructorLider($docAprendiz, $asunto, $cuerpo, $conn) {
     $inst = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($inst) {
+        $headers = "From: SenApre Bienestar <noreply@senapre.onrender.com>\r\n";
+        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        
         $mensajeInstructor = "Estimado Instructor {$inst['nombres']} {$inst['apellidos']},\n\n" .
                              "Se le informa que los líderes de su ficha {$inst['numero_ficha']} han sido citados a: $asunto.\n" .
                              "Detalles: $cuerpo\n\n" .
-                             "Agradecemos conceder el permiso correspondiente.";
+                             "Agradecomendos conceder el permiso correspondiente.";
         
         // Enviar Email real al Instructor
-        // mail($inst['correo'], "NOTIFICACIÓN PERMISO LÍDERES: $asunto", $mensajeInstructor);
+        @mail($inst['correo'], "NOTIFICACIÓN PERMISO LÍDERES: $asunto", $mensajeInstructor, $headers);
     }
 }
 ?>
