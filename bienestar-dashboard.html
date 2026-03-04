@@ -92,7 +92,12 @@
                     <h1 class="content-title">Panel de Liderazgo</h1>
                     <p style="opacity: 0.9; margin: 5px 0 0 0;">Gestión de líderes estudiantiles y comunicaciones</p>
                 </div>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <a href="admin-dashboard.html" class="btn-premium btn-premium-outline"
+                        style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; padding: 0;"
+                        title="Volver al Dashboard">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
                     <button onclick="abrirModalReunion()" class="btn-premium btn-premium-sena">
                         <i class="fas fa-calendar-plus"></i> Nueva Reunión
                     </button>
@@ -290,6 +295,7 @@
         let currentPage = 1;
         const itemsPerPage = 10;
         let filteredData = [];
+        let modoMensaje = 'email'; // Variable global para mensajería
 
         document.addEventListener('DOMContentLoaded', () => {
             const user = authSystem.getCurrentUser();
