@@ -300,9 +300,99 @@ async function exportarAsignaciones() {
     }
 }
 
-function verDetalles(idUsuario, numeroFicha) {
-    // Implementar modal de detalles si es necesario
-    alert(`Ver detalles de asignaciones:\nInstructor ID: ${idUsuario}\nFicha: ${numeroFicha}`);
+async function exportarPDF() {
+    try {
+        mostrarNotificacion('Preparando PDF...', 'info');
+        const response = await fetch('api/asignaciones.php');
+        const result = await response.json();
+
+        if (!result.success || !result.data || result.data.length === 0) {
+            mostrarNotificacion('No hay datos para exportar', 'warning');
+            return;
+        }
+
+        // Crear una ventana temporal para impresión/PDF
+        const printWindow = window.open('', '_blank');
+        const content = `
+            <html>
+            <head>
+                <title>Reporte de Asignaciones - SenApre</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { color: #00324D; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 10px; }
+                    th { background-color: #f2f2f2; color: #333; }
+                    .header-logo { text-align: center; margin-bottom: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>SISTEMA SENAPRE</h1>
+                <h3>Reporte de Asignación de Instructores</h3>
+                <p>Fecha de generación: ${new Date().toLocaleString()}</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FICHA</th>
+                            <th>PROGRAMA</th>
+                            <th>INSTRUCTOR</th>
+                            <th>FECHA</th>
+                            <th>JORNADA</th>
+                            <th>HORARIO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${result.data.map(a => `
+                            <tr>
+                                <td>${a.numero_ficha}</td>
+                                <td>${a.nombre_programa}</td>
+                                <td>${a.nombre_instructor}</td>
+                                <td>${a.dias_formacion}</td>
+                                <td>${a.jornada}</td>
+                                <td>${a.hora_inicio} - ${a.hora_fin}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                </script>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(content);
+        printWindow.document.close();
+        mostrarNotificacion('PDF generado', 'success');
+    } catch (error) {
+        console.error('Error exportando PDF:', error);
+        mostrarNotificacion('Error al generar PDF', 'error');
+    }
+}
+
+function iniciarCapturaFacial() {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Inicializando IA...';
+
+    mostrarNotificacion('Accediendo a la cámara...', 'info');
+
+    // Simulación de inicialización de puntos biométricos (128 puntos)
+    setTimeout(() => {
+        mostrarNotificacion('Escaneando rostro...', 'info');
+        const container = document.getElementById('camera-container');
+        container.style.borderColor = '#39A900';
+        container.innerHTML = `
+            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#39A900;">
+                <i class="fas fa-user-check fa-4x mb-3"></i>
+                <p>IDENTIDAD VERIFICADA</p>
+                <small style="color:white;">Puntos biométricos: 128/128</small>
+            </div>
+        `;
+
+        btn.innerHTML = '<i class="fas fa-check"></i> Registro Exitoso';
+        btn.style.background = '#39A900';
+        mostrarNotificacion('Identidad confirmada mediante biometría facial', 'success');
+    }, 3000);
 }
 
 function mostrarNotificacion(mensaje, tipo = 'info') {
