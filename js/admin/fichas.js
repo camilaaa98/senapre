@@ -233,19 +233,7 @@ function mostrarFichas(fichas) {
         <tr class="table-row-divider">
             <td class="td-mono">${f.numero_ficha}</td>
             <td>${f.nombre_programa || 'N/A'}</td>
-            <td>${f.tipo_formacion || f.tipoFormacion || 'N/A'}</td>
-            <td>${f.jornada || 'N/A'}</td>
-            <td>
-                <select onchange="cambiarTipoFormacion('${f.numero_ficha}', this.value)"
-                        class="form-select-custom td-mono">
-                    <option value="">Sin asignar</option>
-                    ${todosTiposFormacion.map(t => `
-                        <option value="${t.nombre}" ${f.tipoFormacion == t.nombre ? 'selected' : ''}>
-                            ${t.nombre}
-                        </option>
-                    `).join('')}
-                </select>
-            </td>
+            <td class="td-mono">${f.tipoFormacion || 'N/A'}</td>
             <td>${f.jornada || 'N/A'}</td>
             <td>
                 <select onchange="cambiarInstructorLider('${f.numero_ficha}', this.value)" 
