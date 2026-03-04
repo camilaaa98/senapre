@@ -200,6 +200,27 @@
     color: white !important;
 }
 
+.btn-compact {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-compact i {
+    font-size: 0.75rem !important;
+}
+
+.table-header div {
+    display: flex !important;
+    gap: 8px !important;
+}
+
 /* Mobile Toggle Hidden by Default */
 .mobile-nav-toggle {
     display: none;

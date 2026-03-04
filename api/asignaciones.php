@@ -80,9 +80,6 @@ try {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        // LOG: Guardar datos recibidos para depuración
-        file_put_contents('debug_asignaciones.log', date('Y-m-d H:i:s') . " - Datos recibidos: " . json_encode($data) . "\n", FILE_APPEND);
-        
         // Validar datos
         if (empty($data['id_usuario']) || empty($data['numero_ficha'])) {
             throw new Exception('Instructor y Ficha son requeridos');
