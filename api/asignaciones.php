@@ -16,10 +16,8 @@ try {
 
     // Verificar y actualizar estructura de tabla
     $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
-    
     try {
         if ($isPg) {
-            // Verificar existencia en PostgreSQL
             $check = $conn->query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'asignacion_instructores')");
             $exists = $check->fetchColumn();
             
@@ -34,27 +32,27 @@ try {
                     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
                     FOREIGN KEY (numero_ficha) REFERENCES fichas(numero_ficha)
                 )");
+            } else {
+                // Migración: Asegurar columnas
+                $cols = $conn->query("SELECT column_name FROM information_schema.columns WHERE table_name = 'asignacion_instructores'")->fetchAll(PDO::FETCH_COLUMN);
+                if (!in_array('dias_formacion', $cols)) $conn->exec("ALTER TABLE asignacion_instructores ADD COLUMN dias_formacion TEXT DEFAULT ''");
+                if (!in_array('hora_inicio', $cols)) $conn->exec("ALTER TABLE asignacion_instructores ADD COLUMN hora_inicio TEXT DEFAULT '06:00'");
+                if (!in_array('hora_fin', $cols)) $conn->exec("ALTER TABLE asignacion_instructores ADD COLUMN hora_fin TEXT DEFAULT '18:00'");
             }
         } else {
-            // SQLite (Local)
-            $checkTable = $conn->query("PRAGMA table_info(asignacion_instructores)");
-            $columns = $checkTable->fetchAll(PDO::FETCH_COLUMN, 1);
-            
-            if (empty($columns)) {
-                $conn->exec("CREATE TABLE asignacion_instructores (
-                    id_asignacion INTEGER PRIMARY KEY AUTOINCREMENT,
-                    id_usuario TEXT NOT NULL,
-                    numero_ficha TEXT NOT NULL,
-                    dias_formacion TEXT NOT NULL,
-                    hora_inicio TEXT NOT NULL,
-                    hora_fin TEXT NOT NULL,
-                    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-                    FOREIGN KEY (numero_ficha) REFERENCES fichas(numero_ficha)
-                )");
-            }
+            $conn->exec("CREATE TABLE IF NOT EXISTS asignacion_instructores (
+                id_asignacion INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_usuario TEXT NOT NULL,
+                numero_ficha TEXT NOT NULL,
+                dias_formacion TEXT NOT NULL,
+                hora_inicio TEXT NOT NULL,
+                hora_fin TEXT NOT NULL,
+                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+                FOREIGN KEY (numero_ficha) REFERENCES fichas(numero_ficha)
+            )");
         }
     } catch (Exception $e) {
-        error_log("Error verificando estructura de asignaciones: " . $e->getMessage());
+        error_log("Migration error: " . $e->getMessage());
     }
 
     // GET - Listar asignaciones
