@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
+<link rel="stylesheet" href="css/premium-bienestar.css?v=1.0.0">
+</head>
+
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
@@ -18,16 +21,6 @@
                 <div class="sidebar-subtitle" id="userNameSub">Responsable</div>
             </div>
             <nav class="sidebar-menu">
-                <li class="menu-item"><a href="admin-dashboard.html" class="menu-link"
-                        style="background: rgba(255,255,255,0.08);">
-                        <div class="menu-icon"><i class="fas fa-arrow-left"></i></div><span>Volver al Panel</span>
-                    </a></li>
-                <li class="menu-item"><a href="bienestar-dashboard.html" class="menu-link active">
-                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div><span>Gestión de Líderes</span>
-                    </a></li>
-                <li class="menu-item"><a href="admin-aprendices.html#poblacion" class="menu-link">
-                        <div class="menu-icon"><i class="fas fa-users"></i></div><span>Tipo de Población</span>
-                    </a></li>
                 <li class="menu-item"><a href="#" onclick="authSystem.logout()" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div><span>Cerrar Sesión</span>
                     </a></li>
@@ -37,35 +30,33 @@
             </div>
         </aside>
 
-        <main class="main-content">
-            <div class="content-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
+        <main class="main-content" style="background: #fdfdfd; padding: 40px;">
+            <div class="premium-header">
+                <div class="title-group">
                     <h1 class="content-title">Panel de Liderazgo</h1>
-                    <p class="content-description">Gestión de líderes estudiantiles y comunicaciones</p>
+                    <p style="opacity: 0.9; margin: 5px 0 0 0;">Gestión de líderes estudiantiles y comunicaciones</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="abrirModalReunion()" class="btn-primary" style="background: #39A900;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button onclick="abrirModalReunion()" class="btn-premium btn-premium-sena">
                         <i class="fas fa-calendar-plus"></i> Nueva Reunión
                     </button>
-                    <button onclick="window.location.href='admin-bienestar-asistencia.html'" class="btn-primary"
-                        style="background: #00324D;">
-                        <i class="fas fa-fingerprint"></i> Asistencia Biométrica
+                    <button onclick="window.location.href='admin-bienestar-asistencia.html'"
+                        class="btn-premium btn-premium-dark" style="background:#00324D">
+                        <i class="fas fa-fingerprint"></i> Biometría
                     </button>
-                    <a href="admin-bienestar-historico.html" class="btn-primary"
-                        style="background: #64748b; text-decoration: none; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem;">
+                    <a href="admin-bienestar-historico.html" class="btn-premium btn-premium-outline">
                         <i class="fas fa-history"></i> Historial
                     </a>
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom: 25px;">
-                <div class="card-header">
-                    <h3 class="card-title">Filtros y Acciones Masivas</h3>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 15px; align-items: end;">
+            <div class="premium-card">
+                <div class="responsive-actions">
                     <div class="form-group">
-                        <label class="form-label">Filtrar por Tipo</label>
-                        <select id="filtroTipo" class="form-control" onchange="cargarLideres()">
+                        <label class="form-label"
+                            style="font-weight: 600; font-size: 0.85rem; color: #64748b; margin-bottom: 8px; display: block;">FILTRAR
+                            POR TIPO</label>
+                        <select id="filtroTipo" class="premium-input" onchange="cargarLideres()">
                             <option value="todos">Todos los Líderes</option>
                             <option value="principales">Voceros Principales</option>
                             <option value="suplentes">Voceros Suplentes</option>
@@ -74,24 +65,26 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Buscador</label>
-                        <input type="text" id="buscarLider" class="form-control" placeholder="Nombre o Documento..."
+                        <label class="form-label"
+                            style="font-weight: 600; font-size: 0.85rem; color: #64748b; margin-bottom: 8px; display: block;">BUSCADOR</label>
+                        <input type="text" id="buscarLider" class="premium-input" placeholder="Nombre o Documento..."
                             oninput="filtrarTabla()">
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="prepararMensajeMasivo('email')" class="btn-primary"
-                            style="background: #00324D; flex: 1;">
-                            <i class="fas fa-envelope"></i> Email Masivo
+                        <button onclick="prepararMensajeMasivo('email')" class="btn-premium"
+                            style="background: #e2e8f0; color: #1e293b; flex: 1;">
+                            <i class="fas fa-envelope"></i> Email
                         </button>
-                        <button onclick="prepararMensajeMasivo('whatsapp')" class="btn-primary"
-                            style="background: #25D366; flex: 1;">
-                            <i class="fab fa-whatsapp"></i> WhatsApp Masivo
+                        <button onclick="prepararMensajeMasivo('whatsapp')" class="btn-premium"
+                            style="background: #dcfce7; color: #166534; flex: 1;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="table-container animate-slide-in">
+            <div class="table-container animate-slide-in"
+                style="background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; overflow: hidden;">
                 <table class="data-table" id="tablaLideres">
                     <thead>
                         <tr>
