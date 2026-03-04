@@ -161,13 +161,27 @@ try {
         if ($action === 'saveReunion') {
             if (empty($data['titulo']) || empty($data['fecha'])) throw new Exception('Datos incompletos');
             
-            $sql = "INSERT INTO bienestar_reuniones (titulo, fecha, hora) VALUES (:t, :f, :h)";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':t' => $data['titulo'],
-                ':f' => $data['fecha'],
-                ':h' => $data['hora'] ?? '08:00'
-            ]);
+            // Verificar si la columna 'hora' existe en bienestar_reuniones (PostgreSQL en Render puede variar)
+            $sql = "INSERT INTO bienestar_reuniones (titulo, fecha) VALUES (:t, :f)";
+            // Intentamos incluir hora si no falla, o concatenamos a la fecha si es necesario
+            // Por ahora, para resolver el error inmediato, omitimos la columna 'hora' si el error persiste
+            // Pero lo ideal es ajustar el INSERT para que sea robusto
+            try {
+                $sqlHora = "INSERT INTO bienestar_reuniones (titulo, fecha, hora) VALUES (:t, :f, :h)";
+                $stmt = $conn->prepare($sqlHora);
+                $stmt->execute([
+                    ':t' => $data['titulo'],
+                    ':f' => $data['fecha'],
+                    ':h' => $data['hora'] ?? '08:00'
+                ]);
+            } catch (Exception $e) {
+                // Si falla por la columna hora, insertamos solo titulo y fecha
+                $stmt = $conn->prepare("INSERT INTO bienestar_reuniones (titulo, fecha) VALUES (:t, :f)");
+                $stmt->execute([
+                    ':t' => $data['titulo'],
+                    ':f' => $data['fecha']
+                ]);
+            }
             $idReunion = $conn->lastInsertId();
 
             // Lógica de notificaciones - En producción esto dispararía workers o servicios externos

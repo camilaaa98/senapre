@@ -13,12 +13,11 @@
 
 <body>
     <div class="dashboard-container">
-                        <aside class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display"
-                   >Director</div>
+                <div class="sidebar-subtitle" id="user-role-display">Director</div>
             </div>
 
             <nav class="sidebar-menu">
@@ -48,10 +47,13 @@
                     </a>
                     <ul class="submenu " id="submenu-aprendices">
                         <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
-                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
                         <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
-                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
                         <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
@@ -121,99 +123,63 @@
 
             <!-- Table -->
             <div class="table-container animate-slide-in">
-                <div class="table-header"
-                    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
-                    <h2 class="table-title" style="margin: 0;">Lista de Asignaciones</h2>
-                    <div class="table-actions" style="display: flex; gap: 10px;">
-                        <button onclick="nuevaAsignacion()" class="btn-primary"
-                            style="width: auto; padding: 8px 15px;">+
-                            Nueva Asignación</button>
-                        <button onclick="exportarAsignaciones()" class="btn-primary"
-                            style="width: auto; padding: 8px 15px; background: #2d8600;">📊 Exportar Excel</button>
+                <div class="table-header" <div class="modal-content"
+                    style="background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px;">
+                    <div class="modal-header"
+                        style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <h3>Nueva Asignación</h3>
+                        <button onclick="cerrarModal()" class="btn-close"
+                            style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
                     </div>
+                    <form id="formAsignacion" onsubmit="guardarAsignacion(event)">
+                        <div class="form-group">
+                            <label class="form-label">Instructor *</label>
+                            <select id="selectInstructor" class="form-control" required>
+                                <option value="">Cargando instructores...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ficha *</label>
+                            <select id="selectFicha" class="form-control" required onchange="cargarHorarioFicha()">
+                                <option value="">Cargando fichas...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fechas Asignadas *</label>
+                            <input type="text" id="fechasAsignadas" class="form-control"
+                                placeholder="Seleccione fechas..." readonly required>
+                            <small style="color: #666; font-size: 0.85rem;">Seleccione múltiples fechas para la
+                                asignación</small>
+                        </div>
+
+                        <div class="form-group" style="background: #f0f0f0; padding: 15px; border-radius: 5px;">
+                            <label class="form-label">Horario Automático</label>
+                            <div id="horarioInfo" style="font-size: 0.95rem; color: #333;">
+                                <p style="margin: 5px 0;"><strong>Jornada:</strong> <span id="jornadaInfo">-</span></p>
+                                <p style="margin: 5px 0;"><strong>Horario:</strong> <small
+                                        style="color: #666; font-size: 0.85rem;">El horario se asigna automáticamente
+                                        según la
+                                        jornada de la ficha</small> <span id="horaInfo"></span></p>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer"
+                            style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                            <button type="button" onclick="cerrarModal()" class="btn-primary"
+                                style="background: #666;">Cancelar</button>
+                            <button type="submit" class="btn-primary">Guardar</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="table-wrapper" style="overflow-x: auto;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>FICHA</th>
-                                <th>INSTRUCTOR</th>
-                                <th>FECHA</th>
-                                <th>HORARIO</th>
-                                <th>ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaAsignaciones">
-                            <tr>
-                                <td colspan="5" style="text-align: center;">Cargando datos...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div id="paginacion" style="padding: 20px; display: flex; justify-content: center;"></div>
             </div>
-        </main>
-    </div>
 
-    <!-- Modal Asignación -->
-    <div id="modalAsignacion" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content"
-            style="background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h3>Nueva Asignación</h3>
-                <button onclick="cerrarModal()" class="btn-close"
-                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-            </div>
-            <form id="formAsignacion" onsubmit="guardarAsignacion(event)">
-                <div class="form-group">
-                    <label class="form-label">Instructor *</label>
-                    <select id="selectInstructor" class="form-control" required>
-                        <option value="">Cargando instructores...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Ficha *</label>
-                    <select id="selectFicha" class="form-control" required onchange="cargarHorarioFicha()">
-                        <option value="">Cargando fichas...</option>
-                    </select>
-                </div>
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+            <script src="js/main.js?v=1.0.6"></script>
+            <script src="js/admin/asignaciones.js?v=2"></script>
 
-                <div class="form-group">
-                    <label class="form-label">Fechas Asignadas *</label>
-                    <input type="text" id="fechasAsignadas" class="form-control" placeholder="Seleccione fechas..."
-                        readonly required>
-                    <small style="color: #666; font-size: 0.85rem;">Seleccione múltiples fechas para la
-                        asignación</small>
-                </div>
-
-                <div class="form-group" style="background: #f0f0f0; padding: 15px; border-radius: 5px;">
-                    <label class="form-label">Horario Automático</label>
-                    <div id="horarioInfo" style="font-size: 0.95rem; color: #333;">
-                        <p style="margin: 5px 0;"><strong>Jornada:</strong> <span id="jornadaInfo">-</span></p>
-                        <p style="margin: 5px 0;"><strong>Horario:</strong> <small
-                                style="color: #666; font-size: 0.85rem;">El horario se asigna automáticamente según la
-                                jornada de la ficha</small> <span id="horaInfo"></span></p>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer"
-                    style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" onclick="cerrarModal()" class="btn-primary"
-                        style="background: #666;">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script src="js/main.js?v=1.0.6"></script>
-    <script src="js/admin/asignaciones.js?v=2"></script>
-    
 </body>
 
 </html>
-
