@@ -210,10 +210,33 @@ const VoceroDashboard = (() => {
             const est = (a.estado || '').toUpperCase();
             const badge = ({ LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado', APLAZADO: 'badge-aplazado', TRASLADO: 'badge-aplazado' })[est] || 'badge-default';
             const doc = a.documento || '';
+            // Generar selectores de población interactivos
+            const cats = [
+                { id: 'mujer', label: 'M', title: 'Mujer', color: 'bg-mujer' },
+                { id: 'indigena', label: 'I', title: 'Indígena', color: 'bg-indigena' },
+                { id: 'narp', label: 'N', title: 'NARP', color: 'bg-narp' },
+                { id: 'campesino', label: 'C', title: 'Campesino', color: 'bg-campesino' },
+                { id: 'lgbtiq', label: 'L', title: 'LGBTIQ+', color: 'bg-lgbtiq' },
+                { id: 'discapacidad', label: 'D', title: 'Discapacidad', color: 'bg-discapacidad' }
+            ];
+
+            let pobCol = '<div class="poblacion-toggles-inline">';
+            cats.forEach(c => {
+                const checked = a[c.id] == 1 ? 'checked' : '';
+                pobCol += `
+                    <label class="pob-toggle-label ${c.color}" title="${c.title}">
+                        <input type="checkbox" onchange="VoceroDashboard.togglePoblacion('${a.documento}', '${c.id}', this.checked)" ${checked}>
+                        <span>${c.label}</span>
+                    </label>
+                `;
+            });
+            pobCol += '</div>';
+
             return `<tr id="fila-${doc}" data-doc="${doc}" data-ficha="${vocFicha}">
                 <td>${ini + i + 1}</td>
                 <td><strong>${doc}</strong></td>
-                <td>${a.nombre || ''} ${a.apellido || ''}</td>
+                <td><strong>${a.nombre || ''} ${a.apellido || ''}</strong></td>
+                <td>${pobCol}</td>
                 <td>
                     <span class="voc-campo" id="correo-txt-${doc}">${a.correo || '—'}</span>
                     <input class="voc-input voc-edit-input hidden" id="correo-inp-${doc}" value="${a.correo || ''}" placeholder="correo@ejemplo.com">
@@ -241,7 +264,7 @@ const VoceroDashboard = (() => {
         if (el) el.innerHTML = `<table>
             <thead><tr>
                 <th>#</th><th>Documento</th><th>Nombre Completo</th>
-                <th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
+                <th>Población</th><th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
             </tr></thead>
             <tbody>${filas}</tbody>
         </table>`;
@@ -432,6 +455,37 @@ const VoceroDashboard = (() => {
         }, 3000);
     }
 
+    async function togglePoblacion(documento, campo, valor) {
+        try {
+            const action = valor ? 'POST' : 'DELETE';
+            const url = action === 'POST' ? 'api/poblacion.php' : `api/poblacion.php?documento=${documento}&poblacion=${campo}`;
+
+            const options = {
+                method: action,
+                headers: { 'Content-Type': 'application/json' }
+            };
+
+            if (action === 'POST') {
+                options.body = JSON.stringify({ documento, poblacion: campo });
+            }
+
+            const res = await fetch(url, options);
+            const result = await res.json();
+
+            if (result.success) {
+                _toast(`✅ Categoría ${campo.toUpperCase()} actualizada`);
+                // Actualizar el objeto local
+                const a = aprendices.find(x => x.documento === documento);
+                if (a) a[campo] = valor ? 1 : 0;
+            } else {
+                _toast('❌ ' + (result.message || 'Error'), 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            _toast('❌ Error de conexión', 'error');
+        }
+    }
+
     // ────────────────────────────────────────────────────────────
     // PAGINACIÓN
     // ────────────────────────────────────────────────────────────
@@ -442,7 +496,7 @@ const VoceroDashboard = (() => {
     }
 
     // ── API PÚBLICA ────────────────────────────────────────────
-    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFila, cancelarEdicion };
+    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFila, cancelarEdicion, togglePoblacion };
 
 })();
 

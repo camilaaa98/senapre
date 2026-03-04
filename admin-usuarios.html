@@ -12,12 +12,11 @@
 
 <body>
     <div class="dashboard-container">
-                        <aside class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display"
-                   >Director</div>
+                <div class="sidebar-subtitle" id="user-role-display">Director</div>
             </div>
 
             <nav class="sidebar-menu">
@@ -47,10 +46,13 @@
                     </a>
                     <ul class="submenu " id="submenu-aprendices">
                         <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
-                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
                         <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
-                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
                         <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
@@ -275,6 +277,10 @@
     </div>
 
     <script src="js/main.js?v=1.0.6"></script>
+    <!-- PDF Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
     <!-- Librerías de Reconocimiento Facial -->
     <script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
     <script>
@@ -302,4 +308,3 @@
 </body>
 
 </html>
-
