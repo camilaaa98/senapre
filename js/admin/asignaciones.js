@@ -7,7 +7,11 @@ let fichasData = [];
 let instructoresData = [];
 let horariosPorJornada = {
     'Diurna': { inicio: '06:00', fin: '12:00' },
+    'Diurna - Cerrado': { inicio: '06:00', fin: '12:00' },
     'Tarde': { inicio: '13:00', fin: '18:00' },
+    'Tarde - Cerrado': { inicio: '13:00', fin: '18:00' },
+    'Noche': { inicio: '18:00', fin: '00:00' },
+    'Noche - Cerrado': { inicio: '18:00', fin: '00:00' },
     'Nocturna': { inicio: '18:00', fin: '00:00' },
     'Mixta': { inicio: '06:00', fin: '18:00' },
     'Fin de semana': { inicio: '08:00', fin: '16:00' }
