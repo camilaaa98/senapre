@@ -448,9 +448,14 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            const lk = item.querySelector('a');
-            const isDash = text.includes('dashboard') || text.includes('home') || (lk && lk.href.includes('admin-dashboard.html'));
-            permitido = (text.includes('bienestar') || text.includes('aprendices') || text.includes('asistencias') || text.includes('reportes') || text.includes('cerrar sesión')) && !isDash;
+            const academicKeywords = ['aprendices', 'fichas', 'programas', 'asignar', 'asistencias', 'reportes'];
+            const isAcademic = academicKeywords.some(key => text.includes(key));
+
+            // Permitir solo Bienestar y Cerrar Sesión. El Dashboard central se oculta para obligar a ir a Bienestar
+            permitido = text.includes('bienestar') || text.includes('cerrar sesión');
+
+            // Si es académico, se oculta explícitamente a menos que sea Bienestar
+            if (isAcademic && !text.includes('bienestar')) permitido = false;
         }
 
         if (!permitido) {

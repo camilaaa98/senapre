@@ -105,12 +105,12 @@
                 <p class="content-description">Gestión de horarios y asignaciones</p>
             </div>
 
-            <!-- Filters -->
+            <!-- Filtros -->
             <div class="card" style="margin-bottom: 20px;">
                 <div class="card-header">
                     <h3 class="card-title">Filtros</h3>
                 </div>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 15px;">
                     <div style="flex: 1; min-width: 200px;">
                         <input type="text" id="filtroSearch" class="form-control"
                             placeholder="Buscar por instructor o ficha...">
@@ -121,10 +121,11 @@
                 </div>
             </div>
 
-            <!-- Table -->
-            <div class="table-container animate-slide-in">
-                <div class="table-header" <div class="modal-content"
-                    style="background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px;">
+            <!-- Modal Nueva Asignación -->
+            <div id="modalAsignacion" class="modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="modal-content"
+                    style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 500px;">
                     <div class="modal-header"
                         style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                         <h3>Nueva Asignación</h3>
@@ -159,10 +160,8 @@
                                 <p style="margin: 5px 0;"><strong>Jornada:</strong> <span id="jornadaInfo">-</span></p>
                                 <p style="margin: 5px 0;"><strong>Horario:</strong> <small
                                         style="color: #666; font-size: 0.85rem;">El horario se asigna automáticamente
-                                        según la
-                                        jornada de la ficha</small> <span id="horaInfo"></span></p>
+                                        según la jornada de la ficha</small> <span id="horaInfo"></span></p>
                             </div>
-
                         </div>
 
                         <div class="modal-footer"
@@ -172,6 +171,75 @@
                             <button type="submit" class="btn-primary">Guardar</button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Tabla de Datos -->
+            <div class="table-container animate-slide-in" style="margin-top: 20px;">
+                <div class="table-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px;">
+                    <h3 class="table-title">Asignaciones Actuales</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="abrirModal()" class="btn-primary"><i class="fas fa-plus"></i> Nueva
+                            Asignación</button>
+                        <button onclick="exportarExcel()" class="btn-primary" style="background: #1D6F42;"><i
+                                class="fas fa-file-excel"></i> Excel</button>
+                        <button onclick="exportarPDF()" class="btn-primary" style="background: #E84C3D;"><i
+                                class="fas fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Instructor</th>
+                            <th>Ficha</th>
+                            <th>Programa</th>
+                            <th>Jornada</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAsignaciones">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 30px;">Cargando asignaciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sección de Biometría -->
+            <div class="card" style="margin-top: 30px; border-top: 4px solid #39A900;">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-fingerprint"></i> Registro de Asistencia Biométrica Facial
+                    </h3>
+                </div>
+                <div class="biometric-container"
+                    style="display: flex; gap: 30px; align-items: start; padding: 20px; flex-wrap: wrap;">
+                    <div id="camera-container"
+                        style="width: 320px; height: 240px; background: #000; border: 3px solid #666; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-camera fa-3x" style="color: #333;"></i>
+                        <div
+                            style="position: absolute; width: 80%; height: 80%; border: 2px dashed rgba(57, 169, 0, 0.5); border-radius: 50%;">
+                        </div>
+                    </div>
+                    <div class="biometric-info" style="flex: 1; min-width: 300px;">
+                        <p style="margin-bottom: 15px; color: #475569;">Posicione su rostro frente a la cámara. El
+                            sistema realizará un escaneo de <strong>128 puntos biométricos</strong> para validar su
+                            identidad académica.</p>
+                        <ul style="margin-bottom: 20px; color: #64748b; list-style: none; padding: 0;">
+                            <li style="margin-bottom: 8px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
+                                Iluminación adecuada</li>
+                            <li style="margin-bottom: 8px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
+                                Rostro descubierto</li>
+                            <li style="margin-bottom: 20px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
+                                Mirada fija a la cámara</li>
+                        </ul>
+                        <button onclick="iniciarCapturaFacial()" class="btn-premium btn-premium-sena"
+                            style="width: 100%; max-width: 300px;">
+                            <i class="fas fa-video"></i> Iniciar Escaneo Facial
+                        </button>
+                    </div>
                 </div>
             </div>
 
