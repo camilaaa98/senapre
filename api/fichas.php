@@ -79,6 +79,7 @@ try {
 
         $sqlBase = "SELECT f.*, 
                        COALESCE(p.nombre_programa, f.nombre_programa) as nombre_programa,
+                       COALESCE(tf.nombre, f.tipoFormacion) as tipo_formacion_nombre,
                        u.nombre || ' ' || u.apellido as nombre_instructor,
                        vp.nombre || ' ' || vp.apellido as nombre_vocero_principal,
                        vp.documento as id_vocero_principal,
@@ -86,6 +87,7 @@ try {
                        vs.documento as id_vocero_suplente
                 FROM fichas f 
                 LEFT JOIN programas_formacion p ON f.nombre_programa = p.nombre_programa 
+                LEFT JOIN tipoFormacion tf ON f.tipoFormacion = CAST(tf.id AS TEXT)
                 $joinUsuario
                 LEFT JOIN aprendices vp ON f.vocero_principal = vp.documento
                 LEFT JOIN aprendices vs ON f.vocero_suplente = vs.documento

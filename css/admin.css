@@ -1374,4 +1374,56 @@
     background: #d1fae5;
     color: #065f46;
     border: 1px solid #a7f3d0;
+}@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.poblacion-toggles-inline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
 }
+
+.pob-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    border: 1px solid rgba(0,0,0,0.05);
+    opacity: 0.3;
+    color: #fff;
+    filter: grayscale(0.8);
+}
+
+.pob-toggle-label:hover {
+    transform: translateY(-2px);
+    opacity: 0.6;
+    filter: grayscale(0.4);
+}
+
+.pob-toggle-label input {
+    display: none;
+}
+
+.pob-toggle-label:has(input:checked) {
+    opacity: 1 !important;
+    filter: grayscale(0) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: scale(1.1);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.bg-mujer { background: linear-gradient(135deg, #f472b6, #db2777); }
+.bg-indigena { background: linear-gradient(135deg, #84cc16, #4d7c0f); }
+.bg-narp { background: linear-gradient(135deg, #4b5563, #1f2937); }
+.bg-campesino { background: linear-gradient(135deg, #d97706, #92400e); }
+.bg-lgbtiq { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+.bg-discapacidad { background: linear-gradient(135deg, #06b6d4, #0891b2); }

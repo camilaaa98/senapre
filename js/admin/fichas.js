@@ -233,7 +233,7 @@ function mostrarFichas(fichas) {
         <tr class="table-row-divider">
             <td class="td-mono">${f.numero_ficha}</td>
             <td>${f.nombre_programa || 'N/A'}</td>
-            <td class="td-mono">${f.tipoFormacion || 'N/A'}</td>
+            <td class="td-mono">${f.tipo_formacion_nombre || f.tipoFormacion || 'N/A'}</td>
             <td>${f.jornada || 'N/A'}</td>
             <td>
                 <select onchange="cambiarInstructorLider('${f.numero_ficha}', this.value)" 
