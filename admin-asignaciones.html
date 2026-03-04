@@ -106,16 +106,16 @@
             </div>
 
             <!-- Filtros -->
-            <div class="card" style="margin-bottom: 20px;">
+            <div class="card card-margin">
                 <div class="card-header">
                     <h3 class="card-title">Filtros</h3>
                 </div>
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 15px;">
-                    <div style="flex: 1; min-width: 200px;">
+                <div class="card-body-flex">
+                    <div class="flex-grow">
                         <input type="text" id="filtroSearch" class="form-control"
                             placeholder="Buscar por instructor o ficha...">
                     </div>
-                    <div style="width: 200px;">
+                    <div class="fixed-width-date">
                         <input type="date" id="filtroFecha" class="form-control">
                     </div>
                 </div>
@@ -208,40 +208,6 @@
                 </table>
             </div>
 
-            <!-- Sección de Biometría -->
-            <div class="card" style="margin-top: 30px; border-top: 4px solid #39A900;">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-fingerprint"></i> Registro de Asistencia Biométrica Facial
-                    </h3>
-                </div>
-                <div class="biometric-container"
-                    style="display: flex; gap: 30px; align-items: start; padding: 20px; flex-wrap: wrap;">
-                    <div id="camera-container"
-                        style="width: 320px; height: 240px; background: #000; border: 3px solid #666; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-camera fa-3x" style="color: #333;"></i>
-                        <div
-                            style="position: absolute; width: 80%; height: 80%; border: 2px dashed rgba(57, 169, 0, 0.5); border-radius: 50%;">
-                        </div>
-                    </div>
-                    <div class="biometric-info" style="flex: 1; min-width: 300px;">
-                        <p style="margin-bottom: 15px; color: #475569;">Posicione su rostro frente a la cámara. El
-                            sistema realizará un escaneo de <strong>128 puntos biométricos</strong> para validar su
-                            identidad académica.</p>
-                        <ul style="margin-bottom: 20px; color: #64748b; list-style: none; padding: 0;">
-                            <li style="margin-bottom: 8px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
-                                Iluminación adecuada</li>
-                            <li style="margin-bottom: 8px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
-                                Rostro descubierto</li>
-                            <li style="margin-bottom: 20px;"><i class="fas fa-check-circle" style="color:#39A900;"></i>
-                                Mirada fija a la cámara</li>
-                        </ul>
-                        <button onclick="iniciarCapturaFacial()" class="btn-premium btn-premium-sena"
-                            style="width: 100%; max-width: 300px;">
-                            <i class="fas fa-video"></i> Iniciar Escaneo Facial
-                        </button>
-                    </div>
-                </div>
-            </div>
 
             <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
             <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
