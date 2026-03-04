@@ -11,14 +11,25 @@
         window.location.href = 'index.html';
         return;
     }
+
+    const bienestarData = user.bienestar_data || [];
+    const esRespLiderazgo = bienestarData.includes('voceros_y_representantes');
+
     if (rol === 'vocero') {
         window.location.href = 'vocero-dashboard.html';
         return;
     }
-    if (rol === 'liderazgo') {
-        window.location.href = 'admin-bienestar-historico.html';
+
+    // Si tiene alcance de Liderazgo o Bienestar y NO es director, redirigir
+    if ((esRespLiderazgo || bienestarData.length > 0) && !authSystem.isAdmin()) {
+        if (esRespLiderazgo) {
+            window.location.href = 'admin-bienestar-historico.html';
+        } else {
+            window.location.href = 'admin-bienestar-dashboard.html';
+        }
         return;
     }
+
     if (typeof authSystem !== 'undefined' && !authSystem.isAdmin()) {
         window.location.href = 'index.html';
         return;

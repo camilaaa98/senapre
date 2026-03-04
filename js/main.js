@@ -96,9 +96,9 @@ class AuthSystem {
 
     isAdmin() {
         if (!this.currentUser) return false;
-        const rol = this.currentUser.rol.toLowerCase();
-        // Vocero NO es administrador — tiene su propio panel exclusivo
-        return ['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol);
+        const rol = (this.currentUser.rol || '').toLowerCase();
+        // Solo Directores y Administradores generales son "Admins" reales para el dashboard central
+        return ['director', 'admin', 'administrador'].includes(rol);
     }
 
     redirectToDashboard() {
@@ -240,7 +240,8 @@ function aplicarRestriccionesDeRol() {
     const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
     const scope = scopes.length > 0 ? scopes[0] : null;
 
-    const esDirector = rol === 'director' || rol === 'admin' || rol === 'administrador';
+    // Unificado con AuthSystem
+    const esDirector = authSystem.isAdmin();
     const esJefeBienestar = bienestar.includes('jefe_bienestar');
     const esRespLiderazgo = bienestar.includes('voceros_y_representantes');
     const esVocero = rol === 'vocero';
