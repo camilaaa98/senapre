@@ -176,16 +176,18 @@
 
             <!-- Tabla de Datos -->
             <div class="table-container animate-slide-in" style="margin-top: 20px;">
-                <div class="table-header"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px;">
+                <div class="table-header" style="padding: 15px;">
                     <h3 class="table-title">Asignaciones Actuales</h3>
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="nuevaAsignacion()" class="btn-primary btn-compact"><i class="fas fa-plus"></i>
-                            Nueva Asignación</button>
-                        <button onclick="exportarExcel()" class="btn-primary btn-excel btn-compact"><i
-                                class="fas fa-file-excel"></i> Excel</button>
-                        <button onclick="exportarPDF()" class="btn-primary btn-pdf btn-compact"><i
-                                class="fas fa-file-pdf"></i> PDF</button>
+                    <div class="header-actions">
+                        <button onclick="nuevaAsignacion()" class="btn-primary btn-compact">
+                            <i class="fas fa-plus"></i> Agregar Asignación
+                        </button>
+                        <button onclick="exportarExcel()" class="btn-primary btn-excel btn-compact">
+                            <i class="fas fa-file-excel"></i> Exportar Excel
+                        </button>
+                        <button onclick="exportarPDF()" class="btn-primary btn-pdf btn-compact">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
                     </div>
                 </div>
                 <table class="data-table">

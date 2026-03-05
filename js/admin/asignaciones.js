@@ -143,13 +143,27 @@ function cargarHorarioFicha() {
 }
 
 function nuevaAsignacion() {
-    document.getElementById('formAsignacion').reset();
+    console.log('Abriendo modal de nueva asignación...');
+    const form = document.getElementById('formAsignacion');
+    if (form) form.reset();
+
     if (calendarioFlatpickr) {
         calendarioFlatpickr.clear();
     }
-    document.getElementById('jornadaInfo').textContent = '-';
-    document.getElementById('horaInfo').textContent = '';
-    document.getElementById('modalAsignacion').style.display = 'flex';
+
+    const jornadaInfo = document.getElementById('jornadaInfo');
+    const horaInfo = document.getElementById('horaInfo');
+    if (jornadaInfo) jornadaInfo.textContent = '-';
+    if (horaInfo) horaInfo.textContent = '';
+
+    const modal = document.getElementById('modalAsignacion');
+    if (modal) {
+        modal.style.display = 'flex';
+        console.log('Modal abierto.');
+    } else {
+        console.error('No se encontró el modal con ID modalAsignacion');
+        alert('Error: No se pudo abrir el formulario de asignación.');
+    }
 }
 
 function cerrarModal() {

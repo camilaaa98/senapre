@@ -8,17 +8,12 @@ header('Access-Control-Allow-Methods: GET');
 require_once __DIR__ . '/config/Database.php';
 $conn = Database::getInstance()->getConnection();
 
-function safeQuery($conn, $sql, $default = 0) {
-    try {
-        $stmt = $conn->query($sql);
-        if ($stmt) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $row ? $row['total'] : $default;
-        }
-    } catch (Exception $e) {
-        // Ignorar error de tabla faltante y devolver default
-    }
-    return $default;
+function getEstadoColor($estado) {
+    $est = strtoupper(trim($estado));
+    if ($est === 'LECTIVA' || $est === 'EN FORMACION' || $est === 'PRODUCTIVA') return '#39A900'; // Verde SENA
+    if ($est === 'CANCELADO' || $est === 'RETIRO VOLUNTARIO' || $est === 'RETIRO') return '#dc2626'; // Rojo
+    if ($est === 'APLAZADO' || $est === 'TRASLADO') return '#f59e0b'; // Naranja
+    return '#64748b'; // Gris
 }
 
 try {
@@ -99,38 +94,16 @@ try {
     $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
     
     // 4. Aprendices por Estado (para la gráfica)
-    $aprendicesPorEstado = $aprendicesDetalle;
+    // Ya agrupamos arriba en $aprendicesDetalle
     
-    // 5. Fichas por Programa
-    $fichasPorPrograma = [];
-    if (empty($ficha)) {
-        try {
-            $stmt = $conn->query("SELECT nombre_programa, COUNT(*) as cantidad FROM fichas GROUP BY nombre_programa ORDER BY cantidad DESC LIMIT 8");
-            if ($stmt) $fichasPorPrograma = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {}
-    }
-    
-    // 6. Asistencias Recientes
-    $asistenciasRecientes = [];
+    $totalVulnerables = 0;
     try {
-        $isPg = strpos(Database::getInstance()->getDbPath(), 'PostgreSQL') !== false;
-        $tableExists = false;
-        if ($isPg) {
-            $stmtExists = $conn->prepare("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'asistencias')");
-            $stmtExists->execute();
-            $tableExists = $stmtExists->fetchColumn();
-        } else {
-            $stmtExists = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='asistencias'");
-            $tableExists = $stmtExists->fetch();
+        $tablasPob = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        foreach($tablasPob as $t) {
+            $totalVulnerables += safeQuery($conn, "SELECT COUNT(*) as total FROM $t");
         }
+    } catch(Exception $e) {}
 
-        if ($tableExists) {
-             $fechaSql = $isPg ? "fecha >= CURRENT_DATE - INTERVAL '7 days'" : "fecha >= date('now', '-7 days')";
-             $stmt = $conn->query("SELECT fecha, COUNT(*) as cantidad FROM asistencias WHERE $fechaSql GROUP BY fecha ORDER BY fecha");
-             if ($stmt) $asistenciasRecientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    } catch (Exception $e) {}
-    
     echo json_encode([
         'success' => true,
         'data' => [
@@ -145,9 +118,10 @@ try {
                 'voceros_principales' => $vocerosPrincipales,
                 'voceros_suplentes' => $vocerosSuplentes,
                 'voceros_enfoque' => $vocerosEnfoque,
-                'programas' => $totalProgramas
+                'programas' => $totalProgramas,
+                'total_vulnerables' => $totalVulnerables
             ],
-            'aprendices_estado' => $aprendicesPorEstado,
+            'aprendices_estado' => $aprendicesDetalle,
             'fichas_programa' => $fichasPorPrograma,
             'asistencias_trend' => $asistenciasRecientes
         ]

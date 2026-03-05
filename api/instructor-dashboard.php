@@ -16,8 +16,8 @@ try {
 
     // Optimización: Modo WAL para lectura sin bloqueos y timeout
     try {
-    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA journal_mode = WAL;'); }
-    if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA busy_timeout = 5000;'); }
+        if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA journal_mode = WAL;'); }
+        if (!getenv('DATABASE_URL')) { $conn->exec('PRAGMA busy_timeout = 5000;'); }
     } catch (Exception $e) {
         // Continuar si falla optimización
     }
@@ -42,7 +42,7 @@ try {
                           FROM asignacion_instructores 
                           WHERE id_usuario = :id
                       )
-                      AND (a.estado = 'EN FORMACION' OR a.estado = 'En Formación')";
+                      AND (a.estado = 'LECTIVA' OR a.estado = 'EN FORMACION')";
     $stmtAprendices = $conn->prepare($sqlAprendices);
     $stmtAprendices->execute([':id' => $idUsuario]);
     $totalAprendices = $stmtAprendices->fetch(PDO::FETCH_ASSOC)['total'];
@@ -59,7 +59,10 @@ try {
         $stmtAsistencia = $conn->prepare($sqlAsistencia);
         $stmtAsistencia->execute([':id' => $idUsuario]);
         $res = $stmtAsistencia->fetch(PDO::FETCH_ASSOC);
-        if ($res) $asistenciaData = $res;
+        if ($res) {
+            $asistenciaData['total_registros'] = $res['total_registros'] ?? 0;
+            $asistenciaData['total_presentes'] = $res['total_presentes'] ?? 0;
+        }
     } catch (Exception $e) {
         // Si falla (ej. columna id_instructor no existe), ignoramos silenciosamente para no romper todo el dashboard
     }
@@ -81,7 +84,7 @@ try {
             GROUP BY documento_aprendiz
             HAVING (CAST(total_presentes AS FLOAT) / CAST(total_registros AS FLOAT)) < 0.75
             AND total_registros >= 5
-        )";
+        ) as sub";
         $stmtAlertas = $conn->prepare($sqlAlertas);
         $stmtAlertas->execute([':id' => $idUsuario]);
         $resAlertas = $stmtAlertas->fetch(PDO::FETCH_ASSOC);

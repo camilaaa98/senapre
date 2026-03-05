@@ -229,25 +229,35 @@ h6,
     color: white !important;
 }
 
+.header-actions {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+}
+
 .btn-compact {
-    padding: 4px 10px !important;
-    font-size: 0.75rem !important;
-    height: 32px !important;
+    padding: 6px 14px !important;
+    font-size: 0.8rem !important;
+    height: 38px !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 5px !important;
-    border-radius: 6px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
     font-weight: 600 !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-compact:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+    filter: brightness(1.1);
 }
 
 .btn-compact i {
-    font-size: 0.75rem !important;
-}
-
-.table-header div {
-    display: flex !important;
-    gap: 8px !important;
+    font-size: 0.9rem !important;
 }
 
 /* 6. Assistance Status Colors */

@@ -113,9 +113,9 @@ async function cargarEstadisticas() {
 }
 
 function getEstadoColorClass(estado) {
-    const est = (estado || '').toUpperCase();
-    if (est === 'EN FORMACION' || est === 'LECTIVA' || est === 'PRODUCTIVA') return 'color-success';
-    if (est === 'RETIRADO' || est === 'CANCELADO' || est === 'RETIRO VOLUNTARIO') return 'color-error';
+    const est = (estado || '').toUpperCase().trim();
+    if (est === 'EN FORMACION' || est === 'LECTIVA' || est === 'PRODUCTIVA' || est === 'EN FORMACIÓN') return 'color-success';
+    if (est === 'RETIRADO' || est === 'CANCELADO' || est === 'RETIRO VOLUNTARIO' || est === 'CANCELADA') return 'color-error';
     if (est === 'APLAZADO' || est === 'TRASLADO') return 'color-warning';
     return 'color-muted';
 }
