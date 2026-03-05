@@ -82,7 +82,7 @@ class AuthSystem {
             this.currentUser = null;
             localStorage.removeItem(this.storageKey);
             sessionStorage.clear();
-            window.location.href = 'index.html';
+            window.location.href = 'index';
         }
     }
 
@@ -109,15 +109,15 @@ class AuthSystem {
         const encrypt = (path) => btoa(path);
 
         if (rol === 'vocero') {
-            window.location.href = encrypt('vocero-dashboard.html');
+            window.location.href = 'vocero-dashboard';
         } else if (rol === 'bienestar') {
             const user = this.currentUser;
             const esRespLiderazgo = user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes');
-            window.location.href = esRespLiderazgo ? encrypt('admin-bienestar-historico.html') : encrypt('bienestar-aprendiz.html');
+            window.location.href = esRespLiderazgo ? 'admin-bienestar-historico' : 'bienestar-aprendiz';
         } else if (rol === 'instructor') {
-            window.location.href = encrypt('instructor-dashboard.html');
+            window.location.href = 'instructor-dashboard';
         } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            window.location.href = encrypt('admin-dashboard.html');
+            window.location.href = 'admin-dashboard';
         }
     }
 }
@@ -133,8 +133,8 @@ function initGlobalNavigation() {
         head.appendChild(link);
 
         const header = document.querySelector('.content-header') || document.querySelector('.page-header') || document.querySelector('.premium-header');
-        const isDashboard = window.location.pathname.includes('dashboard.html');
-        const isLogin = window.location.pathname.includes('index.html');
+        const isDashboard = window.location.pathname.includes('dashboard');
+        const isLogin = window.location.pathname.includes('index') || window.location.pathname === '/';
 
         // Sidebar Toggle for Mobile
         const dashboardContainer = document.querySelector('.dashboard-container');
@@ -305,7 +305,7 @@ function aplicarRestriccionesDeRol() {
 
     // 1. RESTRICCIÓN PARA SUB-ÁREAS (Enfermería, Deporte, etc.)
     if (esSoloSubArea) {
-        if (window.location.pathname.includes('admin-dashboard.html')) {
+        if (window.location.pathname.includes('admin-dashboard')) {
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
                 mainContent.innerHTML = `
@@ -496,7 +496,7 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
                 if (span) span.textContent = 'Liderazgo Estudiantil';
                 const link = item.querySelector('a');
                 if (link && !link.href.includes('bienestar-dashboard.html')) {
-                    link.href = 'bienestar-dashboard.html';
+                    link.href = 'bienestar-dashboard';
                 }
             }
 
