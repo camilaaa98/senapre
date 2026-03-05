@@ -339,7 +339,7 @@ function aplicarRestriccionesDeRol() {
 }
 
 function filtrarDashboardParaVocero(scope) {
-    if (!window.location.pathname.includes('admin-dashboard.html')) return;
+    if (!window.location.pathname.includes('admin-dashboard')) return;
 
     const cards = document.querySelectorAll('.main-content .card');
     const title = document.querySelector('.content-title');
@@ -422,7 +422,7 @@ function ocultarMenusVocero(scope) {
 }
 
 function filtrarDashboardParaBienestar(esRespLiderazgo = false) {
-    if (!window.location.pathname.includes('admin-dashboard.html')) return;
+    if (!window.location.pathname.includes('admin-dashboard')) return;
 
     // Mostrar botón Volver
     const btnVolver = document.getElementById('btn-volver-dashboard');
@@ -443,7 +443,7 @@ function filtrarDashboardParaBienestar(esRespLiderazgo = false) {
     const btnRepo = document.querySelector('#accesos-rapidos-container button:nth-child(2)');
 
     if (btnAsis) {
-        btnAsis.setAttribute('onclick', "window.location.href='admin-bienestar-historico.html'");
+        btnAsis.setAttribute('onclick', "window.location.href='admin-bienestar-historico'");
         btnAsis.innerHTML = '<i class="fas fa-history"></i> Consultar Asistencias (Líderes)';
     }
     if (btnRepo) {
@@ -495,7 +495,7 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
                 const span = item.querySelector('span');
                 if (span) span.textContent = 'Liderazgo Estudiantil';
                 const link = item.querySelector('a');
-                if (link && !link.href.includes('bienestar-dashboard.html')) {
+                if (link && !link.href.includes('bienestar-dashboard')) {
                     link.href = 'bienestar-dashboard';
                 }
             }

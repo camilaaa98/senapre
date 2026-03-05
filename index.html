@@ -155,18 +155,18 @@
                     const userRol = data.data.rol.toLowerCase();
                     if (userRol === 'vocero') {
                         // Panel exclusivo de voceros — sin módulos del director
-                        window.location.href = 'vocero-dashboard.html';
+                        window.location.href = 'vocero-dashboard';
                     } else if (userRol === 'instructor') {
-                        window.location.href = 'instructor-dashboard.html';
+                        window.location.href = 'instructor-dashboard';
                     } else if (userRol === 'bienestar') {
                         // Panel exclusivo de Bienestar del Aprendiz
-                        window.location.href = 'bienestar-aprendiz.html';
+                        window.location.href = 'bienestar-aprendiz';
                     } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
                         const isBienestar = data.data.bienestar_data && data.data.bienestar_data.includes('jefe_bienestar');
                         if (isBienestar && userRol !== 'director') {
-                            window.location.href = 'jefe-bienestar-dashboard.html';
+                            window.location.href = 'jefe-bienestar-dashboard';
                         } else {
-                            window.location.href = 'admin-dashboard.html';
+                            window.location.href = 'admin-dashboard';
                         }
                     } else {
                         throw new Error('Rol de usuario no reconocido: ' + data.data.rol);

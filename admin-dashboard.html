@@ -25,68 +25,68 @@
 
             <nav class="sidebar-menu">
                 <li class="menu-item">
-                    <a href="admin-dashboard.html" class="menu-link active">
+                    <a href="admin-dashboard" class="menu-link active">
                         <div class="menu-icon"><i class="fas fa-home"></i></div>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-bienestar-dashboard.html" class="menu-link">
+                    <a href="admin-bienestar-dashboard" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-handshake"></i></div>
                         <span>Bienestar del Aprendiz</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-usuarios.html" class="menu-link">
+                    <a href="admin-usuarios" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
                         <span>Gestionar Usuarios</span>
                     </a>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a href="admin-aprendices.html" class="menu-link"
+                    <a href="admin-aprendices" class="menu-link"
                         onclick="toggleSubmenu(event, 'submenu-aprendices')">
                         <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
                         <span>Gestionar Aprendices</span>
                         <i class="fas fa-chevron-down submenu-arrow"></i>
                     </a>
                     <ul class="submenu" id="submenu-aprendices">
-                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
-                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        <li><a href="admin-aprendices"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
                         </li>
-                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                        <li><a href="admin-aprendices#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices#planes"><i class="fas fa-clipboard-list"></i> Planes de
                                 Mejoramiento</a></li>
-                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                        <li><a href="admin-aprendices#inasistencias"><i class="fas fa-exclamation-triangle"></i>
                                 Inasistencias</a></li>
-                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                        <li><a href="admin-aprendices#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-programas.html" class="menu-link">
+                    <a href="admin-programas" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-book"></i></div>
                         <span>Gestionar Programas</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-fichas.html" class="menu-link">
+                    <a href="admin-fichas" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
                         <span>Gestionar Fichas</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-asignaciones.html" class="menu-link">
+                    <a href="admin-asignaciones" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                         <span>Asignar Instructores</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-asistencias.html" class="menu-link">
+                    <a href="admin-asistencias" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
                         <span>Consultar Asistencias</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-reportes.html" class="menu-link">
+                    <a href="admin-reportes" class="menu-link">
                         <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
                         <span>Generar Reportes</span>
                     </a>
@@ -117,7 +117,7 @@
             <!-- Tarjetas Admin (Director/Admin/Liderazgo) -->
             <div id="dashboard-admin-cards" class="admin-stats-grid">
                 <!-- Usuarios -->
-                <div class="stat-card verde" onclick="window.location.href='admin-usuarios.html'">
+                <div class="stat-card verde" onclick="window.location.href = 'admin-usuarios'">
                     <div class="stat-icon verde"><i class="fas fa-users"></i></div>
                     <h3>Usuarios</h3>
                     <div class="stat-num" id="dashTotalUsuarios">--</div>
@@ -130,7 +130,7 @@
                 </div>
 
                 <!-- Aprendices -->
-                <div class="stat-card azul" onclick="window.location.href='admin-aprendices.html'">
+                <div class="stat-card azul" onclick="window.location.href = 'admin-aprendices'">
                     <div class="stat-icon azul"><i class="fas fa-user-graduate"></i></div>
                     <h3>Aprendices</h3>
                     <div class="stat-num" id="dashTotalAprendices">--</div>
@@ -140,7 +140,7 @@
                 </div>
 
                 <!-- Voceros -->
-                <div class="stat-card lila" onclick="window.location.href='admin-fichas.html'">
+                <div class="stat-card lila" onclick="window.location.href = 'admin-fichas'">
                     <div class="stat-icon lila"><i class="fas fa-bullhorn"></i></div>
                     <h3>Voceros</h3>
                     <div class="stat-num" id="dashTotalVoceros">--</div>
@@ -152,7 +152,7 @@
                 </div>
 
                 <!-- Fichas -->
-                <div class="stat-card verde" onclick="window.location.href='admin-fichas.html'">
+                <div class="stat-card verde" onclick="window.location.href = 'admin-fichas'">
                     <div class="stat-icon verde"><i class="fas fa-chalkboard"></i></div>
                     <h3>Fichas</h3>
                     <div class="stat-num" id="dashTotalFichas">--</div>
@@ -162,34 +162,34 @@
 
             <!-- Tarjetas Bienestar (Jefe Bienestar / Enfoque) -->
             <div id="dashboard-bienestar-cards" class="admin-stats-grid" style="display:none">
-                <div class="stat-card lila" onclick="window.location.href='admin-aprendices.html#poblacion'">
+                <div class="stat-card lila" onclick="window.location.href='admin-aprendices#poblacion'">
                     <div class="stat-icon lila"><i class="fas fa-female"></i></div>
                     <h3>Mujeres</h3>
                     <div class="stat-num" id="dashStatMujer">0</div>
                     <p class="stat-desc">Población Femenina</p>
                 </div>
                 <div class="stat-card" style="border-top-color:#84cc16"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    onclick="window.location.href='admin-aprendices#poblacion'">
                     <div class="stat-icon" style="color:#84cc16"><i class="fas fa-seedling"></i></div>
                     <h3>Indígenas</h3>
                     <div class="stat-num" id="dashStatIndigena">0</div>
                     <p class="stat-desc">Población Étnica</p>
                 </div>
-                <div class="stat-card rojo" onclick="window.location.href='admin-aprendices.html#poblacion'">
+                <div class="stat-card rojo" onclick="window.location.href='admin-aprendices#poblacion'">
                     <div class="stat-icon" style="color:#dc2626"><i class="fas fa-fist-raised"></i></div>
                     <h3>NARP</h3>
                     <div class="stat-num" id="dashStatNarp">0</div>
                     <p class="stat-desc">Población Afro</p>
                 </div>
                 <div class="stat-card" style="border-top-color:#E91E63"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    onclick="window.location.href='admin-aprendices#poblacion'">
                     <div class="stat-icon" style="color:#ef4444"><i class="fas fa-rainbow"></i></div>
                     <h3>LGBTIQ+</h3>
                     <div class="stat-num" id="dashStatLgbtiq">0</div>
                     <p class="stat-desc">Diversidad Sexual</p>
                 </div>
                 <div class="stat-card" style="border-top-color:#00324D;background:#00324D"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
+                    onclick="window.location.href='admin-aprendices#poblacion'">
                     <div class="stat-icon verde"><i class="fas fa-user-graduate"></i></div>
                     <h3 style="color:#fff">Total Vulnerable</h3>
                     <div class="stat-num" id="dashStatTotal" style="color:#fff">0</div>
@@ -247,13 +247,13 @@
                     <h3 class="card-title">Accesos Rápidos</h3>
                 </div>
                 <div class="accesos-grid">
-                    <button onclick="window.location.href='admin-bienestar-historico.html'" class="btn-acceso verde">
+                    <button onclick="window.location.href = 'admin-bienestar-historico'" class="btn-acceso verde">
                         <i class="fas fa-users"></i> Asistencia Reuniones (Voceros)
                     </button>
-                    <button onclick="window.location.href='admin-asistencias.html'" class="btn-acceso verde2">
+                    <button onclick="window.location.href = 'admin-asistencias'" class="btn-acceso verde2">
                         <i class="fas fa-check-circle"></i> Asistencia por Fichas
                     </button>
-                    <button onclick="window.location.href='admin-reportes.html'" class="btn-acceso azul">
+                    <button onclick="window.location.href = 'admin-reportes'" class="btn-acceso azul">
                         <i class="fas fa-chart-bar"></i> Reportes Generales
                     </button>
                 </div>
