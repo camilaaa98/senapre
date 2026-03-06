@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listeners para filtros
     document.getElementById('filtroSearch')?.addEventListener('input', debounce(aplicarFiltros, 500));
+    document.getElementById('filtroMunicipio')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtroPrograma')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
 });
@@ -182,9 +183,14 @@ async function cargarInstructores() {
 async function cargarFichas(pagina = 1) {
     try {
         const search = document.getElementById('filtroSearch')?.value || '';
+        const municipio = document.getElementById('filtroMunicipio')?.value || '';
         const programa = document.getElementById('filtroPrograma')?.value || '';
         const estado = document.getElementById('filtroEstado')?.value || '';
-        const response = await fetch('api/fichas.php?limit=-1');
+
+        let url = 'api/fichas.php?limit=-1';
+        if (municipio) url += `&municipio=${encodeURIComponent(municipio)}`;
+
+        const response = await fetch(url);
         const result = await response.json();
 
         if (result.success) {
@@ -508,7 +514,8 @@ async function guardarFicha(event) {
         jornada: document.getElementById('jornada').value,
         estado: document.getElementById('estadoFicha').value,
         instructor_lider: document.getElementById('instructorLider').value,
-        tipoFormacion: tipoFinal
+        tipoFormacion: tipoFinal,
+        municipio: document.getElementById('municipioFicha').value
     };
 
     try {

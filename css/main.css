@@ -252,6 +252,46 @@ body {
     gap: 10px;
 }
 
+/* Header Actions y Botón Volver Profesional */
+/* Botón Volver con Estética Institucional (Azul SENA) */
+.btn-volver,
+.header-actions .btn-primary[style*="background: #00324D"] {
+    background: #00324D !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-volver:hover,
+.header-actions .btn-primary[style*="background: #00324D"]:hover {
+    background: #004a73 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Filtros Horizontales */
+.filters-wrapper {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    padding: 10px 0;
+}
+
+.filters-wrapper .form-group {
+    margin-bottom: 0;
+}
+
+.filters-wrapper label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
 @media (max-width: 900px) {
     .dashboard-container {
         flex-direction: column;

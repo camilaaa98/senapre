@@ -44,7 +44,7 @@ function mostrarProgramas(programas) {
     const tbody = document.getElementById('tablaProgramas');
 
     if (!programas || programas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center color-muted">No se encontraron programas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center color-muted">No se encontraron programas</td></tr>';
         return;
     }
 
@@ -56,7 +56,6 @@ function mostrarProgramas(programas) {
             <td class="td-index">${startIndex + index + 1}</td>
             <td class="font-bold">${p.nombre_programa}</td>
             <td><span class="badge-nivel">${p.nivel_formacion || 'N/A'}</span></td>
-            <td><span class="badge-tipo ${p.tipo_oferta === 'Cerrada' ? 'tipo-cerrada' : 'tipo-abierta'}">${p.tipo_oferta || 'Abierta'}</span></td>
             <td class="td-mono">${p.hora_entrada || '--:--'}</td>
             <td class="td-mono">${p.hora_salida || '--:--'}</td>
             <td class="text-center">
@@ -164,7 +163,6 @@ function editarPrograma(p) {
     document.getElementById('nombrePrograma').value = p.nombre_programa;
     document.getElementById('nombrePrograma').disabled = true;
     document.getElementById('nivelFormacion').value = p.nivel_formacion;
-    document.getElementById('tipoOferta').value = p.tipo_oferta || 'Abierta';
     document.getElementById('horaEntrada').value = p.hora_entrada || '';
     document.getElementById('horaSalida').value = p.hora_salida || '';
     document.getElementById('modalPrograma').style.display = 'flex';
@@ -176,7 +174,6 @@ async function guardarPrograma(event) {
     const formData = {
         nombre_programa: document.getElementById('nombrePrograma').value,
         nivel_formacion: document.getElementById('nivelFormacion').value,
-        tipo_oferta: document.getElementById('tipoOferta').value,
         hora_entrada: document.getElementById('horaEntrada').value,
         hora_salida: document.getElementById('horaSalida').value,
         duracion_meses: 0,
