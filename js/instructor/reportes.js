@@ -269,17 +269,21 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Logos - Robust check
+    // Logos - Robust check to avoid crash if images are missing
     try {
-        if (typeof logoBase64 !== 'undefined' && logoBase64) doc.addImage(logoBase64, 'PNG', 15, 15, 30, 15);
-        if (typeof logoSenaBase64 !== 'undefined' && logoSenaBase64) doc.addImage(logoSenaBase64, 'PNG', 170, 10, 25, 25);
+        if (typeof logoBase64 !== 'undefined' && logoBase64) {
+            doc.addImage(logoBase64, 'PNG', 15, 10, 35, 15);
+        }
+        if (typeof logoSenaBase64 !== 'undefined' && logoSenaBase64) {
+            doc.addImage(logoSenaBase64, 'PNG', 170, 8, 25, 25);
+        }
     } catch (e) {
-        console.warn('Logos not available for PDF');
+        console.warn('Logos not available or blocked by CORS for PDF');
     }
 
     // Título Centrado
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFontSize(18);
     doc.setTextColor(57, 169, 0); // SENA Green
     doc.text('SISTEMA SENAPRE', 105, 20, { align: "center" });
 
@@ -289,16 +293,18 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
 
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Periodo: ${inicio} al ${fin}`, 105, 32, { align: "center" });
+    doc.text(`Periodo: ${inicio} al ${fin}`, 105, 33, { align: "center" });
 
     // Tabla Resumen
-    const colResumen = ["Documento", "Aprendiz", "Total", "Presentes", "Ausentes", "%"];
+    const colResumen = ["Documento", "Aprendiz", "Total", "Pres.", "Ret.", "Aus.", "Exc.", "%"];
     const rowResumen = datos.map(d => [
         d.documento,
         `${d.apellido} ${d.nombre}`,
         d.total,
         d.presentes,
+        d.retardos,
         d.ausentes,
+        d.justificados,
         `${d.porcentaje}%`
     ]);
 
@@ -308,41 +314,50 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
         startY: 40,
         theme: 'grid',
         headStyles: { fillColor: [57, 169, 0], textColor: 255 },
-        styles: { fontSize: 8 }
+        styles: { fontSize: 8 },
+        columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 'auto' },
+            2: { cellWidth: 12 },
+            3: { cellWidth: 12 },
+            4: { cellWidth: 12 },
+            5: { cellWidth: 12 },
+            6: { cellWidth: 12 },
+            7: { cellWidth: 15 }
+        }
     });
 
-    // Tabla Detallada
+    // Tabla Detallada en Nueva Página
     doc.addPage();
-    doc.text("Detalle de Asistencias", 14, 20);
+    doc.setFontSize(14);
+    doc.setTextColor(0, 50, 77);
+    doc.text("Detalle Cronológico de Asistencias", 14, 20);
 
-    const colDetalle = ["Fecha", "Hora", "Aprendiz", "Estado", "Observaciones"];
-    const rowDetalle = detalles.map(d => {
-        const fechaObj = new Date(d.creado_en || d.fecha);
-        return [
-            d.fecha,
-            d.creado_en ? fechaObj.toLocaleTimeString() : '-',
-            `${d.apellido} ${d.nombre}`,
-            d.estado,
-            d.observaciones || ''
-        ];
-    });
+    const colDetalle = ["Fecha", "Documento", "Aprendiz", "Estado", "Observaciones"];
+    const rowDetalle = detalles.map(d => [
+        d.fecha,
+        d.documento_aprendiz,
+        `${d.apellido} ${d.nombre}`,
+        d.estado,
+        d.observaciones || ''
+    ]);
 
     doc.autoTable({
         head: [colDetalle],
         body: rowDetalle,
         startY: 25,
         theme: 'grid',
-        headStyles: { fillColor: [57, 169, 0], textColor: 255 },
+        headStyles: { fillColor: [0, 50, 77], textColor: 255 },
         styles: { fontSize: 8 },
         didParseCell: function (data) {
             if (data.section === 'body' && data.column.index === 3) {
-                const est = data.cell.raw.toLowerCase();
+                const est = (data.cell.raw || '').toLowerCase();
                 if (est.includes('ausente')) {
-                    data.cell.styles.textColor = [229, 62, 62]; // Rojo
+                    data.cell.styles.textColor = [220, 38, 38]; // Rojo
                 } else if (est.includes('retardo') || est.includes('retardado')) {
-                    data.cell.styles.textColor = [183, 149, 11]; // Amarillo Oscuro
+                    data.cell.styles.textColor = [245, 158, 11]; // Naranja
                 } else if (est.includes('presente')) {
-                    data.cell.styles.textColor = [77, 160, 10]; // Verde
+                    data.cell.styles.textColor = [57, 169, 0]; // Verde SENA
                 }
                 data.cell.styles.fontStyle = 'bold';
             }
@@ -370,18 +385,23 @@ function calcularEstadisticasPorAprendiz(datos) {
                 documento: d.documento_aprendiz,
                 nombre: d.nombre,
                 apellido: d.apellido,
-                total: 0, presentes: 0, ausentes: 0, justificados: 0
+                total: 0, presentes: 0, retardos: 0, ausentes: 0, justificados: 0
             };
         }
         porAprendiz[key].total++;
-        if (d.estado === 'Presente') porAprendiz[key].presentes++;
-        if (d.estado === 'Ausente') porAprendiz[key].ausentes++;
-        if (d.estado === 'Justificado') porAprendiz[key].justificados++;
+        const est = (d.estado || '').toLowerCase();
+
+        if (est.includes('presente')) porAprendiz[key].presentes++;
+        else if (est.includes('retardo') || est.includes('retardado')) porAprendiz[key].retardos++;
+        else if (est.includes('ausente')) porAprendiz[key].ausentes++;
+        else if (est.includes('excusa') || est.includes('justificado')) porAprendiz[key].justificados++;
     });
+
     return Object.values(porAprendiz).map(a => ({
         ...a,
-        porcentaje: a.total > 0 ? ((a.presentes / a.total) * 100).toFixed(1) : 0
-    })).sort((a, b) => b.porcentaje - a.porcentaje);
+        // Consideramos Presentes y Retardos como "Asistencia" para el % (opcional, según lógica SENA)
+        porcentaje: a.total > 0 ? (((a.presentes + a.retardos) / a.total) * 100).toFixed(1) : 0
+    })).sort((a, b) => (a.apellido + a.nombre).localeCompare(b.apellido + b.nombre));
 }
 
 function mostrarNotificacion(mensaje, tipo = 'info') {

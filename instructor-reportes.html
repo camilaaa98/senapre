@@ -64,13 +64,17 @@
                         <input type="date" id="reporteFechaFin1" class="form-control">
                     </div>
                 </div>
-                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="generarReporteFicha('excel')" class="btn-primary"
-                        style="background: #2d8600; width: auto;"><i class="fas fa-file-excel"></i> Excel</button>
-                    <button onclick="generarReporteFicha('pdf')" class="btn-primary"
-                        style="background: #dc2626; width: auto;"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button onclick="generarReporteFicha('csv')" class="btn-primary"
-                        style="background: #2563eb; width: auto;"><i class="fas fa-file-csv"></i> CSV</button>
+                <div class="card-body-flex" style="justify-content: center; gap: 15px;">
+                    <button onclick="generarReporteFicha('excel')" class="btn-compact btn-excel">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button onclick="generarReporteFicha('pdf')" class="btn-compact btn-pdf">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button onclick="generarReporteFicha('csv')" class="btn-compact"
+                        style="background: #2563eb; color: white;">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
                 </div>
             </div>
         </main>
