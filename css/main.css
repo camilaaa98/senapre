@@ -216,20 +216,28 @@ body {
 }
 
 .content-header {
-    text-align: center;
-    margin-bottom: 30px;
+    text-align: center !important;
+    margin-bottom: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    position: relative !important;
 }
 
 .content-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #00324D;
-    margin-bottom: 6px;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: #00324D !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
 }
 
 .content-description {
-    color: #64748b;
-    font-size: 0.95rem;
+    color: #64748b !important;
+    font-size: 0.95rem !important;
+    text-align: center !important;
 }
 
 @media (max-width: 900px) {
