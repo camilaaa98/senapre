@@ -124,23 +124,37 @@ try {
             throw new Exception('Nombre de programa requerido para actualizar');
         }
 
-        $sql = "UPDATE programas_formacion SET 
-                nivel_formacion = :nivel,
-                hora_entrada = :entrada,
-                hora_salida = :salida,
-                tipo_oferta = :tipo,
-                estado = :estado
-                WHERE nombre_programa = :nombre";
-        
+        $fields = [];
+        $params = [':nombre' => $data['nombre_programa']];
+
+        if (isset($data['nivel_formacion'])) {
+            $fields[] = "nivel_formacion = :nivel";
+            $params[':nivel'] = $data['nivel_formacion'];
+        }
+        if (isset($data['hora_entrada'])) {
+            $fields[] = "hora_entrada = :entrada";
+            $params[':entrada'] = $data['hora_entrada'];
+        }
+        if (isset($data['hora_salida'])) {
+            $fields[] = "hora_salida = :salida";
+            $params[':salida'] = $data['hora_salida'];
+        }
+        if (isset($data['tipo_oferta'])) {
+            $fields[] = "tipo_oferta = :tipo";
+            $params[':tipo'] = $data['tipo_oferta'];
+        }
+        if (isset($data['estado'])) {
+            $fields[] = "estado = :estado";
+            $params[':estado'] = $data['estado'];
+        }
+
+        if (empty($fields)) {
+            throw new Exception('No se enviaron campos para actualizar');
+        }
+
+        $sql = "UPDATE programas_formacion SET " . implode(', ', $fields) . " WHERE nombre_programa = :nombre";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':nivel' => $data['nivel_formacion'],
-            ':entrada' => $data['hora_entrada'] ?? null,
-            ':salida' => $data['hora_salida'] ?? null,
-            ':tipo' => $data['tipo_oferta'] ?? 'Abierta',
-            ':estado' => $data['estado'] ?? 'Activo',
-            ':nombre' => $data['nombre_programa']
-        ]);
+        $stmt->execute($params);
 
         echo json_encode([
             'success' => true,

@@ -64,17 +64,33 @@ function autocompletarFichaDesdePrograma(p) {
     const modalidadSelect = document.getElementById('modalidadOferta');
     const jornadaSelect = document.getElementById('jornada');
 
-    // 1. Nivel de Formación base
+    // 1. Nivel de Formación base (Pluralizado)
     if (nivelBaseSelect) {
         const nivelNormalizado = (p.nivel_formacion || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-        const options = Array.from(nivelBaseSelect.options);
-        const match = options.find(o => {
-            const optVal = o.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            return optVal === nivelNormalizado || optVal.includes(nivelNormalizado) || nivelNormalizado.includes(optVal);
-        });
+        // Mapeo simple de singular a plural para el autocompletado si es necesario
+        const mapeoPlural = {
+            'tecnico': 'Técnicos',
+            'tecnologo': 'Tecnólogos',
+            'virtual': 'Virtuales',
+            'curso': 'Cursos',
+            'auxiliar': 'Auxiliares',
+            'operario': 'Operarios',
+            'especializacion': 'Especializaciones'
+        };
 
-        if (match) nivelBaseSelect.value = match.value;
+        const targetPlural = mapeoPlural[nivelNormalizado] || mapeoPlural[nivelNormalizado.replace(/s$/, '')] || null;
+
+        if (targetPlural) {
+            nivelBaseSelect.value = targetPlural;
+        } else {
+            const options = Array.from(nivelBaseSelect.options);
+            const match = options.find(o => {
+                const optVal = o.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                return optVal === nivelNormalizado || optVal.includes(nivelNormalizado) || nivelNormalizado.includes(optVal);
+            });
+            if (match) nivelBaseSelect.value = match.value;
+        }
     }
 
     // 2. Modalidad (Oferta)
@@ -295,7 +311,19 @@ function mostrarFichas(fichas) {
         <tr class="table-row-divider">
             <td class="td-mono">${f.numero_ficha}</td>
             <td>${f.nombre_programa || 'N/A'}</td>
-            <td class="td-mono">${f.tipo_formacion_nombre || f.tipoFormacion || 'N/A'}</td>
+            <td class="td-mono">
+                <select onchange="cambiarTipoFormacion('${f.numero_ficha}', this.value)" 
+                        class="form-select-custom">
+                    <option value="">Seleccione...</option>
+                    ${todosTiposFormacion.map(t => `
+                        <option value="${t.nombre}" ${f.tipoFormacion === t.nombre ? 'selected' : ''}>
+                            ${t.nombre}
+                        </option>
+                    `).join('')}
+                    ${(f.tipoFormacion && !todosTiposFormacion.some(t => t.nombre === f.tipoFormacion)) ?
+                `<option value="${f.tipoFormacion}" selected>${f.tipoFormacion}</option>` : ''}
+                </select>
+            </td>
             <td>${f.jornada || 'N/A'}</td>
             <td>
                 <select onchange="cambiarInstructorLider('${f.numero_ficha}', this.value)" 
@@ -330,9 +358,9 @@ function mostrarFichas(fichas) {
                 <select onchange="cambiarEstadoFicha('${f.numero_ficha}', this)" 
                         class="form-control status-select ${claseEstado}">
                     ${todosEstados.map(e => {
-            const claseOpcion = `status-${e.nombre.toLowerCase().replace(/ /g, '-')}`;
-            return `<option value="${e.nombre}" class="${claseOpcion}" ${f.estado === e.nombre ? 'selected' : ''}>${e.nombre}</option>`;
-        }).join('')}
+                    const claseOpcion = `status-${e.nombre.toLowerCase().replace(/ /g, '-')}`;
+                    return `<option value="${e.nombre}" class="${claseOpcion}" ${f.estado === e.nombre ? 'selected' : ''}>${e.nombre}</option>`;
+                }).join('')}
                 </select>
             </td>
         </tr>

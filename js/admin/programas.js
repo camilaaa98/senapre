@@ -55,7 +55,18 @@ function mostrarProgramas(programas) {
         <tr class="table-row-divider">
             <td class="td-index">${startIndex + index + 1}</td>
             <td class="font-bold">${p.nombre_programa}</td>
-            <td><span class="badge-nivel">${p.nivel_formacion || 'N/A'}</span></td>
+            <td>
+                <select onchange="cambiarNivelPrograma('${p.nombre_programa}', this.value)" 
+                        class="form-select-custom">
+                    <option value="Técnicos" ${p.nivel_formacion === 'Técnicos' ? 'selected' : ''}>Técnicos</option>
+                    <option value="Tecnólogos" ${p.nivel_formacion === 'Tecnólogos' ? 'selected' : ''}>Tecnólogos</option>
+                    <option value="Virtuales" ${p.nivel_formacion === 'Virtuales' ? 'selected' : ''}>Virtuales</option>
+                    <option value="Cursos" ${p.nivel_formacion === 'Cursos' ? 'selected' : ''}>Cursos</option>
+                    <option value="Auxiliares" ${p.nivel_formacion === 'Auxiliares' ? 'selected' : ''}>Auxiliares</option>
+                    <option value="Operarios" ${p.nivel_formacion === 'Operarios' ? 'selected' : ''}>Operarios</option>
+                    <option value="Especializaciones" ${p.nivel_formacion === 'Especializaciones' ? 'selected' : ''}>Especializaciones</option>
+                </select>
+            </td>
             <td class="td-mono">${p.hora_entrada || '--:--'}</td>
             <td class="td-mono">${p.hora_salida || '--:--'}</td>
             <td class="text-center">
@@ -70,6 +81,32 @@ function mostrarProgramas(programas) {
             </td>
         </tr>
     `).join('');
+}
+
+async function cambiarNivelPrograma(nombrePrograma, nuevoNivel) {
+    try {
+        const response = await fetch('api/programas.php', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre_programa: nombrePrograma,
+                nivel_formacion: nuevoNivel
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            mostrarNotificacion('Nivel de formación actualizado', 'success');
+        } else {
+            mostrarNotificacion(result.message, 'error');
+            cargarProgramas(); // Revertir
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al actualizar nivel', 'error');
+        cargarProgramas();
+    }
 }
 
 function renderPagination(pagination) {
