@@ -66,7 +66,7 @@ try {
                        f.jornada
                 FROM asignacion_instructores a
                 $joinUsuario
-                JOIN fichas f ON a.numero_ficha = f.numero_ficha
+                JOIN fichas f ON CAST(a.numero_ficha AS TEXT) = CAST(f.numero_ficha AS TEXT)
                 ORDER BY a.numero_ficha, a.dias_formacion";
         
         $stmt = $conn->query($sql);

@@ -1,8 +1,4 @@
 <?php
-/**
- * Aprendices API - Complete CRUD with Pagination and Filters
- */
-// Suprimir warnings para que no contaminen la salida JSON
 error_reporting(0);
 @ini_set('display_errors', 0);
 
@@ -181,41 +177,15 @@ try {
             ':correo' => $data['correo'],
             ':celular' => $data['celular'] ?? null,
             ':ficha' => $data['numero_ficha'],
-            ':estado' => $data['estado'] ?? 'EN FORMACION',
+            ':estado' => $data['estado'] ?? 'LECTIVA',
             ':poblacion' => $data['tipo_poblacion'] ?? '',
             ':lider' => $data['id_instructor_lider'] ?? null
         ]);
 
-        // ... (resto del código de sincronización poblacional omitido por brevedad pero debe mantenerse)
-        // (Nota: El asistente asume que el resto del bloque se mantiene igual)
-
-
-        // Sincronizar con las 6 tablas de población
-        // Mapa: ValorCheckbox => NombreTablaBD
-        $mapPoblacion = [
-            'Mujer' => 'Mujer', 
-            'Indígena' => 'indigena', 
-            'NARP' => 'narp', 
-            'Campesino' => 'campesino', 
-            'LGBTIQ+' => 'lgbtiq', 
-            'Discapacidad' => 'discapacidad'
-        ];
-        
-        $isPg = strpos($database->getDbPath(), 'PostgreSQL') !== false;
-        $poblacionesSeleccionadas = isset($data['tipo_poblacion']) ? explode(',', $data['tipo_poblacion']) : [];
-        $poblacionesSeleccionadas = array_map('trim', $poblacionesSeleccionadas);
-
-        foreach ($mapPoblacion as $valorCheckbox => $tableName) {
-            if (in_array($valorCheckbox, $poblacionesSeleccionadas)) {
-                $sqlIgnore = $isPg ? "INSERT INTO \"$tableName\" (documento) VALUES (:doc) ON CONFLICT DO NOTHING" : "INSERT OR IGNORE INTO `$tableName` (documento) VALUES (:doc)";
-                $conn->prepare($sqlIgnore)->execute([':doc' => $data['documento']]);
-            }
-        }
-        
         echo json_encode([
             'success' => true,
-            'message' => 'Aprendiz creado exitosamente',
-            'id' => $conn->lastInsertId()
+            'message' => 'Aprendiz creado exitosamente. La vinculación a poblaciones se gestiona desde el módulo de Liderazgo.',
+            'id' => $data['documento']
         ]);
         exit;
     }
@@ -229,17 +199,7 @@ try {
             throw new Exception('Documento requerido');
         }
         
-        // Actualización parcial de estado
-        if (count($data) === 1 && isset($data['estado'])) {
-            $sql = "UPDATE aprendices SET estado = :estado WHERE documento = :doc";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([':estado' => $data['estado'], ':doc' => $documento]);
-            
-            echo json_encode(['success' => true, 'message' => 'Estado actualizado']);
-            exit;
-        }
-        
-        // Actualización completa
+        // Actualización parcial de estado o datos
         $sql = "UPDATE aprendices SET 
                 tipo_identificacion = :tipo,
                 nombre = :nombre,
@@ -254,80 +214,28 @@ try {
         
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            ':tipo' => $data['tipo_identificacion'],
+            ':tipo' => $data['tipo_identificacion'] ?? 'CC',
             ':nombre' => $data['nombre'],
             ':apellido' => $data['apellido'],
             ':correo' => $data['correo'],
             ':celular' => $data['celular'] ?? null,
             ':ficha' => $data['numero_ficha'],
-            ':estado' => $data['estado'],
+            ':estado' => $data['estado'] ?? 'LECTIVA',
             ':poblacion' => $data['tipo_poblacion'] ?? '',
             ':lider' => $data['id_instructor_lider'] ?? null,
             ':doc' => $documento
         ]);
-
-        // Sincronizar con las 6 tablas de población
-        // Mapa: ValorCheckbox => NombreTablaBD
-        $mapPoblacion = [
-            'Mujer' => 'Mujer', 
-            'Indígena' => 'indigena', 
-            'NARP' => 'narp', 
-            'Campesino' => 'campesino', 
-            'LGBTIQ+' => 'lgbtiq', 
-            'Discapacidad' => 'discapacidad'
-        ];
-
-        $poblacionesSeleccionadas = isset($data['tipo_poblacion']) ? explode(',', $data['tipo_poblacion']) : [];
-        $poblacionesSeleccionadas = array_map('trim', $poblacionesSeleccionadas);
-
-        foreach ($mapPoblacion as $valorCheckbox => $tableName) {
-            // Eliminar relación previa
-            $conn->prepare("DELETE FROM `$tableName` WHERE documento = :doc")->execute([':doc' => $documento]);
-            
-            // Insertar si está presente en el string enviado
-            if (in_array($valorCheckbox, $poblacionesSeleccionadas)) {
-                $conn->prepare("INSERT INTO `$tableName` (documento) VALUES (:doc)")->execute([':doc' => $documento]);
-            }
-        }
         
-        echo json_encode(['success' => true, 'message' => 'Aprendiz actualizado']);
+        echo json_encode(['success' => true, 'message' => 'Aprendiz actualizado exitosamente']);
         exit;
     }
     
-    // DELETE - Eliminar aprendiz o quitar de población
+    // DELETE - Eliminar aprendiz
     if ($method === 'DELETE') {
         $documento = isset($_GET['documento']) ? $_GET['documento'] : '';
-        $poblacion = isset($_GET['poblacion']) ? $_GET['poblacion'] : '';
         
         if (empty($documento)) {
             throw new Exception('Documento requerido');
-        }
-
-        if (!empty($poblacion)) {
-            // Solo quitar de la tabla de población específica
-            $validTables = [
-                'mujer' => 'Mujer', 
-                'indigena' => 'indigena', 
-                'narp' => 'narp', 
-                'campesino' => 'campesino', 
-                'lgbtiq' => 'lgbtiq', 
-                'discapacidad' => 'discapacidad'
-            ];
-            $tableName = $validTables[strtolower($poblacion)] ?? null;
-
-            if (!$tableName) {
-                throw new Exception('Categoría de población no válida');
-            }
-
-            $sql = "DELETE FROM `$tableName` WHERE documento = :doc";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([':doc' => $documento]);
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Aprendiz quitado de la categoría ' . $tableName
-            ]);
-            exit;
         }
         
         // Eliminación total del sistema

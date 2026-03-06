@@ -180,8 +180,38 @@ h6,
 .card-title,
 .table-title,
 .sidebar-header h3,
-.sidebar-subtitle {
+.sidebar-subtitle,
+.page-title,
+.section-title {
     text-align: center !important;
+    display: block !important;
+    width: 100% !important;
+}
+
+/* 6. Professional 'Volver' Button */
+.btn-back-professional {
+    background: white !important;
+    color: var(--sena-blue) !important;
+    border: 1.5px solid #e2e8f0 !important;
+    padding: 8px 18px !important;
+    border-radius: 50px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 20px;
+}
+
+.btn-back-professional:hover {
+    background: #f8fafc !important;
+    border-color: var(--sena-green) !important;
+    color: var(--sena-green) !important;
+    transform: translateX(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .premium-header {
@@ -190,6 +220,7 @@ h6,
     align-items: center;
     text-align: center;
     gap: 15px;
+    width: 100%;
 }
 
 .title-group {

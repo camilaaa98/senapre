@@ -177,13 +177,13 @@ function initGlobalNavigation() {
                 window.history.back();
             };
 
-            // Contenedor para alinear a la derecha si es necesario
-            btnBack.style.marginLeft = 'auto';
+            // Insertar al inicio del header para mejor visibilidad
+            header.insertBefore(btnBack, header.firstChild);
 
-            header.appendChild(btnBack);
             header.style.display = 'flex';
+            header.style.flexDirection = 'column';
             header.style.alignItems = 'center';
-            header.style.gap = '15px';
+            header.style.gap = '10px';
         }
     });
 }
