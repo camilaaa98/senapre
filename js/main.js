@@ -177,13 +177,24 @@ function initGlobalNavigation() {
                 window.history.back();
             };
 
-            // Insertar al inicio del header para mejor visibilidad
-            header.insertBefore(btnBack, header.firstChild);
-
+            // Asegurar que el contenedor sea flex y distribuya espacio
             header.style.display = 'flex';
-            header.style.flexDirection = 'column';
+            header.style.justifyContent = 'space-between';
             header.style.alignItems = 'center';
-            header.style.gap = '10px';
+            header.style.width = '100%';
+            header.style.gap = '20px';
+            header.style.flexDirection = 'row';
+            header.style.padding = '0 10px';
+
+            // El botón va al final para estar a la derecha
+            header.appendChild(btnBack);
+
+            // Si el título está solo, lo centramos con margin auto en el texto
+            const title = header.querySelector('.content-title') || header.querySelector('.page-header h1');
+            if (title) {
+                title.style.margin = '0';
+                title.style.textAlign = 'left';
+            }
         }
     });
 }
