@@ -1,10 +1,10 @@
 <?php
 $archivos = [
     // Bienestar
-    'bienestar-dashboard.html',
+    'liderazgo.html',
     'bienestar-asistencia.html',
     'bienestar-excusas.html',
-    'jefe-bienestar-dashboard.html',
+    'jefe-liderazgo.html',
     // Instructor
     'instructor-dashboard.html',
     'instructor-asistencia.html',

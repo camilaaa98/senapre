@@ -8,9 +8,9 @@ $archivos = [
     'admin-usuarios.html'        => 'usuarios',
     'admin-aprendices.html'      => 'aprendices',
     'admin-aprendices-crear.html'=> 'aprendices-crear',
-    'admin-bienestar-dashboard.html'  => 'bienestar-dashboard',
-    'admin-bienestar-asignacion.html' => 'bienestar-asignacion',
-    'admin-bienestar-historico.html'  => 'bienestar-historico',
+    'admin-liderazgo.html'  => 'liderazgo',
+    'liderazgo-asignacion.html' => 'bienestar-asignacion',
+    'liderazgo-historico.html'  => 'bienestar-historico',
     'admin-poblacion-detalle.html'    => 'poblacion-detalle',
 ];
 

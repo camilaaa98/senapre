@@ -5,7 +5,7 @@ $_GET['action'] = 'getLideres';
 $_GET['filtro'] = 'todos';
 
 ob_start();
-require_once __DIR__ . '/api/bienestar.php';
+require_once __DIR__ . '/api/liderazgo.php';
 $output = ob_get_clean();
 
 $data = json_decode($output, true);
