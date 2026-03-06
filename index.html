@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<!-- V2.1-DEPLOY-TEST -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenApre - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-info"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 60px;">
+            <div class="info-content">
+                <h2>Sistema de Gestión<br>SenApre</h2>
+                <p>Centro de Teleinformática y Producción Industrial</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Gestión de Asistencia</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Control Biométrico</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Reportes en Tiempo Real</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-footer"
+                style="position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center;">
+                <img src="assets/img/logosena.png" alt="SENA Logo" class="sena-logo-footer">
+            </div>
+        </div>
+
+        <div class="login-form-section">
+            <div class="login-card">
+                <div class="logo-container" style="display: flex; justify-content: center; margin-bottom: 10px;">
+                    <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                </div>
+
+                <h1 class="logo-text" style="text-align: center;">SenApre</h1>
+                <p class="login-subtitle">Ingrese sus credenciales para continuar</p>
+
+                <div id="alertBox" class="alert alert-danger"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="correo" class="form-label">Correo Institucional</label>
+                        <div class="input-group">
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="correo" name="correo" class="form-control"
+                                placeholder="usuario@correo.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group password-wrapper">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password" name="password" class="form-control"
+                                placeholder="••••••••" required style="padding-right: 45px;">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center;">
+                                <i id="togglePasswordIcon" class="fas fa-eye"
+                                    style="color: #94a3b8; font-size: 1.1rem;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="#" class="forgot-password">¿Olvidó su contraseña?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        Ingresar
+                    </button>
+                </form>
+
+                <div class="footer-text" style="text-align: center; margin-top: 20px;">
+                    <p style="margin: 0; opacity: 0.7;">&copy; 2025 SENA - CTPI</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const correoInput = document.getElementById('correo');
+            const passwordInput = document.getElementById('password');
+            const correo = correoInput.value.trim();
+            const password = passwordInput.value.trim(); // Passwords usually shouldn't be trimmed but for this specific "admin123" case it helps if copy-paste adds space
+
+            const alertBox = document.getElementById('alertBox');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Reset alert
+            alertBox.style.display = 'none';
+            alertBox.textContent = '';
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
+
+            // Usar ruta relativa para el API para que funcione en cualquier servidor (WAMP o Render)
+            const API_BASE_URL = 'api';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ correo, password })
+                });
+
+                const text = await response.text();
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch (err) {
+                    throw new Error('Error de comunicación con el servidor');
+                }
+
+                if (data.success) {
+                    // Store user data (Ensure full object is stored for scopes)
+                    const userToStore = data.data;
+                    localStorage.setItem('user', JSON.stringify(userToStore));
+
+                    // Redirigir según el rol exacto — cada rol a su página exclusiva
+                    const userRol = data.data.rol.toLowerCase();
+                    if (userRol === 'vocero') {
+                        // Panel exclusivo de voceros — sin módulos del director
+                        window.location.href = 'vocero-dashboard';
+                    } else if (userRol === 'instructor') {
+                        window.location.href = 'instructor-dashboard';
+                    } else if (userRol === 'bienestar') {
+                        // Panel exclusivo de Bienestar del Aprendiz
+                        window.location.href = 'bienestar-aprendiz';
+                    } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
+                        const isBienestar = data.data.bienestar_data && data.data.bienestar_data.includes('jefe_bienestar');
+                        if (isBienestar && userRol !== 'director') {
+                            window.location.href = 'jefe-bienestar-dashboard';
+                        } else {
+                            window.location.href = 'admin-dashboard';
+                        }
+                    } else {
+                        throw new Error('Rol de usuario no reconocido: ' + data.data.rol);
+                    }
+                } else {
+                    throw new Error(data.message || 'Credenciales inválidas');
+                }
+
+            } catch (error) {
+                console.error('Login Error:', error);
+                // Mostrar respuesta raw si es posible, o mensaje de error
+                alertBox.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                alertBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    </script>
+</body>
+
+</html>

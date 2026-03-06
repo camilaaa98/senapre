@@ -1,0 +1,36 @@
+/* Sidebar Footer Logo Styles */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-top: auto;
+}
+
+.sidebar-footer-logo {
+    width: 150px;
+    max-width: 100%;
+    opacity: 0.9;
+    transition: opacity 0.3s;
+    filter: brightness(1.1);
+}
+
+.sidebar-footer-logo:hover {
+    opacity: 1;
+    filter: brightness(1.3);
+}
+
+.sidebar-logo {
+    width: 60px;
+    margin-bottom: 10px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 0;
+    flex-grow: 1;
+}
+
+.menu-item {
+    margin-bottom: 5px;
+}

@@ -1,0 +1,135 @@
+/* ── PREMIUM BIENESTAR STYLES ── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --premium-gradient: linear-gradient(135deg, #00324D 0%, #001f30 100%);
+    --sena-gradient: linear-gradient(135deg, #39A900 0%, #2d8600 100%);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --accent-blue: #3b82f6;
+    --accent-indigo: #6366f1;
+}
+
+body {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Glassmorphism Cards */
+.premium-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Aesthetics */
+.premium-header {
+    background: var(--premium-gradient);
+    padding: 30px;
+    border-radius: 24px;
+    color: white;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 50, 77, 0.3);
+}
+
+.premium-header .title-group h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(to right, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Button Refinement */
+.btn-premium {
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-premium-sena {
+    background: var(--sena-gradient);
+    color: white;
+    box-shadow: 0 4px 15px rgba(57, 169, 0, 0.3);
+}
+
+.btn-premium-sena:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(57, 169, 0, 0.4);
+}
+
+.btn-premium-dark {
+    background: #1e293b;
+    color: white;
+}
+
+.btn-premium-outline {
+    background: transparent;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+}
+
+.btn-premium-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* Input aesthetics */
+.premium-input {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.premium-input:focus {
+    border-color: var(--accent-blue);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive Grid */
+.responsive-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+@media (max-width: 768px) {
+    .premium-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .responsive-actions {
+        grid-template-columns: 1fr;
+    }
+}
