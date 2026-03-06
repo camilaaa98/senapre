@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Población - SenApre</title>
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="css/admin.css?v=2.0.2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .poblacion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .poblacion-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+
+        .poblacion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .poblacion-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .poblacion-card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #334155;
+        }
+
+        .poblacion-card .count {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 10px 0;
+        }
+
+        .poblacion-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Colores específicos */
+        .card-mujer i {
+            color: #a855f7;
+        }
+
+        .card-indigena i {
+            color: #84cc16;
+        }
+
+        .card-narp i {
+            color: #dc2626;
+        }
+
+        .card-campesino i {
+            color: #6B8E23;
+        }
+
+        .card-lgbtiq i {
+            color: #ef4444;
+        }
+
+        .card-discapacidad i {
+            color: #4A90E2;
+        }
+
+        .active-selection {
+            border: 2px solid var(--sena-green);
+            background: #f0fdf4;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display">Vocero</div>
+            </div>
+            <nav class="sidebar-menu" id="menu-lateral">
+                <!-- Se cargará dinámicamente -->
+            </nav>
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1 class="content-title">Gestión de Población Diferencial</h1>
+                    <p class="content-description" id="scope-description">Administra los aprendices de tu ficha por
+                        categoría vulnerable</p>
+                </div>
+            </header>
+
+            <!-- Cards de Selección -->
+            <div class="poblacion-grid">
+                <div class="poblacion-card card-mujer" onclick="seleccionarCategoria('mujer', this)">
+                    <i class="fas fa-venus"></i>
+                    <h3>MUJERES</h3>
+                    <div class="count" id="count-mujer">0</div>
+                    <p>Ficha: <span class="ficha-numero">-</span></p>
+                </div>
+                <div class="poblacion-card card-indigena" onclick="seleccionarCategoria('indigena', this)">
+                    <i class="fas fa-leaf"></i>
+                    <h3>INDÍGENAS</h3>
+                    <div class="count" id="count-indigena">0</div>
+                    <p>Ficha: <span class="ficha-numero">-</span></p>
+                </div>
+                <div class="poblacion-card card-narp" onclick="seleccionarCategoria('narp', this)">
+                    <i class="fas fa-fist-raised"></i>
+                    <h3>NARP</h3>
+                    <div class="count" id="count-narp">0</div>
+                    <p>Ficha: <span class="ficha-numero">-</span></p>
+                </div>
+                <div class="poblacion-card card-lgbtiq" onclick="seleccionarCategoria('lgbtiq', this)">
+                    <i class="fas fa-rainbow"></i>
+                    <h3>LGBTIQ+</h3>
+                    <div class="count" id="count-lgbtiq">0</div>
+                    <p>Ficha: <span class="ficha-numero">-</span></p>
+                </div>
+            </div>
+
+            <!-- Tabla de Gestión -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title">Aprendices en Categoría: <span id="nombre-categoria-actual">Seleccione
+                            una...</span></h2>
+                    <div>
+                        <button onclick="abrirModalAnexar()" class="btn-primary" id="btn-anexar" style="display: none;">
+                            <i class="fas fa-plus"></i> Mandar a Lista
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-integrantes">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">
+                                    <i class="fas fa-info-circle"></i> Seleccione una categoría para ver los aprendices.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Anexar Aprendiz -->
+    <div id="modalAnexar" class="modal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: var(--primary-color);">Anexar a Población</h2>
+                <span class="close" onclick="cerrarModalAnexar()"
+                    style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+            </div>
+            <p style="color: #64748b; margin-bottom: 20px;">Seleccione el aprendiz de su ficha para agregarlo a <strong
+                    id="modal-label-poblacion"></strong>.</p>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Aprendiz:</label>
+                <select id="select-aprendiz" class="form-control"
+                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                    <!-- Cargado por JS -->
+                    <option value="">Cargando aprendices...</option>
+                </select>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="cerrarModalAnexar()" class="btn-secondary">Cancelar</button>
+                <button onclick="confirmarAnexar()" class="btn-primary">Anexar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js?v=2.0.2"></script>
+    <script>
+        let categoriaActual = '';
+        let aprendicesFicha = [];
+        let configFicha = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = authSystem.getCurrentUser();
+            if (!user || user.rol.toLowerCase() !== 'vocero') {
+                window.location.href = 'index';
+                return;
+            }
+
+            const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+            const scope = scopes[0];
+            if (!scope || !scope.ficha) {
+                alert('No tienes una ficha asignada.');
+                window.location.href = 'vocero-dashboard';
+                return;
+            }
+
+            configFicha = scope.ficha;
+            document.querySelectorAll('.ficha-numero').forEach(el => el.textContent = configFicha);
+            document.getElementById('scope-description').textContent = `Administrando aprendices de la Ficha ${configFicha}`;
+
+            cargarContadores();
+            cargarAprendicesDeMiFicha();
+        });
+
+        async function cargarContadores() {
+            try {
+                // Obtenemos todos los aprendices de la ficha y contamos manual por tabla si el API no tiene endpoint dedicado
+                const res = await fetch(`api/aprendices.php?ficha=${configFicha}&limit=-1`);
+                const data = await res.json();
+                if (data.success) {
+                    const c = { mujer: 0, indigena: 0, narp: 0, lgbtiq: 0 };
+                    data.data.forEach(a => {
+                        if (a.mujer == 1) c.mujer++;
+                        if (a.indigena == 1) c.indigena++;
+                        if (a.narp == 1) c.narp++;
+                        if (a.lgbtiq == 1) c.lgbtiq++;
+                    });
+                    document.getElementById('count-mujer').textContent = c.mujer;
+                    document.getElementById('count-indigena').textContent = c.indigena;
+                    document.getElementById('count-narp').textContent = c.narp;
+                    document.getElementById('count-lgbtiq').textContent = c.lgbtiq;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function cargarAprendicesDeMiFicha() {
+            try {
+                const res = await fetch(`api/aprendices.php?ficha=${configFicha}&limit=-1&estado=LECTIVA`);
+                const data = await res.json();
+                if (data.success) {
+                    aprendicesFicha = data.data;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function seleccionarCategoria(cat, el) {
+            categoriaActual = cat;
+            document.querySelectorAll('.poblacion-card').forEach(c => c.classList.remove('active-selection'));
+            el.classList.add('active-selection');
+
+            const labels = { 'mujer': 'MUJERES', 'indigena': 'INDÍGENAS', 'narp': 'NARP', 'lgbtiq': 'LGBTIQ+' };
+            document.getElementById('nombre-categoria-actual').textContent = labels[cat];
+            document.getElementById('btn-anexar').style.display = 'block';
+
+            cargarIntegrantesCategoria();
+        }
+
+        async function cargarIntegrantesCategoria() {
+            const tbody = document.getElementById('tabla-integrantes');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Buscando...</td></tr>';
+
+            try {
+                const res = await fetch(`api/aprendices.php?ficha=${configFicha}&tabla_poblacion=${categoriaActual}&limit=-1`);
+                const data = await res.json();
+
+                if (data.success && data.data.length > 0) {
+                    tbody.innerHTML = data.data.map(a => `
+                        <tr>
+                            <td>${a.documento}</td>
+                            <td>${a.nombre}</td>
+                            <td>${a.apellido}</td>
+                            <td><span class="badge ${a.estado === 'LECTIVA' ? 'badge-success' : 'badge-warning'}">${a.estado}</span></td>
+                            <td>
+                                <button onclick="removerDePoblacion('${a.documento}')" class="btn-icon" style="color: #ef4444;" title="Quitar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">No hay aprendices registrados en esta categoría para tu ficha.</td></tr>';
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar datos.</td></tr>';
+            }
+        }
+
+        function abrirModalAnexar() {
+            const select = document.getElementById('select-aprendiz');
+            select.innerHTML = '<option value="">Seleccione un aprendiz...</option>';
+
+            aprendicesFicha.forEach(a => {
+                const option = document.createElement('option');
+                option.value = a.documento;
+                option.textContent = `${a.nombre} ${a.apellido} (${a.documento})`;
+                select.appendChild(option);
+            });
+
+            document.getElementById('modal-label-poblacion').textContent = categoriaActual.toUpperCase();
+            document.getElementById('modalAnexar').style.display = 'flex';
+        }
+
+        function cerrarModalAnexar() {
+            document.getElementById('modalAnexar').style.display = 'none';
+        }
+
+        async function confirmarAnexar() {
+            const documento = document.getElementById('select-aprendiz').value;
+            if (!documento) return alert('Seleccione un aprendiz.');
+
+            try {
+                const res = await fetch('api/poblacion.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ documento: documento, poblacion: categoriaActual })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Anexado correctamente.');
+                    cerrarModalAnexar();
+                    cargarIntegrantesCategoria();
+                    cargarContadores();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (e) {
+                alert('Ocurrió un error al procesar la solicitud.');
+            }
+        }
+
+        async function removerDePoblacion(doc) {
+            if (!confirm('¿Está seguro de quitar a este aprendiz de la categoría?')) return;
+
+            try {
+                const res = await fetch(`api/poblacion.php?documento=${doc}&poblacion=${categoriaActual}`, {
+                    method: 'DELETE'
+                });
+                const result = await res.json();
+                if (result.success) {
+                    cargarIntegrantesCategoria();
+                    cargarContadores();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (e) {
+                alert('No se pudo quitar al aprendiz.');
+            }
+        }
+    </script>
+</body>
+
+</html>

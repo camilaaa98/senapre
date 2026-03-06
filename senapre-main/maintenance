@@ -1,0 +1,67 @@
+<?php
+/**
+ * Script de Actualización Masiva de Logos
+ * Reemplaza el logo antiguo por logosena.png en todos los archivos HTML
+ */
+
+$files = [
+    'admin-aprendices.html',
+    'admin-fichas.html',
+    'admin-programas.html',
+    'admin-asistencias.html',
+    'admin-reportes.html',
+    'instructor-dashboard.html',
+    'instructor-fichas.html'
+];
+
+$oldLogo = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Sena_Colombia_logo.svg/1200px-Sena_Colombia_logo.svg.png';
+$newLogo = 'logosena.png';
+
+$updated = 0;
+$errors = 0;
+
+echo "<h1>Actualización Masiva de Logos</h1><hr>";
+
+foreach ($files as $file) {
+    if (!file_exists($file)) {
+        echo "<p style='color: orange;'>⚠️ No encontrado: {$file}</p>";
+        continue;
+    }
+    
+    $content = file_get_contents($file);
+    
+    if (strpos($content, $oldLogo) !== false) {
+        // Reemplazar logo
+        $content = str_replace($oldLogo, $newLogo, $content);
+        
+        // Agregar enlace a dashboard si no existe
+        if (strpos($content, 'admin-dashboard.html') === false && strpos($file, 'admin-') === 0) {
+            // Buscar el primer menu-item y agregar dashboard antes
+            $dashboardLink = '                <li class="menu-item">
+                    <a href="admin-dashboard.html" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+';
+            $content = preg_replace(
+                '/(<nav class="sidebar-menu">[\s\S]*?<li class="menu-item">)/',
+                '$1' . "\n" . $dashboardLink,
+                $content,
+                1
+            );
+        }
+        
+        file_put_contents($file, $content);
+        echo "<p>✅ Actualizado: {$file}</p>";
+        $updated++;
+    } else {
+        echo "<p>ℹ️ Ya actualizado: {$file}</p>";
+    }
+}
+
+echo "<hr>";
+echo "<h2>Resumen</h2>";
+echo "<p><strong>Archivos actualizados:</strong> {$updated}</p>";
+echo "<p><a href='admin-dashboard.html'>Ir al Dashboard</a></p>";
+?>
