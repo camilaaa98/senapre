@@ -168,16 +168,32 @@ function initGlobalNavigation() {
         if (header && !isDashboard && !isLogin) {
             if (header.querySelector('.btn-back-professional')) return;
 
-            // Agrupar contenido existente para que se mantenga a la izquierda
-            const wrapper = document.createElement('div');
-            wrapper.className = 'header-title-wrapper';
-            wrapper.style.textAlign = 'left';
-            wrapper.style.flex = '1';
+            // Asegurar que el header sea el contenedor de referencia
+            header.style.position = 'relative';
+            header.style.display = 'flex';
+            header.style.flexDirection = 'column';
+            header.style.alignItems = 'center'; // Centrado horizontal para el contenido base
+            header.style.justifyContent = 'center';
+            header.style.width = '100%';
+            header.style.minHeight = '80px';
+            header.style.padding = '10px 0';
 
-            while (header.firstChild) {
-                wrapper.appendChild(header.firstChild);
+            // Forzar centrado de títulos y subtítulos
+            const titleElement = header.querySelector('h1, h2, .content-title, .page-title');
+            if (titleElement) {
+                titleElement.style.textAlign = 'center';
+                titleElement.style.width = '100%';
+                titleElement.style.margin = '0 auto';
+                titleElement.style.display = 'block';
             }
-            header.appendChild(wrapper);
+
+            const descElement = header.querySelector('p, .content-description, .sidebar-subtitle');
+            if (descElement) {
+                descElement.style.textAlign = 'center';
+                descElement.style.width = '100%';
+                descElement.style.opacity = '0.8';
+                descElement.style.margin = '5px auto 0';
+            }
 
             const btnBack = document.createElement('a');
             btnBack.className = 'btn-back-professional';
@@ -188,25 +204,14 @@ function initGlobalNavigation() {
                 window.history.back();
             };
 
-            // Asegurar que el contenedor sea flex y distribuya espacio
-            header.style.display = 'flex';
-            header.style.justifyContent = 'space-between';
-            header.style.alignItems = 'center';
-            header.style.width = '100%';
-            header.style.gap = '20px';
-            header.style.flexDirection = 'row';
-            header.style.padding = '10px 0';
+            // Estilo para posicionar el botón arriba a la derecha de forma absoluta
+            btnBack.style.position = 'absolute';
+            btnBack.style.right = '20px';
+            btnBack.style.top = '50%';
+            btnBack.style.transform = 'translateY(-50%)';
+            btnBack.style.margin = '0';
 
-            // El botón va al final para estar a la derecha
             header.appendChild(btnBack);
-
-            // Forzar que los títulos internos NO estén centrados
-            const innerTitles = wrapper.querySelectorAll('h1, h2, .content-title, .page-title');
-            innerTitles.forEach(t => {
-                t.style.textAlign = 'left';
-                t.style.margin = '0';
-                t.style.width = 'auto';
-            });
         }
     });
 }
