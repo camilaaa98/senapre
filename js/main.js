@@ -168,6 +168,17 @@ function initGlobalNavigation() {
         if (header && !isDashboard && !isLogin) {
             if (header.querySelector('.btn-back-professional')) return;
 
+            // Agrupar contenido existente para que se mantenga a la izquierda
+            const wrapper = document.createElement('div');
+            wrapper.className = 'header-title-wrapper';
+            wrapper.style.textAlign = 'left';
+            wrapper.style.flex = '1';
+
+            while (header.firstChild) {
+                wrapper.appendChild(header.firstChild);
+            }
+            header.appendChild(wrapper);
+
             const btnBack = document.createElement('a');
             btnBack.className = 'btn-back-professional';
             btnBack.href = '#';
@@ -184,17 +195,18 @@ function initGlobalNavigation() {
             header.style.width = '100%';
             header.style.gap = '20px';
             header.style.flexDirection = 'row';
-            header.style.padding = '0 10px';
+            header.style.padding = '10px 0';
 
             // El botón va al final para estar a la derecha
             header.appendChild(btnBack);
 
-            // Si el título está solo, lo centramos con margin auto en el texto
-            const title = header.querySelector('.content-title') || header.querySelector('.page-header h1');
-            if (title) {
-                title.style.margin = '0';
-                title.style.textAlign = 'left';
-            }
+            // Forzar que los títulos internos NO estén centrados
+            const innerTitles = wrapper.querySelectorAll('h1, h2, .content-title, .page-title');
+            innerTitles.forEach(t => {
+                t.style.textAlign = 'left';
+                t.style.margin = '0';
+                t.style.width = 'auto';
+            });
         }
     });
 }
