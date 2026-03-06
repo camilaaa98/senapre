@@ -83,18 +83,22 @@
         </aside>
 
         <main class="main-content">
-            <div class="liderazgo-header">
-                <div>
-                    <h1 style="margin:0; font-size: 2rem; text-align: center;">Liderazgo Estudiantil</h1>
-                    <p style="margin: 5px 0 0; opacity: 0.9; text-align: center;">Módulo de Gestión de Líderes y
+            <div class="liderazgo-header"
+                style="position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; border-radius: 15px; margin-bottom: 30px;">
+                <div class="content-info">
+                    <h1 style="margin:0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;">Liderazgo
+                        Estudiantil</h1>
+                    <p style="margin: 8px 0 0; opacity: 0.9; font-size: 1.05rem;">Módulo de Gestión de Líderes y
                         Representación Estudiantil</p>
                 </div>
-                <div class="liderazgo-actions">
-                    <button onclick="cargarTodo()" class="btn-liderazgo" style="background: rgba(255,255,255,0.1);">
+                <div class="header-actions"
+                    style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); display: flex; gap: 12px; z-index: 10;">
+                    <button onclick="cargarTodo()" class="btn-liderazgo"
+                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
                         <i class="fas fa-sync"></i> Sincronizar
                     </button>
                     <button onclick="window.location.href='admin-bienestar-dashboard.html'" class="btn-liderazgo"
-                        style="background: white; color: #00324D;">
+                        style="background: white; color: #00324D; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                         <i class="fas fa-arrow-left"></i> Volver a Bienestar
                     </button>
                 </div>

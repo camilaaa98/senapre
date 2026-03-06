@@ -216,28 +216,40 @@ body {
 }
 
 .content-header {
-    text-align: center !important;
-    margin-bottom: 30px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    position: relative !important;
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
+    padding: 0 120px;
+    /* Espacio para que el botón no tape el título en pantallas medianas */
+}
+
+.content-info {
+    width: 100%;
 }
 
 .content-title {
-    font-size: 1.6rem !important;
-    font-weight: 700 !important;
-    color: #00324D !important;
-    margin-bottom: 6px !important;
-    text-align: center !important;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00324D;
+    margin: 0;
+    text-align: center;
 }
 
 .content-description {
-    color: #64748b !important;
-    font-size: 0.95rem !important;
-    text-align: center !important;
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 4px 0 0;
+    text-align: center;
+}
+
+.header-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
 }
 
 @media (max-width: 900px) {

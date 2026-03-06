@@ -44,7 +44,7 @@ function mostrarProgramas(programas) {
     const tbody = document.getElementById('tablaProgramas');
 
     if (!programas || programas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center color-muted">No se encontraron programas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center color-muted">No se encontraron programas</td></tr>';
         return;
     }
 
@@ -54,14 +54,20 @@ function mostrarProgramas(programas) {
     tbody.innerHTML = programas.map((p, index) => `
         <tr class="table-row-divider">
             <td class="td-index">${startIndex + index + 1}</td>
-            <td>${p.nombre_programa}</td>
-            <td>${p.nivel_formacion || 'N/A'}</td>
+            <td class="font-bold">${p.nombre_programa}</td>
+            <td><span class="badge-nivel">${p.nivel_formacion || 'N/A'}</span></td>
+            <td><span class="badge-tipo ${p.tipo_oferta === 'Cerrada' ? 'tipo-cerrada' : 'tipo-abierta'}">${p.tipo_oferta || 'Abierta'}</span></td>
+            <td class="td-mono">${p.hora_entrada || '--:--'}</td>
+            <td class="td-mono">${p.hora_salida || '--:--'}</td>
             <td class="text-center">
-                <button onclick="eliminarPrograma('${p.nombre_programa}')" class="btn-icon btn-danger" title="Eliminar">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <button onclick='editarPrograma(${JSON.stringify(p)})' class="btn-icon btn-primary" title="Editar" style="background: #00324D;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="eliminarPrograma('${p.nombre_programa}')" class="btn-icon btn-danger" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     `).join('');
@@ -118,14 +124,50 @@ function cambiarPagina(page) {
     cargarProgramas();
 }
 
+function cerrarModal() {
+    document.getElementById('modalPrograma').style.display = 'none';
+}
+
+function setHorarioJornada(jornada) {
+    const entrada = document.getElementById('horaEntrada');
+    const salida = document.getElementById('horaSalida');
+
+    switch (jornada) {
+        case 'Diurna':
+            entrada.value = '06:00';
+            salida.value = '12:00';
+            break;
+        case 'Tarde':
+            entrada.value = '12:00';
+            salida.value = '18:00';
+            break;
+        case 'Noche':
+            entrada.value = '18:00';
+            salida.value = '23:00'; // Mariana: Noche (6 pm - 11 pm)
+            break;
+    }
+}
+
+let editMode = false;
+
 function nuevoPrograma() {
+    editMode = false;
     document.getElementById('modalTitle').textContent = 'Nuevo Programa';
     document.getElementById('formPrograma').reset();
+    document.getElementById('nombrePrograma').disabled = false;
     document.getElementById('modalPrograma').style.display = 'flex';
 }
 
-function cerrarModal() {
-    document.getElementById('modalPrograma').style.display = 'none';
+function editarPrograma(p) {
+    editMode = true;
+    document.getElementById('modalTitle').textContent = 'Editar Programa';
+    document.getElementById('nombrePrograma').value = p.nombre_programa;
+    document.getElementById('nombrePrograma').disabled = true;
+    document.getElementById('nivelFormacion').value = p.nivel_formacion;
+    document.getElementById('tipoOferta').value = p.tipo_oferta || 'Abierta';
+    document.getElementById('horaEntrada').value = p.hora_entrada || '';
+    document.getElementById('horaSalida').value = p.hora_salida || '';
+    document.getElementById('modalPrograma').style.display = 'flex';
 }
 
 async function guardarPrograma(event) {
@@ -134,13 +176,19 @@ async function guardarPrograma(event) {
     const formData = {
         nombre_programa: document.getElementById('nombrePrograma').value,
         nivel_formacion: document.getElementById('nivelFormacion').value,
-        duracion_meses: 0, // Valor por defecto ya que se eliminó el campo
+        tipo_oferta: document.getElementById('tipoOferta').value,
+        hora_entrada: document.getElementById('horaEntrada').value,
+        hora_salida: document.getElementById('horaSalida').value,
+        duracion_meses: 0,
         estado: 'Activo'
     };
 
     try {
-        const response = await fetch('api/programas.php', {
-            method: 'POST',
+        const url = 'api/programas.php';
+        const method = editMode ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
@@ -148,7 +196,7 @@ async function guardarPrograma(event) {
         const result = await response.json();
 
         if (result.success) {
-            mostrarNotificacion('Programa guardado exitosamente', 'success');
+            mostrarNotificacion(editMode ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 'success');
             cerrarModal();
             cargarProgramas();
         } else {

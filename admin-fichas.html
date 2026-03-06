@@ -100,8 +100,16 @@
 
         <main class="main-content">
             <div class="content-header">
-                <h1 class="content-title">Gestión de Fichas</h1>
-                <p class="content-description">Administración de fichas de formación</p>
+                <div class="content-info">
+                    <h1 class="content-title">Gestión de Fichas</h1>
+                    <p class="content-description">Administración de fichas de formación</p>
+                </div>
+                <div class="header-actions">
+                    <button onclick="window.location.href='admin-dashboard'" class="btn-primary"
+                        style="background: #64748b; width: auto; padding: 10px 20px;">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
             </div>
 
             <!-- Filters -->
@@ -180,22 +188,30 @@
                     <label for="numeroFicha" class="form-label">Número de Ficha *</label>
                     <input type="number" id="numeroFicha" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label for="tipoFormacionSelect" class="form-label">Tipo Formación *</label>
-                    <select id="tipoFormacionSelect" class="form-control" required>
-                        <option value="">Seleccione...</option>
-                        <option value="Tecnico">Tecnico</option>
-                        <option value="Tecnico - Cerrado">Tecnico - Cerrado</option>
-                        <option value="Tecnologo">Tecnologo</option>
-                        <option value="Tecnologo - Cerrado">Tecnologo - Cerrado</option>
-                        <option value="Curso">Curso</option>
-                        <option value="Curso - Cerrado">Curso - Cerrado</option>
-                        <option value="Auxiliar">Auxiliar</option>
-                        <option value="Auxiliar - Cerrado">Auxiliar - Cerrado</option>
-                        <option value="Operario">Operario</option>
-                        <option value="Operario - Cerrado">Operario - Cerrado</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="tipoFormacionBase" class="form-label">Nivel de Formación *</label>
+                        <select id="tipoFormacionBase" class="form-control" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Tecnólogo">Tecnólogo</option>
+                            <option value="Virtual">Virtual</option>
+                            <option value="Curso">Curso</option>
+                            <option value="Auxiliar">Auxiliar</option>
+                            <option value="Operario">Operario</option>
+                            <option value="Especialización">Especialización</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalidadOferta" class="form-label">Modalidad (Oferta) *</label>
+                        <select id="modalidadOferta" class="form-control" required>
+                            <option value="Abierta">Abierta</option>
+                            <option value="Cerrada">Cerrada</option>
+                        </select>
+                    </div>
                 </div>
+                <input type="hidden" id="tipoFormacionSelect" value="">
+                <!-- Mantener el ID para compatibilidad con JS -->
                 <div class="form-group">
                     <label for="programa" class="form-label">Programa de Formación *</label>
                     <select id="programa" class="form-control" required>

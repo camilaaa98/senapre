@@ -109,9 +109,17 @@
             <!-- SECCIÓN: LISTA DE APRENDICES -->
             <div id="seccion-lista" class="content-section active">
                 <div class="content-header">
-                    <h1 class="content-title" id="titulo-gestion-aprendices">Gestión de Aprendices</h1>
-                    <p class="content-description" id="desc-gestion-aprendices">Administración completa de aprendices
-                        matriculados</p>
+                    <div class="content-info">
+                        <h1 class="content-title" id="titulo-gestion-aprendices">Gestión de Aprendices</h1>
+                        <p class="content-description" id="desc-gestion-aprendices">Administración completa de
+                            aprendices matriculados</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="window.location.href='admin-dashboard'" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </button>
+                    </div>
                 </div>
                 <!-- Filtros de Búsqueda -->
                 <div class="card card-filtros">
@@ -192,8 +200,16 @@
             <!-- SECCIÓN: TIPO DE POBLACIÓN (Estadísticas y Filtros) -->
             <div id="seccion-poblacion" class="content-section">
                 <div class="content-header">
-                    <h1 class="content-title">Distribución de Población</h1>
-                    <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
+                    <div class="content-info">
+                        <h1 class="content-title">Distribución de Población</h1>
+                        <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="mostrarSeccion(event, 'lista')" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver a Lista
+                        </button>
+                    </div>
                 </div>
                 <div class="chart-section-grid">
                     <!-- Tarjetas de Estadística -->
@@ -331,9 +347,17 @@
             <!-- SECCIÓN: GESTIÓN DE TIPOS DE POBLACIÓN (Vista AGREGAR) -->
             <div id="seccion-gestion-poblacion" class="content-section">
                 <div class="content-header">
-                    <h1 class="content-title">Tipo de Población</h1>
-                    <p class="content-description">Mujer, Indígena, Afro, Víctima, Campesina, N.A.P, LGBTI, Discapacidad
-                    </p>
+                    <div class="content-info">
+                        <h1 class="content-title">Tipo de Población</h1>
+                        <p class="content-description">Mujer, Indígena, Afro, Víctima, Campesina, N.A.P, LGBTI,
+                            Discapacidad</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="mostrarSeccion(event, 'poblacion')" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver a Estadísticas
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Filtros de Búsqueda (Copia de la lista principal) -->

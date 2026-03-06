@@ -17,12 +17,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
 });
 
+let programasData = []; // Cache para datos de programas
+
 async function cargarProgramas() {
     try {
-        const response = await fetch('api/programas.php');
+        const response = await fetch('api/programas.php?limit=-1');
         const result = await response.json();
 
         if (result.success) {
+            programasData = result.data;
             const select = document.getElementById('programa');
             const filtroSelect = document.getElementById('filtroPrograma');
 
@@ -40,11 +43,64 @@ async function cargarProgramas() {
                     filtroSelect.appendChild(filterOption);
                 }
             });
+
+            // Listener para autocompletar campos cuando cambia el programa
+            select.addEventListener('change', (e) => {
+                const programaNombre = e.target.value;
+                const programa = programasData.find(p => p.nombre_programa === programaNombre);
+                if (programa) {
+                    autocompletarFichaDesdePrograma(programa);
+                }
+            });
         }
     } catch (error) {
         console.error('Error cargando programas:', error);
     }
 }
+
+function autocompletarFichaDesdePrograma(p) {
+    const nivelBaseSelect = document.getElementById('tipoFormacionBase');
+    const modalidadSelect = document.getElementById('modalidadOferta');
+    const jornadaSelect = document.getElementById('jornada');
+
+    // 1. Nivel de Formación base
+    if (nivelBaseSelect) {
+        const nivelNormalizado = (p.nivel_formacion || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        const options = Array.from(nivelBaseSelect.options);
+        const match = options.find(o => {
+            const optVal = o.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            return optVal === nivelNormalizado || optVal.includes(nivelNormalizado) || nivelNormalizado.includes(optVal);
+        });
+
+        if (match) nivelBaseSelect.value = match.value;
+    }
+
+    // 2. Modalidad (Oferta)
+    if (modalidadSelect) {
+        modalidadSelect.value = (p.tipo_oferta === 'Cerrada') ? 'Cerrada' : 'Abierta';
+    }
+
+    // 3. Determinar Jornada basándose en horarios del programa
+    if (jornadaSelect && p.hora_entrada) {
+        const h = parseInt(p.hora_entrada.split(':')[0]);
+        let jornadaAsumida = '';
+        if (h >= 5 && h < 12) jornadaAsumida = 'Diurna';
+        else if (h >= 12 && h < 18) jornadaAsumida = 'Tarde';
+        else if (h >= 18) jornadaAsumida = 'Noche';
+
+        if (jornadaAsumida) {
+            // Si es oferta cerrada, intentar buscar la opción "- Cerrado"
+            const sufijo = (p.tipo_oferta === 'Cerrada') ? ' - Cerrado' : '';
+            const buscado = jornadaAsumida + sufijo;
+
+            const options = Array.from(jornadaSelect.options);
+            const match = options.find(o => o.value === buscado) || options.find(o => o.value.startsWith(jornadaAsumida));
+            if (match) jornadaSelect.value = match.value;
+        }
+    }
+}
+
 
 let todosInstructores = []; // Variable global para almacenar instructores
 let todosTiposFormacion = []; // Variable global para almacenar tipos de formación
@@ -438,13 +494,21 @@ function cerrarModal() {
 async function guardarFicha(event) {
     event.preventDefault();
 
+    // Combinar Nivel + Modalidad para el campo tipoFormacion de la BD
+    const nivel = document.getElementById('tipoFormacionBase').value;
+    const modalidad = document.getElementById('modalidadOferta').value;
+    let tipoFinal = nivel;
+    if (modalidad === 'Cerrada') {
+        tipoFinal += ' - Cerrado';
+    }
+
     const formData = {
         numero_ficha: document.getElementById('numeroFicha').value,
         nombre_programa: document.getElementById('programa').value,
         jornada: document.getElementById('jornada').value,
         estado: document.getElementById('estadoFicha').value,
         instructor_lider: document.getElementById('instructorLider').value,
-        tipoFormacion: document.getElementById('tipoFormacionSelect').value
+        tipoFormacion: tipoFinal
     };
 
     try {

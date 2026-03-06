@@ -12,12 +12,11 @@
 
 <body>
     <div class="dashboard-container">
-                        <aside class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display"
-                   >Director</div>
+                <div class="sidebar-subtitle" id="user-role-display">Director</div>
             </div>
 
             <nav class="sidebar-menu">
@@ -49,8 +48,10 @@
                         <li><a href="admin-aprendices"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
                         <li><a href="admin-aprendices#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
                         <li><a href="admin-aprendices#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
-                        <li><a href="admin-aprendices#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
                         <li><a href="admin-aprendices#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
@@ -98,8 +99,16 @@
 
         <main class="main-content">
             <div class="content-header">
-                <h1 class="content-title">Gestión de Programas</h1>
-                <p class="content-description">Administración de programas de formación</p>
+                <div class="content-info">
+                    <h1 class="content-title">Gestión de Programas</h1>
+                    <p class="content-description">Administración de programas de formación</p>
+                </div>
+                <div class="header-actions">
+                    <button onclick="window.location.href='admin-dashboard'" class="btn-primary"
+                        style="background: #64748b; width: auto; padding: 10px 20px;">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
             </div>
 
             <!-- Filters -->
@@ -143,12 +152,15 @@
                                 <th style="width: 60px;">#</th>
                                 <th>NOMBRE PROGRAMA</th>
                                 <th>NIVEL</th>
-                                <th style="width: 100px;">ACCIONES</th>
+                                <th>TIPO OFERTA</th>
+                                <th>HORA ENTRADA</th>
+                                <th>HORA SALIDA</th>
+                                <th style="width: 120px;">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="tablaProgramas">
                             <tr>
-                                <td colspan="4" style="text-align: center;">Cargando datos...</td>
+                                <td colspan="7" style="text-align: center;">Cargando datos...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -159,11 +171,9 @@
     </div>
 
     <!-- Modal -->
-    <div id="modalPrograma" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content"
-            style="background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <div id="modalPrograma" class="modal-overlay">
+        <div class="modal-content-card">
+            <div class="modal-header-flex">
                 <h3 id="modalTitle">Nuevo Programa</h3>
                 <button onclick="cerrarModal()" class="btn-close"
                     style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
@@ -173,18 +183,49 @@
                     <label for="nombrePrograma" class="form-label">Nombre del Programa *</label>
                     <input type="text" id="nombrePrograma" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label for="nivelFormacion" class="form-label">Nivel de Formación *</label>
-                    <select id="nivelFormacion" class="form-control" required>
-                        <option value="TECNICO">TECNICO</option>
-                        <option value="TECNOLOGO">TECNOLOGO</option>
-                        <option value="ESPECIALIZACION">ESPECIALIZACION</option>
-                        <option value="CURSO">CURSO</option>
-                        <option value="CURSO VIRTUAL">CURSO VIRTUAL</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="nivelFormacion" class="form-label">Nivel de Formación *</label>
+                        <select id="nivelFormacion" class="form-control" required>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Tecnólogo">Tecnólogo</option>
+                            <option value="Virtual">Virtual</option>
+                            <option value="Curso">Curso</option>
+                            <option value="Auxiliar">Auxiliar</option>
+                            <option value="Operario">Operario</option>
+                            <option value="Especialización">Especialización</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoOferta" class="form-label">Tipo de Oferta *</label>
+                        <select id="tipoOferta" class="form-control" required>
+                            <option value="Abierta">Abierta</option>
+                            <option value="Cerrada">Cerrada</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="modal-footer"
-                    style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Horario Sugerido (por Jornada)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button type="button" onclick="setHorarioJornada('Diurna')" class="btn-primary"
+                            style="background: #39A900; font-size: 0.8rem; padding: 5px 10px;">Diurna</button>
+                        <button type="button" onclick="setHorarioJornada('Tarde')" class="btn-primary"
+                            style="background: #2d8600; font-size: 0.8rem; padding: 5px 10px;">Tarde</button>
+                        <button type="button" onclick="setHorarioJornada('Noche')" class="btn-primary"
+                            style="background: #00324D; font-size: 0.8rem; padding: 5px 10px;">Noche</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="horaEntrada" class="form-label">Hora Entrada</label>
+                        <input type="time" id="horaEntrada" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="horaSalida" class="form-label">Hora Salida</label>
+                        <input type="time" id="horaSalida" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer-flex">
                     <button type="button" onclick="cerrarModal()" class="btn-primary"
                         style="background: #666;">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
@@ -193,10 +234,9 @@
         </div>
     </div>
 
-    <script src="js/main.js?v=1.0.6"></script>
-    <script src="js/admin/programas.js"></script>
-    
+    <script src="js/main.js?v=2.0.2"></script>
+    <script src="js/admin/programas.js?v=2.0.2"></script>
+
 </body>
 
 </html>
-

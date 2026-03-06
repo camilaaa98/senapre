@@ -50,7 +50,8 @@ try {
         $countSql = "SELECT COUNT(*) as total FROM programas_formacion $whereClause";
         $countStmt = $conn->prepare($countSql);
         $countStmt->execute($params);
-        $total = $countStmt->fetch()['total'];
+        $totalRow = $countStmt->fetch();
+        $total = $totalRow['total'] ?? 0;
         
         // Obtener datos paginados o todos
         if ($limit === -1) {
@@ -81,10 +82,10 @@ try {
             'success' => true,
             'data' => $programas,
             'pagination' => [
-                'total' => $total,
+                'total' => (int)$total,
                 'page' => $page,
                 'limit' => $limit,
-                'pages' => ceil($total / $limit)
+                'pages' => $limit === -1 ? 1 : ceil($total / $limit)
             ]
         ]);
         exit;
@@ -94,20 +95,56 @@ try {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $sql = "INSERT INTO programas_formacion (nombre_programa, nivel_formacion, duracion_meses, estado) 
-                VALUES (:nombre, :nivel, :duracion, :estado)";
+        $sql = "INSERT INTO programas_formacion (nombre_programa, nivel_formacion, duracion_meses, estado, hora_entrada, hora_salida, tipo_oferta) 
+                VALUES (:nombre, :nivel, :duracion, :estado, :entrada, :salida, :tipo)";
         
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             ':nombre' => $data['nombre_programa'],
             ':nivel' => $data['nivel_formacion'] ?? 'Técnico',
             ':duracion' => $data['duracion_meses'] ?? 12,
-            ':estado' => $data['estado'] ?? 'Activo'
+            ':estado' => $data['estado'] ?? 'Activo',
+            ':entrada' => $data['hora_entrada'] ?? null,
+            ':salida' => $data['hora_salida'] ?? null,
+            ':tipo' => $data['tipo_oferta'] ?? 'Abierta'
         ]);
         
         echo json_encode([
             'success' => true,
             'message' => 'Programa creado exitosamente'
+        ]);
+        exit;
+    }
+
+    // PUT - Actualizar programa
+    if ($method === 'PUT') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['nombre_programa'])) {
+            throw new Exception('Nombre de programa requerido para actualizar');
+        }
+
+        $sql = "UPDATE programas_formacion SET 
+                nivel_formacion = :nivel,
+                hora_entrada = :entrada,
+                hora_salida = :salida,
+                tipo_oferta = :tipo,
+                estado = :estado
+                WHERE nombre_programa = :nombre";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':nivel' => $data['nivel_formacion'],
+            ':entrada' => $data['hora_entrada'] ?? null,
+            ':salida' => $data['hora_salida'] ?? null,
+            ':tipo' => $data['tipo_oferta'] ?? 'Abierta',
+            ':estado' => $data['estado'] ?? 'Activo',
+            ':nombre' => $data['nombre_programa']
+        ]);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Programa actualizado exitosamente'
         ]);
         exit;
     }
