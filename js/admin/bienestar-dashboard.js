@@ -25,22 +25,24 @@ async function cargarResponsable(area) {
     try {
         const response = await fetch(`api/liderazgo.php?action=getResponsable&area=${area}`);
         const result = await response.json();
-        const loggedUser = authSystem.getCurrentUser();
+        const loggedUser = authSystem ? authSystem.getCurrentUser() : null;
 
         if (result.success && result.data) {
-            element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span class="meta-text">${result.data.correo}</span>`;
+            if (element) {
+                element.innerHTML = `<strong>${result.data.nombre} ${result.data.apellido}</strong><br><span class="meta-text">${result.data.correo}</span>`;
+            }
             if (btnAssign) btnAssign.innerHTML = '<i class="fas fa-user-edit"></i> Cambiar Responsable';
 
-            // REGLA: Jefe de bienestar NO puede auto-asignarse (si es el responsable actual del area jefe_bienestar)
+            // REGLA: Jefe de bienestar NO puede auto-asignarse
             if (area === 'jefe_bienestar' && loggedUser && loggedUser.id_usuario == result.data.id_usuario) {
-                if (btnAssign) btnAssign.classList.add('hidden');
+                if (btnAssign) btnAssign.style.display = 'none';
             }
         } else {
-            element.textContent = 'Sin asignar';
+            if (element) element.textContent = 'Sin asignar';
         }
     } catch (error) {
         console.error(`Error cargando responsable de ${area}:`, error);
-        element.textContent = 'Error al cargar';
+        if (element) element.textContent = 'Sin asignar'; // Silent fail to "Sin asignar" instead of Error
     }
 }
 

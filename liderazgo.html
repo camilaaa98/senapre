@@ -4,510 +4,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienestar (Liderazgo) - SenApre</title>
+    <title>Liderazgo Estudiantil - Bienestar del Aprendiz</title>
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="css/admin.css?v=2.0.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
+    <style>
+        .liderazgo-header {
+            background: linear-gradient(135deg, #00324D 0%, #001f2f 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
 
-<link rel="stylesheet" href="css/premium-bienestar.css?v=1.0.1">
+        .liderazgo-header::after {
+            content: "\f0c0";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 30px;
+            bottom: -20px;
+            font-size: 150px;
+            opacity: 0.1;
+        }
+
+        .grid-lideres {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card-lider {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #39A900;
+            transition: transform 0.2s;
+        }
+
+        .card-lider:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-liderazgo {
+            background: #39A900;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body>
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
-                <h3>Bienestar</h3>
-                <div class="sidebar-subtitle" id="userNameSub">Responsable</div>
-            </div>
-            <nav class="sidebar-menu">
-                <li class="menu-item"><a href="#" onclick="authSystem.logout()" class="menu-link">
-                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div><span>Cerrar Sesión</span>
-                    </a></li>
-            </nav>
-            <div class="sidebar-footer">
-                <img src="assets/img/logosena.png" alt="SENA Logo">
-            </div>
+        <!-- Reutilizamos el sidebar del admin-dashboard -->
+        <aside class="sidebar" id="sidebar-container">
+            <!-- Cargado dinámicamente o inyectado por JS -->
         </aside>
 
-        <main class="main-content" style="background: #fdfdfd; padding: 40px;">
-            <div class="premium-header">
-                <div class="title-group">
-                    <h1 class="content-title">Panel de Liderazgo</h1>
-                    <p style="opacity: 0.9; margin: 5px 0 0 0;">Gestión de líderes estudiantiles y comunicaciones</p>
-                </div>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                    <a href="admin-dashboard" class="btn-premium btn-premium-outline"
-                        style="border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; padding: 0;"
-                        title="Volver al Dashboard">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <button onclick="abrirModalReunion()" class="btn-premium btn-premium-sena">
-                        <i class="fas fa-calendar-plus"></i> Nueva Reunión
-                    </button>
-                    <button onclick="window.location.href = 'admin-bienestar-asistencia'"
-                        class="btn-premium btn-premium-dark" style="background:#00324D">
-                        <i class="fas fa-fingerprint"></i> Biometría
-                    </button>
-                    <a href="admin-bienestar-historico" class="btn-premium btn-premium-outline">
-                        <i class="fas fa-history"></i> Historial
-                    </a>
-                </div>
-            </div>
-
-            <div class="premium-card">
-                <div class="responsive-actions">
-                    <div class="form-group">
-                        <label class="form-label"
-                            style="font-weight: 600; font-size: 0.85rem; color: #64748b; margin-bottom: 8px; display: block;">FILTRAR
-                            POR TIPO</label>
-                        <select id="filtroTipo" class="premium-input" onchange="cargarLideres()">
-                            <option value="todos">Todos los Líderes</option>
-                            <option value="principales">Voceros Principales</option>
-                            <option value="suplentes">Voceros Suplentes</option>
-                            <option value="enfoque">Enfoque Diferencial</option>
-                            <option value="representantes">Representantes de Jornada</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"
-                            style="font-weight: 600; font-size: 0.85rem; color: #64748b; margin-bottom: 8px; display: block;">BUSCADOR</label>
-                        <input type="text" id="buscarLider" class="premium-input" placeholder="Nombre o Documento..."
-                            oninput="filtrarTabla()">
+        <main class="main-content">
+            <div class="liderazgo-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <h1 style="margin:0; font-size: 2rem;">Liderazgo Estudiantil</h1>
+                        <p style="margin: 5px 0 0; opacity: 0.9;">Módulo de Gestión de Líderes y Representación
+                            Estudiantil</p>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="prepararMensajeMasivo('email')" class="btn-premium"
-                            style="background: #e2e8f0; color: #1e293b; flex: 1;">
-                            <i class="fas fa-envelope"></i> Email
+                        <button onclick="cargarTodo()" class="btn-liderazgo" style="background: rgba(255,255,255,0.1);">
+                            <i class="fas fa-sync"></i> Sincronizar
                         </button>
-                        <button onclick="prepararMensajeMasivo('whatsapp')" class="btn-premium"
-                            style="background: #dcfce7; color: #166534; flex: 1;">
-                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        <button onclick="window.location.href='admin-bienestar-dashboard.html'" class="btn-liderazgo"
+                            style="background: white; color: #00324D;">
+                            <i class="fas fa-arrow-left"></i> Volver a Bienestar
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="table-container animate-slide-in"
-                style="background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; overflow: hidden;">
-                <table class="data-table" id="tablaLideres">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Documento</th>
-                            <th>Aprendiz</th>
-                            <th>Tipo de Líder</th>
-                            <th>Población</th>
-                            <th>Ficha</th>
-                            <th>Contacto</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyLideres">
-                        <tr>
-                            <td colspan="8" style="text-align: center; padding: 30px;">Cargando líderes...</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div id="paginationControls" class="pagination-footer"
-                    style="padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-top: 1px solid #e2e8f0;">
-                    <div class="pagination-info" style="font-size: 0.9rem; color: #64748b;">
-                        Mostrando <span id="pagStart">0</span> - <span id="pagEnd">0</span> de <span
-                            id="pagTotal">0</span> líderes
-                    </div>
-                    <div class="pagination-buttons" style="display: flex; gap: 8px;">
-                        <button onclick="prevPage()" id="btnPrev" class="btn-premium btn-premium-outline"
-                            style="padding: 5px 15px; font-size: 0.85rem;">
-                            <i class="fas fa-chevron-left"></i> Anterior
-                        </button>
-                        <button onclick="nextPage()" id="btnNext" class="btn-premium btn-premium-outline"
-                            style="padding: 5px 15px; font-size: 0.85rem;">
-                            Siguiente <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+            <div class="tab-container">
+                <button class="tab-button active" onclick="switchTab('voceros')"><i class="fas fa-users"></i> Voceros
+                    Ficha</button>
+                <button class="tab-button" onclick="switchTab('representantes')"><i class="fas fa-user-shield"></i>
+                    Representantes</button>
+                <button class="tab-button" onclick="switchTab('enfoque')"><i class="fas fa-people-arrows"></i> Enfoque
+                    Diferencial</button>
+                <button class="tab-button" onclick="switchTab('reuniones')"><i class="fas fa-calendar-check"></i>
+                    Reuniones</button>
+            </div>
+
+            <div id="tab-voceros" class="tab-panel active">
+                <div class="grid-lideres" id="container-voceros"></div>
+            </div>
+
+            <div id="tab-representantes" class="tab-panel">
+                <div class="grid-lideres" id="container-representantes"></div>
+            </div>
+
+            <div id="tab-enfoque" class="tab-panel">
+                <div class="grid-lideres" id="container-enfoque"></div>
+            </div>
+
+            <div id="tab-reuniones" class="tab-panel">
+                <div class="grid-lideres" id="container-reuniones"></div>
             </div>
         </main>
     </div>
 
-    <!-- Modal Nueva Reunión -->
-    <div id="modalReunion" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content"
-            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px;">
-            <h3>Programar Nueva Reunión</h3>
-            <form id="formReunion" onsubmit="guardarReunion(event)">
-                <div class="form-group">
-                    <label class="form-label">Título de la Reunión</label>
-                    <input type="text" id="tituloReunion" class="form-control" required
-                        placeholder="Ej: Asamblea de Voceros">
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" id="fechaReunion" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Hora</label>
-                        <input type="time" id="horaReunion" class="form-control" required>
-                    </div>
-                </div>
-
-                <div style="margin: 15px 0; padding: 10px; background: #f8fafc; border-radius: 8px;">
-                    <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;">Notificar
-                        por:</label>
-                    <div style="display: flex; gap: 15px;">
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                            <input type="checkbox" id="notiEmail" checked> Email
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                            <input type="checkbox" id="notiSMS"> SMS
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                            <input type="checkbox" id="notiWA" checked> WhatsApp
-                        </label>
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" onclick="cerrarModalReunion()" class="btn-primary"
-                        style="background: #666;">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="background: #39A900;">Crear y Notificar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Editar Líder -->
-    <div id="modalEditarLider" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content"
-            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px;">
-            <h3>Editar Datos de Contacto</h3>
-            <p id="labelLiderEdit" style="color: #666; font-size: 0.9rem; margin-bottom: 15px;"></p>
-            <form id="formEditarLider" onsubmit="guardarEdicionLider(event)">
-                <input type="hidden" id="editDoc">
-                <div class="form-group">
-                    <label class="form-label">Correo Electrónico</label>
-                    <input type="email" id="editCorreo" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Número de Celular</label>
-                    <input type="tel" id="editTel" class="form-control" required>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" onclick="cerrarModalEditar()" class="btn-primary"
-                        style="background: #666;">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="background: #00324D;">Actualizar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Mensajería -->
-    <div id="modalMensajeria" class="modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content"
-            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 600px;">
-            <h3 id="tituloModalMensaje">Enviar Mensaje</h3>
-            <div class="form-group">
-                <label class="form-label">Asunto / Título</label>
-                <input type="text" id="asuntoMensaje" class="form-control"
-                    placeholder="Ej: Citación a reunión ordinaria">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Cuerpo del Mensaje</label>
-                <textarea id="cuerpoMensaje" class="form-control" rows="6"
-                    placeholder="Escriba el mensaje aquí..."></textarea>
-            </div>
-            <div
-                style="background: #eef2ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem;">
-                <p style="margin: 0; color: #4338ca;"><i class="fas fa-info-circle"></i> Este mensaje se enviará a todos
-                    los líderes que coincidan con el filtro actual (<strong id="tipoSeleccionado"></strong>).</p>
-                <p style="margin: 5px 0 0 0; color: #4338ca;"><i class="fas fa-user-tie"></i> También se notificará a
-                    sus Instructores Líderes para coordinar el permiso.</p>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button onclick="cerrarModalMensaje()" class="btn-primary" style="background: #666;">Cancelar</button>
-                <button id="btnEnviarMensaje" onclick="enviarMensajeMasivo()" class="btn-primary">Enviar</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/main.js"></script>
     <script>
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let filteredData = [];
-        let modoMensaje = 'email'; // Variable global para mensajería
+        async function cargarTodo() {
+            await Promise.all([
+                cargarLideres('principales', 'container-voceros'),
+                cargarLideres('representantes', 'container-representantes'),
+                cargarLideres('enfoque', 'container-enfoque'),
+                cargarReuniones()
+            ]);
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = authSystem.getCurrentUser();
-            if (user) document.getElementById('userNameSub').textContent = user.nombre;
-            cargarLideres();
-        });
-
-        async function cargarLideres() {
-            const tipo = document.getElementById('filtroTipo').value;
-            const tbody = document.getElementById('tbodyLideres');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin"></i> Cargando líderes...</td></tr>';
+        async function cargarLideres(filtro, containerId) {
             try {
-                const response = await fetch(`api/bienestar.php?action=getLideres&filtro=${tipo}`);
-                if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-
-                const result = await response.json();
-                if (result.success && Array.isArray(result.data)) {
-                    lideresData = result.data;
-                    filteredData = [...lideresData];
-                    currentPage = 1;
-                    renderTable();
-                } else {
-                    throw new Error(result.message || 'Respuesta inesperada del servidor');
+                const res = await fetch(`api/liderazgo.php?action=getLideres&filtro=${filtro}`);
+                const data = await res.json();
+                if (data.success) {
+                    renderLideres(data.data, containerId);
                 }
-            } catch (error) {
-                console.error('Error cargando líderes:', error);
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Error al cargar.</td></tr>`;
-            }
+            } catch (e) { console.error(e); }
         }
 
-        function renderTable() {
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageData = filteredData.slice(start, end);
-
-            renderLideres(pageData);
-            updatePaginationInfo();
+        async function cargarReuniones() {
+            try {
+                const res = await fetch('api/liderazgo.php?action=getReuniones');
+                const data = await res.json();
+                if (data.success) renderReuniones(data.data);
+            } catch (e) { console.error(e); }
         }
 
-        function renderLideres(data) {
-            const tbody = document.getElementById('tbodyLideres');
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">No hay líderes para mostrar</td></tr>';
+        function renderLideres(lideres, containerId) {
+            const container = document.getElementById(containerId);
+            if (!lideres.length) {
+                container.innerHTML = '<p class="italic-muted">No hay líderes registrados en esta categoría.</p>';
                 return;
             }
-            tbody.innerHTML = data.map((l, index) => {
-                const itemNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
-                return `
-                <tr>
-                    <td style="color: #64748b; font-weight: 600;">${itemNumber}</td>
-                    <td class="td-mono">${l.documento}</td>
-                    <td><strong>${l.nombre} ${l.apellido}</strong></td>
-                    <td><span class="badge" style="background: var(--sena-green, #39A900); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${l.tipo}</span></td>
-                    <td style="color: #64748b; font-size: 0.85rem;">${l.poblacion || 'Ninguna'}</td>
-                    <td class="td-mono">${l.detalle}</td>
-                    <td>
-                        <div style="font-size: 0.85rem; color: #475569;">
-                            <i class="fas fa-envelope" style="width: 15px;"></i> ${l.correo || '-'}<br>
-                            <i class="fab fa-whatsapp" style="width: 15px;"></i> ${l.telefono || '-'}
+            container.innerHTML = lideres.map(l => `
+                <div class="card-lider">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="margin:0;">${l.nombre} ${l.apellido}</h3>
+                            <span class="badge-pob bg-narp">${l.tipo}</span>
                         </div>
-                    </td>
-                    <td>
-                        <div style="display: flex; gap: 5px;">
-                            <button onclick='abrirEditarLider(${JSON.stringify(l).replace(/'/g, "&apos;")})' class="btn-icon" style="background: #f1f5f9; color: #475569;" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `}).join('');
+                        <i class="fas fa-id-badge fa-2x" style="color: #cbd5e1;"></i>
+                    </div>
+                    <hr style="margin: 15px 0; opacity: 0.1;">
+                    <p><i class="fas fa-hashtag"></i> <strong>Ficha/Area:</strong> ${l.detalle}</p>
+                    <p><i class="fas fa-envelope"></i> ${l.correo || 'S/C'}</p>
+                    <button class="btn-liderazgo" style="width: 100%; margin-top: 15px;" onclick="verHistorial('${l.documento}')">
+                        <i class="fas fa-history"></i> Ver Seguimiento
+                    </button>
+                </div>
+            `).join('');
         }
 
-        function updatePaginationInfo() {
-            const total = filteredData.length;
-            const start = total === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-            const end = Math.min(currentPage * itemsPerPage, total);
-
-            document.getElementById('pagStart').textContent = start;
-            document.getElementById('pagEnd').textContent = end;
-            document.getElementById('pagTotal').textContent = total;
-
-            document.getElementById('btnPrev').disabled = currentPage === 1;
-            document.getElementById('btnNext').disabled = end >= total;
-
-            document.getElementById('btnPrev').style.opacity = currentPage === 1 ? '0.5' : '1';
-            document.getElementById('btnNext').style.opacity = end >= total ? '0.5' : '1';
-        }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-            }
-        }
-
-        function nextPage() {
-            if ((currentPage * itemsPerPage) < filteredData.length) {
-                currentPage++;
-                renderTable();
-            }
-        }
-
-        function filtrarTabla() {
-            const term = (document.getElementById('buscarLider').value || '').toLowerCase();
-            filteredData = lideresData.filter(l => {
-                const searchStr = `${l.nombre} ${l.apellido} ${l.documento} ${l.detalle} ${l.tipo} ${l.poblacion}`.toLowerCase();
-                return searchStr.includes(term);
-            });
-            currentPage = 1;
-            renderTable();
-        }
-
-        function prepararMensajeMasivo(modo) {
-            modoMensaje = modo;
-            const tipo = document.getElementById('filtroTipo').options[document.getElementById('filtroTipo').selectedIndex].text;
-            document.getElementById('tipoSeleccionado').textContent = tipo;
-            document.getElementById('tituloModalMensaje').textContent = `Enviar ${modo === 'email' ? 'Email' : 'WhatsApp'} Masivo`;
-            document.getElementById('modalMensajeria').style.display = 'flex';
-        }
-
-        function cerrarModalMensaje() {
-            document.getElementById('modalMensajeria').style.display = 'none';
-        }
-
-        async function enviarMensajeMasivo() {
-            const asunto = document.getElementById('asuntoMensaje').value;
-            const cuerpo = document.getElementById('cuerpoMensaje').value;
-            const tipo = document.getElementById('filtroTipo').value;
-
-            if (!asunto || !cuerpo) {
-                alert('Por favor complete todos los campos');
+        function renderReuniones(reuniones) {
+            const container = document.getElementById('container-reuniones');
+            if (!reuniones.length) {
+                container.innerHTML = '<p class="italic-muted">No hay reuniones programadas.</p>';
                 return;
             }
-
-            const btn = document.getElementById('btnEnviarMensaje');
-            btn.disabled = true;
-            btn.textContent = 'Enviando...';
-
-            try {
-                // Preparamos lista de destinatarios basándonos en los datos cargados y filtrados
-                const destinatarios = lideresData.map(l => ({
-                    documento: l.documento,
-                    email: l.correo,
-                    tel: l.telefono,
-                    nombre: `${l.nombre} ${l.apellido}`
-                }));
-
-                const response = await fetch('api/mensajeria.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        modo: modoMensaje,
-                        asunto,
-                        cuerpo,
-                        destinatarios,
-                        tipo_lideres: tipo
-                    })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert(`Mensajes enviados exitosamente a ${result.enviados} líderes y sus instructores.`);
-                    cerrarModalMensaje();
-                } else {
-                    alert('Error enviando mensajes: ' + result.message);
-                }
-            } catch (error) {
-                alert('Error técnico al enviar mensajes');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Enviar';
-            }
+            container.innerHTML = reuniones.map(r => `
+                <div class="card-lider" style="border-left-color: #00324D;">
+                    <h3 style="margin:0;">${r.titulo}</h3>
+                    <p><i class="fas fa-calendar"></i> ${r.fecha} - ${r.hora}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${r.lugar || 'SENA'}</p>
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="btn-liderazgo" style="flex:1;"><i class="fas fa-user-check"></i> Asistencia</button>
+                        <button class="btn-liderazgo" style="background:#64748b;"><i class="fas fa-file-pdf"></i> Acta</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // --- FUNCIONES MÓDULO REUNIONES ---
-        function abrirModalReunion() {
-            document.getElementById('modalReunion').style.display = 'flex';
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        function cerrarModalReunion() {
-            document.getElementById('modalReunion').style.display = 'none';
-        }
-
-        async function guardarReunion(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.textContent = 'Procesando...';
-
-            const payload = {
-                titulo: document.getElementById('tituloReunion').value,
-                fecha: document.getElementById('fechaReunion').value,
-                hora: document.getElementById('horaReunion').value,
-                notificar_email: document.getElementById('notiEmail').checked,
-                notificar_sms: document.getElementById('notiSMS').checked,
-                notificar_whatsapp: document.getElementById('notiWA').checked,
-                destinatarios: lideresData.map(l => ({
-                    documento: l.documento,
-                    email: l.correo,
-                    tel: l.telefono,
-                    nombre: `${l.nombre} ${l.apellido}`
-                }))
-            };
-
-            try {
-                const res = await fetch('api/bienestar.php?action=saveReunion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    alert('Reunión creada y notificaciones procesadas correctamente.');
-                    cerrarModalReunion();
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            } catch (err) {
-                alert('Error técnico al crear la reunión');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Crear y Notificar';
-            }
-        }
-
-        // --- FUNCIONES EDICIÓN LIDER ---
-        function abrirEditarLider(l) {
-            document.getElementById('editDoc').value = l.documento;
-            document.getElementById('editCorreo').value = l.correo || '';
-            document.getElementById('editTel').value = l.telefono || '';
-            document.getElementById('labelLiderEdit').textContent = `Líder: ${l.nombre} ${l.apellido} (${l.tipo})`;
-            document.getElementById('modalEditarLider').style.display = 'flex';
-        }
-
-        function cerrarModalEditar() {
-            document.getElementById('modalEditarLider').style.display = 'none';
-        }
-
-        async function guardarEdicionLider(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
-
-            const payload = {
-                documento: document.getElementById('editDoc').value,
-                correo: document.getElementById('editCorreo').value,
-                telefono: document.getElementById('editTel').value
-            };
-
-            try {
-                const res = await fetch('api/bienestar.php?action=updateLider', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    cerrarModalEditar();
-                    cargarLideres(); // Recargar tabla
-                } else {
-                    alert('Error: ' + result.message);
-                }
-            } catch (err) {
-                alert('Error al actualizar datos');
-            } finally {
-                btn.disabled = false;
-            }
-        }
+        document.addEventListener('DOMContentLoaded', cargarTodo);
     </script>
 </body>
 
