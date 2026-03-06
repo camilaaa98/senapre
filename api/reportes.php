@@ -16,6 +16,17 @@ function getEstadoColor($estado) {
     return '#64748b'; // Gris
 }
 
+function safeQuery($conn, $sql, $params = []) {
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($params);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $res['total'] ?? 0;
+    } catch (Exception $e) {
+        return 0;
+    }
+}
+
 try {
     $ficha = $_GET['ficha'] ?? '';
     $tabla_poblacion = $_GET['tabla_poblacion'] ?? '';

@@ -1,7 +1,3 @@
-/**
- * Bienestar Dashboard - Admin Logic
- */
-
 const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +23,7 @@ async function cargarResponsable(area) {
     const btnAssign = card.querySelector('.btn-assign');
 
     try {
-        const response = await fetch(`api/bienestar.php?action=getResponsable&area=${area}`);
+        const response = await fetch(`api/liderazgo.php?action=getResponsable&area=${area}`);
         const result = await response.json();
         const loggedUser = authSystem.getCurrentUser();
 

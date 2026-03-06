@@ -30,11 +30,17 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-bienestar-dashboard" class="menu-link">
+                <li class="menu-item has-submenu">
+                    <a href="#" class="menu-link" onclick="toggleSubmenu(event, 'submenu-bienestar')">
                         <div class="menu-icon"><i class="fas fa-handshake"></i></div>
                         <span>Bienestar del Aprendiz</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
                     </a>
+                    <ul class="submenu" id="submenu-bienestar">
+                        <li><a href="liderazgo.html"><i class="fas fa-users"></i> Liderazgo Estudiantil</a></li>
+                        <li><a href="admin-bienestar-dashboard.html"><i class="fas fa-chart-pie"></i> Estadísticas
+                                Bienestar</a></li>
+                    </ul>
                 </li>
                 <li class="menu-item">
                     <a href="admin-usuarios" class="menu-link">
@@ -246,13 +252,15 @@
                     <h3 class="card-title">Accesos Rápidos</h3>
                 </div>
                 <div class="accesos-grid">
-                    <button onclick="window.location.href = 'admin-bienestar-historico'" class="btn-premium verde">
+                    <button onclick="window.location.href = 'liderazgo-historico.html'"
+                        class="btn-premium premium-gradient-verde">
                         <i class="fas fa-users"></i> Asistencia Reuniones Voceros
                     </button>
-                    <button onclick="window.location.href = 'admin-asistencias'" class="btn-premium verde2">
+                    <button onclick="window.location.href = 'admin-asistencias'"
+                        class="btn-premium premium-gradient-verde2">
                         <i class="fas fa-clipboard-check"></i> Consultar Asistencias de Fichas
                     </button>
-                    <button onclick="window.location.href = 'admin-reportes'" class="btn-premium azul">
+                    <button onclick="window.location.href = 'admin-reportes'" class="btn-premium premium-gradient-azul">
                         <i class="fas fa-chart-line"></i> Centro de Reportes y Estadísticas
                     </button>
                 </div>
