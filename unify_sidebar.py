@@ -50,7 +50,7 @@ def get_sidebar_html(active_file):
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="liderazgo.html" class="menu-link {is_bien}">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link {is_bien}">
                         <div class="menu-icon"><i class="fas fa-handshake"></i></div>
                         <span>Bienestar del Aprendiz</span>
                     </a>

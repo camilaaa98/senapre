@@ -104,20 +104,23 @@ class AuthSystem {
     redirectToDashboard() {
         if (!this.currentUser) return;
         const rol = this.currentUser.rol.toLowerCase();
-
-        // Función interna para ofuscar (cifrado simple solicitado)
-        const encrypt = (path) => btoa(path);
+        const areas = this.currentUser.bienestar_data || [];
 
         if (rol === 'vocero') {
             window.location.href = 'vocero-dashboard';
-        } else if (rol === 'bienestar') {
-            const user = this.currentUser;
-            const esRespLiderazgo = user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes');
-            window.location.href = esRespLiderazgo ? 'admin-bienestar-historico' : 'bienestar-aprendiz';
+        } else if (areas.includes('jefe_bienestar')) {
+            // Erick Johana Yañez Sabaleta - Jefe de Bienestar
+            window.location.href = 'admin-bienestar-dashboard.html';
+        } else if (areas.includes('voceros_y_representantes')) {
+            // Jancy Esperanza Barreto Moreno - Liderazgo
+            window.location.href = 'liderazgo.html';
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
-        } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            window.location.href = 'admin-dashboard';
+        } else if (['director', 'admin'].includes(rol)) {
+            window.location.href = 'admin-dashboard.html';
+        } else {
+            // Otros administrativos o roles de apoyo
+            window.location.href = 'admin-dashboard.html';
         }
     }
 }
@@ -549,27 +552,21 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            const academicKeywords = ['aprendices', 'fichas', 'programas', 'asignar', 'asistencias', 'reportes', 'usuarios'];
-            const isAcademic = academicKeywords.some(key => text.includes(key));
+            // Responsable de Liderazgo (Jancy Barreto) tiene acceso muy limitado
+            const keywordsLiderazgo = ['bienestar', 'liderazgo', 'cerrar sesión'];
+            permitido = keywordsLiderazgo.some(key => text.includes(key));
 
-            // Permitir solo Liderazgo (antes Bienestar) y Cerrar Sesión
-            permitido = text.includes('bienestar') || text.includes('liderazgo') || text.includes('cerrar sesión');
-
-            // Rebranding dinámico de Bienestar a Liderazgo
+            // Rebranding dinámico de Bienestar a Liderazgo si no es Director
             if (text.includes('bienestar')) {
                 const span = item.querySelector('span');
                 if (span) span.textContent = 'Liderazgo Estudiantil';
                 const link = item.querySelector('a');
-                if (link && !link.href.includes('bienestar-dashboard')) {
-                    link.href = 'bienestar-dashboard';
-                }
+                if (link) link.href = 'liderazgo.html';
             }
 
-            // Si es académico, se oculta explícitamente
-            if (isAcademic && !text.includes('bienestar') && !text.includes('liderazgo')) permitido = false;
-
-            // Ocultar el Dashboard Administrativo
-            if (text === 'dashboard') permitido = false;
+            // Ocultar explícitamente menús administrativos para Liderazgo
+            const adminKeywords = ['usuarios', 'programas', 'fichas', 'asignar', 'asistencias', 'reportes', 'dashboard'];
+            if (adminKeywords.some(key => text.includes(key))) permitido = false;
         }
 
         if (!permitido) {
