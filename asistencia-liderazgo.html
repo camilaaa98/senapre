@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toma de Asistencia Liderazgo - SenApre</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css?v=2.1.0">
+    <link rel="stylesheet" href="css/admin.css?v=2.1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-sena: #39A900;
+            --primary-dark: #00324D;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f8fafc;
+        }
+
+        .attendance-header {
+            background: white;
+            padding: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .attendance-list {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .attendance-item {
+            display: flex;
+            align-items: center;
+            padding: 1.2rem;
+            border-bottom: 1px solid #f1f5f9;
+            transition: 0.2s;
+        }
+
+        .attendance-item:hover {
+            background: #f8fafc;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .item-sub {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .attendance-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-status {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit';
+        }
+
+        .btn-status.active-present {
+            background: var(--primary-sena);
+            color: white;
+            border-color: var(--primary-sena);
+        }
+
+        .btn-status.active-absent {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .btn-status.active-excused {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        .summary-bar {
+            position: sticky;
+            top: 20px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            z-index: 100;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-val {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .btn-back-prof {
+            background: transparent;
+            border: 1px solid var(--primary-dark);
+            color: var(--primary-dark);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="attendance-header">
+        <div>
+            <a href="liderazgo.html" class="btn-back-prof"><i class="fas fa-arrow-left"></i> Panel Liderazgo</a>
+        </div>
+        <div style="text-align: center;">
+            <h1 style="margin:0; font-weight:800; color:var(--primary-dark);" id="meet-title">Cargando reunión...</h1>
+            <p style="margin:4px 0 0; color:#64748b;" id="meet-date"></p>
+        </div>
+        <div>
+            <button onclick="finalizarAsistencia()" class="btn-primary"
+                style="background:var(--primary-sena); width:auto; padding: 12px 24px;">
+                <i class="fas fa-save"></i> Finalizar Llamado
+            </button>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 0 20px;">
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span class="summary-val" id="count-total">0</span>
+                <span class="summary-label">Total Líderes</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-val" id="count-present">0</span>
+                <span class="summary-label">Presentes</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-val" id="count-absent">0</span>
+                <span class="summary-label">Ausentes</span>
+            </div>
+        </div>
+
+        <div class="attendance-list" id="list-container">
+            <!-- Items injected by JS -->
+            <div style="text-align:center; padding:3rem; color:#94a3b8;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Cargando lista de líderes...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const meetingId = urlParams.get('id');
+        let leaders = [];
+        let states = {}; // doc -> state
+
+        async function init() {
+            if (!meetingId) {
+                alert('ID de reunión no válido');
+                window.location.href = 'liderazgo.html';
+                return;
+            }
+            await cargarDatosReunion();
+            await cargarLideres();
+        }
+
+        async function cargarDatosReunion() {
+            try {
+                const res = await fetch('api/liderazgo.php?action=getReuniones');
+                const data = await res.json();
+                const meet = data.data.find(m => m.id == meetingId);
+                if (meet) {
+                    document.getElementById('meet-title').textContent = meet.titulo;
+                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora}`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function cargarLideres() {
+            try {
+                // Obtenemos todos los líderes (puedes ajustar el endpoint si necesitas algo más específico)
+                const res = await fetch('api/liderazgo.php?action=getLideres&filtro=todos');
+                const data = await res.json();
+                leaders = data.data;
+
+                // Cargar asistencias ya registradas si existen
+                const resAsis = await fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`);
+                const dataAsis = await resAsis.json();
+
+                dataAsis.data.forEach(as => {
+                    states[as.id_aprendiz] = as.estado;
+                });
+
+                renderLista();
+                updateSummary();
+            } catch (e) { console.error(e); }
+        }
+
+        function renderLista() {
+            const container = document.getElementById('list-container');
+            container.innerHTML = leaders.map(l => {
+                const state = states[l.documento] || 'pendiente';
+                return `
+                <div class="attendance-item">
+                    <div class="item-info">
+                        <p class="item-name">${l.nombre} ${l.apellido}</p>
+                        <p class="item-sub">${l.tipo} | Ficha: ${l.detalle}</p>
+                    </div>
+                    <div class="attendance-controls">
+                        <button class="btn-status ${state === 'asistio' ? 'active-present' : ''}" 
+                                onclick="marcar('${l.documento}', 'asistio', this)">
+                            Presente
+                        </button>
+                        <button class="btn-status ${state === 'ausente' ? 'active-absent' : ''}" 
+                                onclick="marcar('${l.documento}', 'ausente', this)">
+                            Ausente
+                        </button>
+                        <button class="btn-status ${state === 'justificado' ? 'active-excused' : ''}" 
+                                onclick="marcar('${l.documento}', 'justificado', this)">
+                            Excusa
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        async function marcar(doc, state, btn) {
+            // Optimistic update
+            states[doc] = state;
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.btn-status').forEach(b => b.className = 'btn-status');
+            if (state === 'asistio') btn.classList.add('active-present');
+            if (state === 'ausente') btn.classList.add('active-absent');
+            if (state === 'justificado') btn.classList.add('active-excused');
+
+            updateSummary();
+
+            // API Call
+            try {
+                const res = await fetch('api/liderazgo.php?action=registrarAsistencia', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_reunion: meetingId,
+                        id_aprendiz: doc,
+                        estado: state
+                    })
+                });
+                const result = await res.json();
+                if (result.alerta_fallas) {
+                    mostrarNotificacion(`¡ALERTA! El aprendiz ${doc} ha acumulado 3 fallas. Su rol ha sido revocado automáticamente.`, 'error', 10000);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function updateSummary() {
+            const total = leaders.length;
+            const present = Object.values(states).filter(s => s === 'asistio').length;
+            const absent = Object.values(states).filter(s => s === 'ausente').length;
+
+            document.getElementById('count-total').textContent = total;
+            document.getElementById('count-present').textContent = present;
+            document.getElementById('count-absent').textContent = absent;
+        }
+
+        function finalizarAsistencia() {
+            mostrarNotificacion('Asistencia guardada correctamente', 'success');
+            setTimeout(() => window.location.href = 'liderazgo.html', 1500);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

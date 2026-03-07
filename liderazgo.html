@@ -4,137 +4,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liderazgo Estudiantil - Bienestar del Aprendiz</title>
-    <link rel="stylesheet" href="css/main.css?v=2.0.2">
-    <link rel="stylesheet" href="css/admin.css?v=2.0.2">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Liderazgo Estudiantil Premium - SenApre</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css?v=2.2.0">
+    <link rel="stylesheet" href="css/admin.css?v=2.2.0">
+    <link rel="stylesheet" href="css/liderazgo-premium.css?v=1.0.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        .liderazgo-header {
-            background: linear-gradient(135deg, #00324D 0%, #001f2f 100%);
-            color: white;
-            padding: 40px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+        :root {
+            --primary-sena: #39A900;
+            --primary-dark: #00324D;
+            --accent-blue: #0ea5e9;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
 
-        .liderazgo-actions {
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f8fafc;
+        }
+
+        .premium-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #001f2f 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 50, 77, 0.15);
+        }
+
+        .premium-header::before {
+            content: '';
             position: absolute;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(57, 169, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .header-title p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 50, 77, 0.12);
+        }
+
+        .tabs-premium {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 8px;
+            background: #f1f5f9;
+            border-radius: 16px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            font-family: 'Outfit';
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .liderazgo-header::after {
-            content: "\f0c0";
-            font-family: "Font Awesome 5 Free";
-            font-weight: 900;
-            position: absolute;
-            right: 30px;
-            bottom: -20px;
-            font-size: 150px;
-            opacity: 0.1;
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .grid-lideres {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
 
-        .card-lider {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #39A900;
-            transition: transform 0.2s;
+        .lider-card {
+            padding: 1.5rem;
+            position: relative;
         }
 
-        .card-lider:hover {
-            transform: translateY(-3px);
+        .lider-avatar {
+            width: 56px;
+            height: 56px;
+            background: #e2e8f0;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
         }
 
-        .btn-liderazgo {
-            background: #39A900;
+        .badge-premium {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-vocero {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-representante {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .badge-enfoque {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .btn-plus-floating {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 64px;
+            height: 64px;
+            background: var(--primary-sena);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(57, 169, 0, 0.3);
             cursor: pointer;
+            border: none;
+            z-index: 100;
+            transition: 0.3s;
+        }
+
+        .btn-plus-floating:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Modal glassmorphism */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-glass {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
+            color: #475569;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-family: 'Outfit';
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-sena);
+            box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
+        }
+
+        .btn-premium {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+        }
+
+        .btn-primary-p {
+            background: var(--primary-sena);
+            color: white;
+        }
+
+        .btn-primary-p:hover {
+            background: #2d8500;
+            transform: translateY(-2px);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-danger {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .status-success {
+            background: #f0fdf4;
+            color: #16a34a;
         }
     </style>
 </head>
 
 <body>
     <div class="dashboard-container">
-        <!-- Reutilizamos el sidebar del admin-dashboard -->
-        <aside class="sidebar" id="sidebar-container">
-            <!-- Cargado dinámicamente o inyectado por JS -->
+        <!-- Sidebar Institucional -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle" id="user-role-display">Director</div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="admin-dashboard" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-handshake"></i></div>
+                        <span>Bienestar del Aprendiz</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-usuarios" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+                        <span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                        <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Gestionar Aprendices</span>
+                        <i class="fas fa-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
+                        <li><a href="admin-aprendices#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-programas" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-book"></i></div>
+                        <span>Gestionar Programas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-fichas" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
+                        <span>Gestionar Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asignaciones" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <span>Asignar Instructores</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-asistencias" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="admin-reportes" class="menu-link ">
+                        <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
         </aside>
 
         <main class="main-content">
-            <div class="liderazgo-header"
-                style="position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; border-radius: 15px; margin-bottom: 30px;">
-                <div class="content-info">
-                    <h1 style="margin:0; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;">Liderazgo
-                        Estudiantil</h1>
-                    <p style="margin: 8px 0 0; opacity: 0.9; font-size: 1.05rem;">Módulo de Gestión de Líderes y
-                        Representación Estudiantil</p>
+            <header class="premium-header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1>Liderazgo Estudiantil</h1>
+                        <p>Gestión estratégica de roles y participación democrática</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <button onclick="cargarTodo()" class="btn-liderazgo"
+                            style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; color: white; border-radius: 16px; backdrop-filter: blur(8px); cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-sync-alt"></i> Sincronizar
+                        </button>
+                    </div>
                 </div>
-                <div class="header-actions"
-                    style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); display: flex; gap: 12px; z-index: 10;">
-                    <button onclick="cargarTodo()" class="btn-liderazgo"
-                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
-                        <i class="fas fa-sync"></i> Sincronizar
-                    </button>
-                    <button onclick="window.location.href='admin-bienestar-dashboard.html'" class="btn-liderazgo"
-                        style="background: white; color: #00324D; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        <i class="fas fa-arrow-left"></i> Volver a Bienestar
-                    </button>
-                </div>
-            </div>
+            </header>
 
-            <div class="tab-container">
-                <button class="tab-button active" onclick="switchTab('voceros')"><i class="fas fa-users"></i> Voceros
-                    Ficha</button>
-                <button class="tab-button" onclick="switchTab('representantes')"><i class="fas fa-user-shield"></i>
+            <nav class="tabs-premium">
+                <button class="tab-btn active" onclick="switchTab('voceros')"><i class="fas fa-users"></i>
+                    Voceros</button>
+                <button class="tab-btn" onclick="switchTab('representantes')"><i class="fas fa-user-shield"></i>
                     Representantes</button>
-                <button class="tab-button" onclick="switchTab('enfoque')"><i class="fas fa-people-arrows"></i> Enfoque
+                <button class="tab-btn" onclick="switchTab('enfoque')"><i class="fas fa-fingerprint"></i> Enfoque
                     Diferencial</button>
-                <button class="tab-button" onclick="switchTab('reuniones')"><i class="fas fa-calendar-check"></i>
+                <button class="tab-btn" onclick="switchTab('reuniones')"><i class="fas fa-calendar-alt"></i>
                     Reuniones</button>
-            </div>
+            </nav>
 
+            <!-- Panels -->
             <div id="tab-voceros" class="tab-panel active">
                 <div class="grid-lideres" id="container-voceros"></div>
             </div>
 
-            <div id="tab-representantes" class="tab-panel">
+            <div id="tab-representantes" class="tab-panel" style="display:none;">
                 <div class="grid-lideres" id="container-representantes"></div>
             </div>
 
-            <div id="tab-enfoque" class="tab-panel">
+            <div id="tab-enfoque" class="tab-panel" style="display:none;">
                 <div class="grid-lideres" id="container-enfoque"></div>
             </div>
 
-            <div id="tab-reuniones" class="tab-panel">
+            <div id="tab-reuniones" class="tab-panel" style="display:none;">
                 <div class="grid-lideres" id="container-reuniones"></div>
             </div>
         </main>
     </div>
 
+    <!-- Floating Action Button -->
+    <button class="btn-plus-floating" onclick="abrirModalReunion()" id="fab-reunion" style="display:none;">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalReunion">
+        <div class="modal-glass">
+            <h2 style="margin-top:0; font-weight:800; color:var(--primary-dark);">Programar Reunión</h2>
+            <p style="accent-color: #64748b; margin-bottom: 2rem;">Nueva sesión masiva con líderes estudiantiles.</p>
+            <form id="formReunion">
+                <div class="form-group">
+                    <label class="form-label">Título del Encuentro</label>
+                    <input type="text" id="tituloReunion" class="form-input" placeholder="Ej: Comité General de Voceros"
+                        required>
+                </div>
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div class="form-group">
+                        <label class="form-label">Fecha del Evento</label>
+                        <input type="date" id="fechaReunion" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hora</label>
+                        <input type="time" id="horaReunion" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lugar o Enlace Virtual</label>
+                    <input type="text" id="lugarReunion" class="form-input"
+                        placeholder="Ej: Auditorio Bloque A o Teams">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:15px; margin-top:2rem;">
+                    <button type="button" onclick="cerrarModal()" class="btn-premium"
+                        style="background:#f1f5f9; color:#64748b;">Descartar</button>
+                    <button type="submit" class="btn-premium btn-primary-p">Registrar Reunión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="js/main.js"></script>
     <script>
+        let currentTab = 'voceros';
+
         async function cargarTodo() {
             await Promise.all([
                 cargarLideres('principales', 'container-voceros'),
@@ -145,16 +484,23 @@
         }
 
         async function cargarLideres(filtro, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="loading-shimmer" style="height:350px; grid-column:1/-1;"></div>`;
+
             try {
                 const res = await fetch(`api/liderazgo.php?action=getLideres&filtro=${filtro}`);
                 const data = await res.json();
                 if (data.success) {
                     renderLideres(data.data, containerId);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Error al conectar con la API</p>';
+            }
         }
 
         async function cargarReuniones() {
+            const container = document.getElementById('container-reuniones');
             try {
                 const res = await fetch('api/liderazgo.php?action=getReuniones');
                 const data = await res.json();
@@ -165,52 +511,118 @@
         function renderLideres(lideres, containerId) {
             const container = document.getElementById(containerId);
             if (!lideres.length) {
-                container.innerHTML = '<p class="italic-muted">No hay líderes registrados en esta categoría.</p>';
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:5rem 2rem; background:white; border-radius:24px; border:2px dashed #e2e8f0; color:#94a3b8;"><i class="fas fa-users-slash fa-3x" style="margin-bottom:1rem; opacity:0.3;"></i><p style="font-size:1.1rem; font-weight:500;">No se encontraron registros activos en esta categoría.</p></div>';
                 return;
             }
-            container.innerHTML = lideres.map(l => `
-                <div class="card-lider">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <h3 style="margin:0;">${l.nombre} ${l.apellido}</h3>
-                            <span class="badge-pob bg-narp">${l.tipo}</span>
+            container.innerHTML = lideres.map(l => {
+                const badgeClass = l.tipo.toLowerCase().includes('vocero') ? 'badge-vocero' :
+                    l.tipo.toLowerCase().includes('representante') ? 'badge-representante' : 'badge-enfoque';
+
+                return `
+                <div class="glass-card lider-card">
+                    <div style="display:flex; gap:1.2rem; align-items:center; margin-bottom:2rem;">
+                        <div class="lider-avatar">
+                            <i class="fas fa-user-circle"></i>
                         </div>
-                        <i class="fas fa-id-badge fa-2x" style="color: #cbd5e1;"></i>
+                        <div style="flex:1;">
+                            <h3 style="margin:0; font-weight:800; color:var(--primary-dark); font-size:1.2rem; letter-spacing:-0.4px;">${l.nombre} ${l.apellido}</h3>
+                            <span class="badge-premium ${badgeClass}">${l.tipo}</span>
+                        </div>
                     </div>
-                    <hr style="margin: 15px 0; opacity: 0.1;">
-                    <p><i class="fas fa-hashtag"></i> <strong>Ficha/Area:</strong> ${l.detalle}</p>
-                    <p><i class="fas fa-envelope"></i> ${l.correo || 'S/C'}</p>
-                    <button class="btn-liderazgo" style="width: 100%; margin-top: 15px;" onclick="verHistorial('${l.documento}')">
-                        <i class="fas fa-history"></i> Ver Seguimiento
+                    
+                    <div style="background:rgba(241, 245, 249, 0.5); border-radius:18px; padding:16px; margin-bottom:1.5rem;">
+                        <p style="margin:0; font-size:0.95rem; color:#475569; font-weight:500;"><i class="fas fa-hashtag" style="color:var(--primary-sena);"></i> Identificador: <strong>${l.detalle}</strong></p>
+                        <p style="margin:8px 0 0; font-size:0.95rem; color:#475569; font-weight:500;"><i class="fas fa-envelope" style="color:var(--primary-sena);"></i> ${l.correo || 'Pendiente'}</p>
+                    </div>
+
+                    <button class="btn-premium" style="background: white; border: 1.5px solid #e2e8f0; color: var(--primary-dark); display:flex; align-items:center; justify-content:center; gap:12px; font-weight:700;" onclick="verSeguimiento('${l.documento}')">
+                        <i class="fas fa-list-check"></i> Consultar Trayectoria
                     </button>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderReuniones(reuniones) {
             const container = document.getElementById('container-reuniones');
             if (!reuniones.length) {
-                container.innerHTML = '<p class="italic-muted">No hay reuniones programadas.</p>';
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:5rem 2rem; background:white; border-radius:24px; border:2px dashed #e2e8f0; color:#94a3b8;"><i class="fas fa-calendar-times fa-3x" style="margin-bottom:1rem; opacity:0.3;"></i><p style="font-size:1.1rem; font-weight:500;">No existen reuniones programadas actualmente.</p></div>';
                 return;
             }
             container.innerHTML = reuniones.map(r => `
-                <div class="card-lider" style="border-left-color: #00324D;">
-                    <h3 style="margin:0;">${r.titulo}</h3>
-                    <p><i class="fas fa-calendar"></i> ${r.fecha} - ${r.hora}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> ${r.lugar || 'SENA'}</p>
-                    <div style="display:flex; gap:10px; margin-top:15px;">
-                        <button class="btn-liderazgo" style="flex:1;"><i class="fas fa-user-check"></i> Asistencia</button>
-                        <button class="btn-liderazgo" style="background:#64748b;"><i class="fas fa-file-pdf"></i> Acta</button>
+                <div class="glass-card lider-card" style="border-left: 8px solid var(--primary-dark);">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1rem;">
+                        <h3 style="margin:0; font-weight:900; font-size:1.3rem; letter-spacing:-0.5px;">${r.titulo}</h3>
+                        <span class="status-pill status-success"><i class="fas fa-bolt"></i> Activa</span>
+                    </div>
+                    <p style="margin:10px 0 0; color:#64748b; font-weight:500;"><i class="fas fa-clock" style="width:20px;"></i> ${r.fecha} | ${r.hora}</p>
+                    <p style="margin:8px 0 2rem; color:#64748b; font-weight:500;"><i class="fas fa-location-arrow" style="width:20px;"></i> ${r.lugar || 'Instalaciones SENA'}</p>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr auto; gap:12px;">
+                        <button class="btn-premium btn-primary-p" onclick="tomarAsistencia('${r.id}')">
+                            <i class="fas fa-clipboard-user"></i> Control de Asistencia
+                        </button>
+                        <button class="btn-premium" style="width:56px; background:#f1f5f9; color:#64748b; padding:0;" title="Bajar Acta de Sesión">
+                            <i class="fas fa-file-export"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
+            currentTab = tab;
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById('tab-' + tab).style.display = 'block';
             event.currentTarget.classList.add('active');
+
+            // FAB only for meetings
+            document.getElementById('fab-reunion').style.display = (tab === 'reuniones') ? 'flex' : 'none';
+        }
+
+        function abrirModalReunion() {
+            document.getElementById('modalReunion').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalReunion').style.display = 'none';
+        }
+
+        document.getElementById('formReunion').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                titulo: document.getElementById('tituloReunion').value,
+                fecha: document.getElementById('fechaReunion').value,
+                hora: document.getElementById('horaReunion').value,
+                lugar: document.getElementById('lugarReunion').value
+            };
+
+            try {
+                const res = await fetch('api/liderazgo.php?action=saveReunion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.success) {
+                    mostrarNotificacion('Evento programado exitosamente', 'success');
+                    cerrarModal();
+                    cargarReuniones();
+                    document.getElementById('formReunion').reset();
+                }
+            } catch (e) {
+                mostrarNotificacion('Error técnico al guardar el evento', 'error');
+            }
+        });
+
+        function verSeguimiento(doc) {
+            mostrarNotificacion('Preparando bitácora de seguimiento...', 'info');
+            // Futura implementación de modal de historial
+        }
+
+        function tomarAsistencia(id) {
+            window.location.href = `asistencia-liderazgo.html?id=${id}`;
         }
 
         document.addEventListener('DOMContentLoaded', cargarTodo);
