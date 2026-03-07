@@ -30,7 +30,9 @@
         return;
     }
 
-    if (typeof authSystem !== 'undefined' && !authSystem.isAdmin()) {
+    // Permitir acceso a roles directivos y de apoyo administrativo
+    const rolesDash = ['director', 'admin', 'administrativo', 'coordinador'];
+    if (!rolesDash.includes(rol)) {
         window.location.href = 'index.html';
         return;
     }

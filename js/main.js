@@ -97,8 +97,8 @@ class AuthSystem {
     isAdmin() {
         if (!this.currentUser) return false;
         const rol = (this.currentUser.rol || '').toLowerCase();
-        // Solo Directores y Administradores generales son "Admins" reales para el dashboard central
-        return ['director', 'admin', 'administrador'].includes(rol);
+        // Solo Directores y Administradores generales son "Admins" reales con poder total
+        return ['director', 'admin'].includes(rol);
     }
 
     redirectToDashboard() {
@@ -282,13 +282,23 @@ function aplicarRestriccionesDeRol() {
     // Actualizar visualización del rol en el sidebar
     const roleDisplay = document.getElementById('user-role-display');
     if (roleDisplay) {
-        let displayRole = user.rol.charAt(0).toUpperCase() + user.rol.slice(1);
+        let displayRole = 'Usuario';
+        const roleMap = {
+            'director': 'Director de Centro',
+            'administrativo': 'Personal Administrativo',
+            'instructor': 'Instructor SENA',
+            'vocero': 'Vocero Estudiantil',
+            'admin': 'Administrador Sistema'
+        };
+
+        displayRole = roleMap[rol] || displayRole;
+
         if (user.bienestar_data && user.bienestar_data.length > 0) {
             const areaMap = {
                 'jefe_bienestar': 'Jefe de Bienestar',
                 'voceros_y_representantes': 'Liderazgo',
-                'enfermeria': 'Promoción y Prevención de Enfermedades',
-                'socioemocional': 'Socioemocional',
+                'enfermeria': 'Bienestar (Salud)',
+                'socioemocional': 'Bienestar (Socioemocional)',
                 'deporte': 'Bienestar (Deporte)',
                 'arte': 'Bienestar (Cultura)',
                 'apoyos': 'Bienestar (Apoyos)'
@@ -360,10 +370,37 @@ function aplicarRestriccionesDeRol() {
     if ((esJefeBienestar || esRespLiderazgo) && !esDirector) {
         filtrarDashboardParaBienestar(esRespLiderazgo);
         ocultarMenusRestringidos(false, esRespLiderazgo, esDirector);
+    } else if (rol === 'administrativo') {
+        // El administrativo es un cargo de apoyo, no tiene panel de director
+        filtrarDashboardParaAdministrativo();
+        ocultarMenusAdministrativo();
     } else if (esDirector) {
         // Asegurar que el director vea todo el menú
         ocultarMenusRestringidos(false, false, true);
     }
+}
+
+function ocultarMenusAdministrativo() {
+    const menusSensibles = ['menu-usuarios', 'menu-programas', 'menu-asignaciones'];
+    menusSensibles.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+}
+
+function filtrarDashboardParaAdministrativo() {
+    if (!window.location.pathname.includes('admin-dashboard')) return;
+
+    // Ocultar tarjetas de alta gerencia o configuración
+    const idsOcultar = ['dashTotalUsuarios']; // Por ejemplo, no debe gestionar usuarios
+    idsOcultar.forEach(id => {
+        const el = document.getElementById(id);
+        const card = el?.closest('.stat-card');
+        if (card) card.style.display = 'none';
+    });
+
+    const title = document.querySelector('.content-title');
+    if (title) title.textContent = 'Panel de Apoyo Administrativo';
 }
 
 function filtrarDashboardParaVocero(scope) {
