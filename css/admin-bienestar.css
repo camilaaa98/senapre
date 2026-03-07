@@ -99,44 +99,83 @@
     font-weight: 600;
     border: none;
     cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
 
-    /* ── Accesos Rápidos Premium ───────────────── */
-    .bienestar-quick-access {
-        margin-bottom: 30px;
-    }
+.btn-module:hover {
+    background: #2d8500;
+}
 
-    .quick-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-    }
+/* ── Accesos Rápidos Premium ───────────────── */
+.bienestar-quick-access {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
 
-    .quick-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border-color: #39A900;
-    }
+.quick-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
 
-    .quick-card i {
-        font-size: 2rem;
-        color: #39A900;
-    }
+.quick-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #39A900;
+}
 
-    .quick-card h4 {
-        margin: 0;
-        font-size: 1.1rem;
-        color: #00324D;
-    }
+.quick-card i {
+    font-size: 2rem;
+    color: #39A900;
+    width: 50px;
+    text-align: center;
+}
 
-    .quick-card p {
-        margin: 5px 0 0;
-        font-size: 0.85rem;
-        color: #64748b;
+.quick-card h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #00324D;
+}
+
+.quick-card p {
+    margin: 5px 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+/* Área Jefe (Especial) */
+.area-card.jefe-area {
+    grid-column: 1 / -1;
+    border-top-color: #00324D;
+    margin-bottom: 20px;
+}
+
+.jefe-layout {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.jefe-icon {
+    background: #e0f2fe;
+    color: #00324D;
+    width: 60px;
+    height: 60px;
+}
+
+@media (max-width: 768px) {
+    .jefe-layout {
+        flex-direction: column;
+        align-items: flex-start;
     }
+}

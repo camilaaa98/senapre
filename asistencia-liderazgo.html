@@ -11,162 +11,44 @@
     <link rel="stylesheet" href="css/main.css?v=2.1.0">
     <link rel="stylesheet" href="css/admin.css?v=2.1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-sena: #39A900;
-            --primary-dark: #00324D;
-        }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #f8fafc;
-        }
-
-        .attendance-header {
-            background: white;
-            padding: 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .attendance-list {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .attendance-item {
-            display: flex;
-            align-items: center;
-            padding: 1.2rem;
-            border-bottom: 1px solid #f1f5f9;
-            transition: 0.2s;
-        }
-
-        .attendance-item:hover {
-            background: #f8fafc;
-        }
-
-        .item-info {
-            flex: 1;
-        }
-
-        .item-name {
-            font-weight: 700;
-            color: var(--primary-dark);
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .item-sub {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .attendance-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-status {
-            padding: 10px 18px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Outfit';
-        }
-
-        .btn-status.active-present {
-            background: var(--primary-sena);
-            color: white;
-            border-color: var(--primary-sena);
-        }
-
-        .btn-status.active-absent {
-            background: #ef4444;
-            color: white;
-            border-color: #ef4444;
-        }
-
-        .btn-status.active-excused {
-            background: #f59e0b;
-            color: white;
-            border-color: #f59e0b;
-        }
-
-        .summary-bar {
-            position: sticky;
-            top: 20px;
-            background: var(--primary-dark);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 2rem;
-            z-index: 100;
-        }
-
-        .summary-item {
-            text-align: center;
-        }
-
-        .summary-val {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .summary-label {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            text-transform: uppercase;
-        }
-
-        .btn-back-prof {
-            background: transparent;
-            border: 1px solid var(--primary-dark);
-            color: var(--primary-dark);
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-    </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Asistencia Biométrica Liderazgo - SenApre</title>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="css/main.css?v=2.1.0">
+        <link rel="stylesheet" href="css/admin.css?v=2.1.0">
+        <link rel="stylesheet" href="css/liderazgo-premium.css?v=1.1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    </head>
 
 <body>
     <div class="attendance-header">
         <div>
-            <a href="liderazgo.html" class="btn-back-prof"><i class="fas fa-arrow-left"></i> Panel Liderazgo</a>
+            <a href="liderazgo.html" class="btn-back"><i class="fas fa-arrow-left"></i> Panel Liderazgo</a>
         </div>
-        <div style="text-align: center;">
-            <h1 style="margin:0; font-weight:800; color:var(--primary-dark);" id="meet-title">Cargando reunión...</h1>
-            <p style="margin:4px 0 0; color:#64748b;" id="meet-date"></p>
+        <div class="text-center">
+            <h1 id="meet-title" class="color-dark m-0 font-bold">Cargando reunión...</h1>
+            <p id="meet-date" class="color-muted mt-5"></p>
         </div>
         <div>
-            <button onclick="finalizarAsistencia()" class="btn-primary"
-                style="background:var(--primary-sena); width:auto; padding: 12px 24px;">
-                <i class="fas fa-save"></i> Finalizar Llamado
+            <button onclick="generarPDF()" class="btn-primary-p btn-premium"
+                style="width: auto; padding: 12px 24px; background: #ef4444;">
+                <i class="fas fa-file-pdf"></i> PDF
+            </button>
+            <button onclick="finalizarAsistencia()" class="btn-primary-p btn-premium"
+                style="width: auto; padding: 12px 24px; margin-left: 10px;">
+                <i class="fas fa-save"></i> Finalizar
             </button>
         </div>
     </div>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 0 20px;">
+    <div class="container p-20">
         <div class="summary-bar">
             <div class="summary-item">
                 <span class="summary-val" id="count-total">0</span>
@@ -182,11 +64,37 @@
             </div>
         </div>
 
-        <div class="attendance-list" id="list-container">
-            <!-- Items injected by JS -->
-            <div style="text-align:center; padding:3rem; color:#94a3b8;">
-                <i class="fas fa-spinner fa-spin fa-2x"></i>
-                <p>Cargando lista de líderes...</p>
+        <div class="attendance-layout">
+            <!-- Panel de Biometría -->
+            <div class="glass-card p-2rem">
+                <h3 class="color-dark mb-1rem">Escáner Biométrico</h3>
+                <div class="scanner-container">
+                    <div id="sensorIcon" class="scanner-active">
+                        <i class="fas fa-user-shield"
+                            style="font-size: 4rem; color: var(--primary-sena); opacity: 0.2;"></i>
+                        <div class="scan-line"></div>
+                    </div>
+                    <h4 id="scannerStatus" class="color-dark">Buscando Rostro...</h4>
+                    <p class="color-muted mt-10" style="font-size: 0.85rem;">Encuadre el rostro para el registro
+                        automático</p>
+
+                    <div class="mt-2rem pt-20" style="border-top: 1px solid #e2e8f0;">
+                        <label class="form-label">Registro Manual (Doc)</label>
+                        <input type="text" id="manualDoc" class="form-input" placeholder="Presione Enter"
+                            onkeypress="if(event.key === 'Enter') registrarManual()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listado de Asistencia -->
+            <div class="glass-card p-2rem">
+                <h3 class="color-dark mb-1rem">Estado de Asistencia</h3>
+                <div class="attendance-list" id="list-container">
+                    <div class="text-center p-3rem color-muted">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p>Sincronizando líderes...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -196,73 +104,79 @@
         const urlParams = new URLSearchParams(window.location.search);
         const meetingId = urlParams.get('id');
         let leaders = [];
-        let states = {}; // doc -> state
+        let attendance = [];
 
         async function init() {
             if (!meetingId) {
-                alert('ID de reunión no válido');
-                window.location.href = 'liderazgo.html';
+                mostrarNotificacion('ID de reunión no válido', 'error');
+                setTimeout(() => window.location.href = 'liderazgo.html', 1500);
                 return;
             }
             await cargarDatosReunion();
-            await cargarLideres();
+            await cargarLideresYAsistencia();
+
+            // Simular inicio de escáner biométrico
+            setTimeout(() => {
+                document.getElementById('scannerStatus').textContent = 'Listo para leer';
+            }, 1000);
         }
 
         async function cargarDatosReunion() {
             try {
                 const res = await fetch('api/liderazgo.php?action=getReuniones');
-                const data = await res.json();
-                const meet = data.data.find(m => m.id == meetingId);
+                const r = await res.json();
+                const meet = r.data.find(m => m.id == meetingId);
                 if (meet) {
                     document.getElementById('meet-title').textContent = meet.titulo;
-                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora}`;
+                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora} | ${meet.lugar || 'Sede Principal'}`;
                 }
             } catch (e) { console.error(e); }
         }
 
-        async function cargarLideres() {
+        async function cargarLideresYAsistencia() {
             try {
-                // Obtenemos todos los líderes (puedes ajustar el endpoint si necesitas algo más específico)
-                const res = await fetch('api/liderazgo.php?action=getLideres&filtro=todos');
-                const data = await res.json();
-                leaders = data.data;
+                const [resLid, resAsis] = await Promise.all([
+                    fetch('api/liderazgo.php?action=getLideres&filtro=todos'),
+                    fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`)
+                ]);
 
-                // Cargar asistencias ya registradas si existen
-                const resAsis = await fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`);
-                const dataAsis = await resAsis.json();
+                const rLid = await resLid.json();
+                const rAsis = await resAsis.json();
 
-                dataAsis.data.forEach(as => {
-                    states[as.id_aprendiz] = as.estado;
-                });
-
-                renderLista();
-                updateSummary();
+                if (rLid.success) {
+                    leaders = rLid.data;
+                    attendance = rAsis.success ? rAsis.data : [];
+                    renderLista();
+                    updateSummary();
+                }
             } catch (e) { console.error(e); }
         }
 
         function renderLista() {
             const container = document.getElementById('list-container');
+            const asisMap = {};
+            attendance.forEach(a => asisMap[a.id_aprendiz] = a);
+
             container.innerHTML = leaders.map(l => {
-                const state = states[l.documento] || 'pendiente';
+                const hasAsis = asisMap[l.documento];
+                const state = hasAsis ? hasAsis.estado : 'pendiente';
+
                 return `
                 <div class="attendance-item">
                     <div class="item-info">
                         <p class="item-name">${l.nombre} ${l.apellido}</p>
-                        <p class="item-sub">${l.tipo} | Ficha: ${l.detalle}</p>
+                        <p class="item-sub">${l.tipo} | Ficha: ${l.detalle} | ${l.documento}</p>
                     </div>
                     <div class="attendance-controls">
-                        <button class="btn-status ${state === 'asistio' ? 'active-present' : ''}" 
-                                onclick="marcar('${l.documento}', 'asistio', this)">
-                            Presente
-                        </button>
-                        <button class="btn-status ${state === 'ausente' ? 'active-absent' : ''}" 
-                                onclick="marcar('${l.documento}', 'ausente', this)">
-                            Ausente
-                        </button>
-                        <button class="btn-status ${state === 'justificado' ? 'active-excused' : ''}" 
-                                onclick="marcar('${l.documento}', 'justificado', this)">
-                            Excusa
-                        </button>
+                        <span class="status-badge ${state === 'asistio' ? 'status-presente' : (state === 'ausente' ? 'status-ausente' : 'status-espera')}">
+                            ${state === 'asistio' ? '✓ Presente' : (state === 'ausente' ? 'Ausente' : 'Pendiente')}
+                        </span>
+                        <div class="ml-10">
+                            <button class="btn-status ${state === 'asistio' ? 'active-present' : ''}" 
+                                    onclick="marcar('${l.documento}', 'asistio', this)">P</button>
+                            <button class="btn-status ${state === 'ausente' ? 'active-absent' : ''}" 
+                                    onclick="marcar('${l.documento}', 'ausente', this)">A</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -270,46 +184,85 @@
         }
 
         async function marcar(doc, state, btn) {
-            // Optimistic update
-            states[doc] = state;
-            const parent = btn.parentElement;
-            parent.querySelectorAll('.btn-status').forEach(b => b.className = 'btn-status');
-            if (state === 'asistio') btn.classList.add('active-present');
-            if (state === 'ausente') btn.classList.add('active-absent');
-            if (state === 'justificado') btn.classList.add('active-excused');
-
-            updateSummary();
-
-            // API Call
             try {
                 const res = await fetch('api/liderazgo.php?action=registrarAsistencia', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id_reunion: meetingId,
-                        id_aprendiz: doc,
-                        estado: state
-                    })
+                    body: JSON.stringify({ id_reunion: meetingId, id_aprendiz: doc, estado: state })
                 });
                 const result = await res.json();
-                if (result.alerta_fallas) {
-                    mostrarNotificacion(`¡ALERTA! El aprendiz ${doc} ha acumulado 3 fallas. Su rol ha sido revocado automáticamente.`, 'error', 10000);
+                if (result.success) {
+                    if (result.alerta_fallas) {
+                        mostrarNotificacion(`¡ALERTA! El aprendiz ${doc} ha acumulado 3 fallas. Rol revocado.`, 'error', 8000);
+                    }
+                    cargarLideresYAsistencia();
                 }
             } catch (e) { console.error(e); }
         }
 
+        async function registrarManual() {
+            const doc = document.getElementById('manualDoc').value;
+            if (!doc) return;
+            await marcar(doc, 'asistio', null);
+            document.getElementById('manualDoc').value = '';
+
+            // Feedback visual del sensor
+            const sensor = document.getElementById('sensorIcon');
+            sensor.style.background = '#dcfce7';
+            setTimeout(() => sensor.style.background = 'white', 500);
+        }
+
         function updateSummary() {
             const total = leaders.length;
-            const present = Object.values(states).filter(s => s === 'asistio').length;
-            const absent = Object.values(states).filter(s => s === 'ausente').length;
+            const present = attendance.filter(a => a.estado === 'asistio').length;
+            const absent = attendance.filter(a => a.estado === 'ausente').length;
 
             document.getElementById('count-total').textContent = total;
             document.getElementById('count-present').textContent = present;
             document.getElementById('count-absent').textContent = absent;
         }
 
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const title = document.getElementById('meet-title').textContent;
+            const date = document.getElementById('meet-date').textContent;
+
+            doc.setFontSize(18);
+            doc.setTextColor(57, 169, 0);
+            doc.text('Reporte de Asistencia Liderazgo Estudiantil', 14, 20);
+
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Encuentro: ${title}`, 14, 28);
+            doc.text(`Detalles: ${date}`, 14, 34);
+
+            const rows = leaders.map(l => {
+                const asis = attendance.find(a => a.id_aprendiz === l.documento);
+                return [
+                    `${l.nombre} ${l.apellido}`,
+                    l.documento,
+                    l.detalle,
+                    l.tipo,
+                    asis ? asis.estado.toUpperCase() : 'PENDIENTE',
+                    asis ? asis.fecha_registro : '-'
+                ];
+            });
+
+            doc.autoTable({
+                head: [['Nombre', 'Documento', 'Ficha', 'Cargo', 'Estado', 'Fecha/Hora']],
+                body: rows,
+                startY: 40,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 50, 77] }
+            });
+
+            doc.save(`Asistencia_${title.replace(/ /g, '_')}.pdf`);
+        }
+
         function finalizarAsistencia() {
-            mostrarNotificacion('Asistencia guardada correctamente', 'success');
+            mostrarNotificacion('Asistencia finalizada y guardada', 'success');
             setTimeout(() => window.location.href = 'liderazgo.html', 1500);
         }
 
