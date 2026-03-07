@@ -105,27 +105,24 @@
                     <p class="content-description">Administración de fichas de formación</p>
                 </div>
                 <div class="header-actions">
-                    <button onclick="window.location.href='admin-dashboard'" class="btn-primary"
-                        style="background: #00324D; width: auto; padding: 10px 25px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <a href="admin-dashboard" class="btn-back">
                         <i class="fas fa-arrow-left"></i> Volver
-                    </button>
+                    </a>
                 </div>
             </div>
 
             <!-- Filters -->
-            <div class="card" style="margin-bottom: 20px;">
+            <div class="card mb-20">
                 <div class="card-header">
                     <h3 class="card-title">Filtros</h3>
                 </div>
-                <div class="filters-wrapper" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <label class="form-label" style="font-size: 0.8rem; margin-bottom: 5px; display: block;">Buscar
-                            Ficha</label>
+                <div class="filters-wrapper d-flex gap-15 flex-wrap items-end">
+                    <div class="flex-1 min-w-200">
+                        <label class="form-label filter-label-small">Buscar Ficha</label>
                         <input type="text" id="filtroSearch" class="form-control" placeholder="Número de ficha...">
                     </div>
-                    <div style="width: 200px;">
-                        <label class="form-label"
-                            style="font-size: 0.8rem; margin-bottom: 5px; display: block;">Municipio</label>
+                    <div class="f-width-200">
+                        <label class="form-label filter-label-small">Municipio</label>
                         <select id="filtroMunicipio" class="form-control">
                             <option value="">Todos los Municipios</option>
                             <option value="Florencia">Florencia</option>
@@ -146,16 +143,14 @@
                             <option value="Valparaíso">Valparaíso</option>
                         </select>
                     </div>
-                    <div style="width: 250px;">
-                        <label class="form-label"
-                            style="font-size: 0.8rem; margin-bottom: 5px; display: block;">Programa</label>
+                    <div class="f-width-250">
+                        <label class="form-label filter-label-small">Programa</label>
                         <select id="filtroPrograma" class="form-control">
                             <option value="">Todos los Programas</option>
                         </select>
                     </div>
-                    <div style="width: 180px;">
-                        <label class="form-label"
-                            style="font-size: 0.8rem; margin-bottom: 5px; display: block;">Estado</label>
+                    <div class="f-width-180">
+                        <label class="form-label filter-label-small">Estado</label>
                         <select id="filtroEstado" class="form-control">
                             <option value="">Todos los Estados</option>
                         </select>
@@ -165,16 +160,16 @@
 
             <!-- Table -->
             <div class="table-container animate-slide-in">
-                <div class="table-header flex-between" style="padding: 20px; border-bottom: 1px solid #eee;">
-                    <h2 class="table-title" style="margin: 0;">Lista de Fichas</h2>
-                    <div class="table-actions" style="display: flex; gap: 10px;">
-                        <button onclick="nuevaFicha()" class="btn-primary" style="width: auto; padding: 8px 15px;">+
+                <div class="table-header flex-between p-20 pb-eee">
+                    <h2 class="table-title m-0">Lista de Fichas</h2>
+                    <div class="table-actions d-flex gap-10">
+                        <button onclick="nuevaFicha()" class="btn-primary f-width-auto p-15">+
                             Nueva Ficha</button>
-                        <button onclick="exportarFichas()" class="btn-primary"
-                            style="width: auto; padding: 8px 15px; background: #2d8600;">📊 Exportar Excel</button>
+                        <button onclick="exportarFichas()" class="btn-primary f-width-auto p-15 bg-excel">📊 Exportar
+                            Excel</button>
                     </div>
                 </div>
-                <div class="table-wrapper" style="overflow-x: auto;">
+                <div class="table-wrapper overflow-x">
                     <table class="table">
                         <thead class="sticky-thead">
                             <tr>
@@ -183,19 +178,19 @@
                                 <th>TIPO FORMACIÓN</th>
                                 <th>JORNADA</th>
                                 <th>INSTRUCTOR LÍDER</th>
-                                <th style="min-width: 200px;">VOCERO PRINCIPAL</th>
-                                <th style="min-width: 200px;">VOCERO SUPLENTE</th>
+                                <th class="min-w-200">VOCERO PRINCIPAL</th>
+                                <th class="min-w-200">VOCERO SUPLENTE</th>
                                 <th>ESTADO</th>
                             </tr>
                         </thead>
                         <tbody id="tablaFichas">
                             <tr>
-                                <td colspan="5" style="text-align: center;">Cargando datos...</td>
+                                <td colspan="5" class="text-center">Cargando datos...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div id="paginacion" style="padding: 20px; display: flex; justify-content: center;"></div>
+                <div id="paginacion" class="p-20 d-flex justify-center"></div>
             </div>
         </main>
     </div>
@@ -205,15 +200,14 @@
         <div class="modal-content-card">
             <div class="modal-header-flex">
                 <h3 id="modalTitle">Nueva Ficha</h3>
-                <button onclick="cerrarModal()" class="btn-close"
-                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                <button onclick="cerrarModal()" class="btn-close btn-none">&times;</button>
             </div>
             <form id="formFicha" onsubmit="guardarFicha(event)">
                 <div class="form-group">
                     <label for="numeroFicha" class="form-label">Número de Ficha *</label>
                     <input type="number" id="numeroFicha" class="form-control" required>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div class="d-grid grid-3 gap-15">
                     <div class="form-group">
                         <label for="tipoFormacionBase" class="form-label">Nivel *</label>
                         <select id="tipoFormacionBase" class="form-control" required>
@@ -269,11 +263,8 @@
                     <select id="jornada" class="form-control" required>
                         <option value="">Seleccione...</option>
                         <option value="Diurna">Diurna</option>
-                        <option value="Diurna - Cerrado">Diurna - Cerrado</option>
                         <option value="Tarde">Tarde</option>
-                        <option value="Tarde - Cerrado">Tarde - Cerrado</option>
                         <option value="Noche">Noche</option>
-                        <option value="Noche - Cerrado">Noche - Cerrado</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -291,8 +282,7 @@
                     </select>
                 </div>
                 <div class="modal-footer-flex">
-                    <button type="button" onclick="cerrarModal()" class="btn-primary"
-                        style="background: #666;">Cancelar</button>
+                    <button type="button" onclick="cerrarModal()" class="btn-primary btn-cancel">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar</button>
                 </div>
             </form>
