@@ -233,30 +233,32 @@
     <script>
         // ===== GUARD DE ACCESO: Solo Jefe de Bienestar y Director pueden ver este panel =====
         (function () {
-            const raw = localStorage.getItem('senapre_user') || sessionStorage.getItem('senapre_user');
-            if (!raw) { window.location.href = 'index.html'; return; }
-            try {
-                const user = JSON.parse(raw);
-                const areas = user.bienestar_data || [];
-                const rol = (user.rol || '').toLowerCase();
+            // Usar authSystem si está disponible, si no leer localStorage directamente
+            let user = null;
+            if (typeof authSystem !== 'undefined' && authSystem.getCurrentUser) {
+                user = authSystem.getCurrentUser();
+            } else {
+                const raw = localStorage.getItem('user');
+                if (raw) { try { user = JSON.parse(raw); } catch (e) { } }
+            }
 
-                // Si es Responsable de Liderazgo (sin ser Jefe de Bienestar ni Director)
-                const esRespLiderazgo = areas.includes('voceros_y_representantes') && !areas.includes('jefe_bienestar');
-                const esDirector = ['director', 'admin'].includes(rol);
+            if (!user) { window.location.href = 'index.html'; return; }
 
-                if (esRespLiderazgo && !esDirector) {
-                    // Jancy Barreto → solo va a Liderazgo
-                    window.location.replace('liderazgo.html');
-                    return;
-                }
+            const areas = user.bienestar_data || [];
+            const rol = (user.rol || '').toLowerCase();
+            const esDirector = ['director', 'admin'].includes(rol);
+            const esJefeBienestar = areas.includes('jefe_bienestar');
+            const esRespLiderazgo = areas.includes('voceros_y_representantes') && !esJefeBienestar;
 
-                // Si no es Jefe de Bienestar ni Director → no tiene acceso aquí
-                const esJefeBienestar = areas.includes('jefe_bienestar');
-                if (!esJefeBienestar && !esDirector) {
-                    window.location.replace('admin-dashboard.html');
-                }
-            } catch (e) {
-                window.location.href = 'index.html';
+            if (esRespLiderazgo && !esDirector) {
+                // Componente Liderazgo (ej: Jancy) → su panel es liderazgo.html
+                window.location.replace('liderazgo.html');
+                return;
+            }
+
+            if (!esJefeBienestar && !esDirector) {
+                // Otro administrativo sin área de bienestar → dashboard general
+                window.location.replace('admin-dashboard.html');
             }
         })();
     </script>
