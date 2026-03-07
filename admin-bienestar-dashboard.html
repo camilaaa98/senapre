@@ -13,7 +13,7 @@
 
 <body>
     <div class="dashboard-container">
-                                <aside class="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <img src="assets/img/asi.png" alt="ASI Logo" class="logo-principal">
                 <h3>SenApre</h3>
@@ -47,10 +47,13 @@
                     </a>
                     <ul class="submenu " id="submenu-aprendices">
                         <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
-                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
+                        </li>
                         <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
-                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de
+                                Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i>
+                                Inasistencias</a></li>
                         <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
@@ -227,6 +230,36 @@
 
     <script src="js/main.js?v=1.0.6"></script>
     <script src="js/admin/bienestar-dashboard.js?v=1.0.0"></script>
+    <script>
+        // ===== GUARD DE ACCESO: Solo Jefe de Bienestar y Director pueden ver este panel =====
+        (function () {
+            const raw = localStorage.getItem('senapre_user') || sessionStorage.getItem('senapre_user');
+            if (!raw) { window.location.href = 'index.html'; return; }
+            try {
+                const user = JSON.parse(raw);
+                const areas = user.bienestar_data || [];
+                const rol = (user.rol || '').toLowerCase();
+
+                // Si es Responsable de Liderazgo (sin ser Jefe de Bienestar ni Director)
+                const esRespLiderazgo = areas.includes('voceros_y_representantes') && !areas.includes('jefe_bienestar');
+                const esDirector = ['director', 'admin'].includes(rol);
+
+                if (esRespLiderazgo && !esDirector) {
+                    // Jancy Barreto → solo va a Liderazgo
+                    window.location.replace('liderazgo.html');
+                    return;
+                }
+
+                // Si no es Jefe de Bienestar ni Director → no tiene acceso aquí
+                const esJefeBienestar = areas.includes('jefe_bienestar');
+                if (!esJefeBienestar && !esDirector) {
+                    window.location.replace('admin-dashboard.html');
+                }
+            } catch (e) {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
 
 </body>
 
