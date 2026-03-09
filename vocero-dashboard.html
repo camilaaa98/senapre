@@ -171,7 +171,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/main.js?v=1.0.7"></script>
+    <script>
+        // ===== GUARD: Solo voceros autenticados =====
+        (function () {
+            const user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
+                ? authSystem.getCurrentUser()
+                : JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) { window.location.href = 'index.html'; return; }
+            const rol = (user.rol || '').toLowerCase();
+            if (rol !== 'vocero') { window.location.href = 'index.html'; }
+        })();
+    </script>
     <script src="js/vocero/vocero-dashboard.js?v=2.0.0"></script>
 </body>
 

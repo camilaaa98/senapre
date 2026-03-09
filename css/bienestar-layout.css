@@ -1,0 +1,515 @@
+/* ===========================================
+   BIENESTAR-LAYOUT.CSS — v1.0.0
+   Layout del Panel Jefe de Bienestar
+   SOLID, Responsivo, Sin inline
+   =========================================== */
+
+:root {
+    --bien-sidebar-w: 260px;
+    --bien-bg: #f0f4f8;
+    --bien-sb-bg: #003153;
+    --bien-sb-active: #0ea5e9;
+    --bien-sb-hover: rgba(14, 165, 233, 0.12);
+    --bien-sb-text: rgba(255, 255, 255, 0.82);
+    --bien-radius: 16px;
+    --bien-transition: 0.3s ease;
+    --bien-shadow: 0 4px 24px rgba(0, 50, 77, 0.10);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', 'Outfit', sans-serif;
+    background: var(--bien-bg);
+    color: #1e293b;
+    min-height: 100vh;
+}
+
+/* === Contenedor ===================== */
+.bien-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* === Sidebar ======================== */
+.bien-sidebar {
+    width: var(--bien-sidebar-w);
+    background: var(--bien-sb-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform var(--bien-transition);
+    z-index: 200;
+}
+
+.bien-sb-header {
+    padding: 2rem 1.5rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+}
+
+.bien-sb-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: white;
+    padding: 4px;
+    margin-bottom: 0.75rem;
+}
+
+.bien-sb-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+.bien-sb-role {
+    font-size: 0.78rem;
+    color: var(--bien-sb-active);
+    font-weight: 600;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Nav */
+.bien-sb-nav {
+    flex: 1;
+    padding: 1.25rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bien-sb-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: var(--bien-sb-text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all var(--bien-transition);
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.bien-sb-link i {
+    width: 20px;
+    text-align: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.bien-sb-link:hover {
+    background: var(--bien-sb-hover);
+    color: white;
+}
+
+.bien-sb-link.active {
+    background: var(--bien-sb-active);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+}
+
+/* Footer */
+.bien-sb-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bien-sb-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all var(--bien-transition);
+}
+
+.bien-sb-logout:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #fee2e2;
+}
+
+/* === Contenido Principal ============= */
+.bien-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 2rem;
+    overflow-x: hidden;
+}
+
+/* Topbar Móvil */
+.bien-topbar {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    background: white;
+    border-radius: var(--bien-radius);
+    padding: 0.875rem 1.25rem;
+    box-shadow: var(--bien-shadow);
+}
+
+.bien-hamburger {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--bien-sb-bg);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: background var(--bien-transition);
+}
+
+.bien-hamburger:hover {
+    background: #f1f5f9;
+}
+
+.bien-topbar-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--bien-sb-bg);
+    flex: 1;
+}
+
+.bien-topbar-user {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* Overlay */
+.bien-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 199;
+}
+
+.bien-overlay.visible {
+    display: block;
+}
+
+/* === Header Premium ================== */
+.bien-header {
+    background: linear-gradient(135deg, var(--bien-sb-bg), #002040);
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 12px 40px rgba(0, 50, 77, 0.18);
+    position: relative;
+    overflow: hidden;
+}
+
+.bien-header::after {
+    content: "\f4fc";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    font-size: 180px;
+    opacity: 0.04;
+}
+
+.bien-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.bien-header-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(14, 165, 233, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #7dd3fc;
+    flex-shrink: 0;
+}
+
+.bien-header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.bien-header-desc {
+    font-size: 0.9rem;
+    opacity: 0.75;
+}
+
+/* === Accesos Rápidos ================= */
+.bien-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.bien-quick-card {
+    background: white;
+    border-radius: var(--bien-radius);
+    padding: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--bien-shadow);
+    transition: all var(--bien-transition);
+    border: 2px solid transparent;
+}
+
+.bien-quick-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--bien-sb-active);
+    box-shadow: 0 12px 32px rgba(0, 50, 77, 0.1);
+}
+
+.bien-quick-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.bien-quick-card h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.bien-quick-card p {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+/* === Grid de Áreas =================== */
+.bien-areas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 1.25rem;
+}
+
+/* Tarjeta de área */
+.bien-area-card {
+    background: white;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: var(--bien-shadow);
+    border-top: 4px solid var(--area-color, #0ea5e9);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all var(--bien-transition);
+}
+
+.bien-area-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 50, 77, 0.12);
+}
+
+/* Área jefe — especial ancho completo */
+.bien-area-jefe {
+    grid-column: 1 / -1;
+    border-top-color: #0369a1 !important;
+}
+
+.bien-area-jefe-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.bien-area-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.bien-area-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.bien-area-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.bien-area-desc {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.bien-responsable-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    margin-top: 4px;
+}
+
+.bien-responsable-box i {
+    color: var(--area-color, #0ea5e9);
+}
+
+.bien-responsable-box p {
+    font-size: 0.85rem;
+    color: #334155;
+    font-weight: 500;
+    margin: 0;
+}
+
+.bien-area-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* === Botones ========================= */
+.btn-bien {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.55rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all var(--bien-transition);
+    text-decoration: none;
+}
+
+.btn-bien-primary {
+    background: var(--bien-sb-bg);
+    color: white;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-bien-primary:hover {
+    background: #004a73;
+}
+
+.btn-bien-outline {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-bien-outline:hover {
+    background: #e2e8f0;
+}
+
+.bien-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* === Responsive ====================== */
+@media (max-width: 1024px) {
+    .bien-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+    }
+
+    .bien-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .bien-topbar {
+        display: flex;
+    }
+
+    .bien-main {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .bien-areas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bien-quick-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bien-area-jefe-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bien-header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bien-area-actions {
+        flex-direction: column;
+    }
+}
