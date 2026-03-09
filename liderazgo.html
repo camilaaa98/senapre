@@ -130,8 +130,61 @@
 
             <!-- Panel: Tipo de Población -->
             <div class="tab-panel" id="tab-enfoque" role="tabpanel" style="display:none;">
-                <div class="lideres-grid" id="container-enfoque">
-                    <div class="loading-shimmer" style="height:280px;grid-column:1/-1;border-radius:24px;"></div>
+                <!-- Encabezado del Panel -->
+                <div class="pob-header">
+                    <h2 class="pob-title"><i class="fas fa-layer-group"></i> Aprendices por Tipo de Población</h2>
+                    <p class="pob-subtitle">Clasificación de aprendices según enfoque diferencial registrado en el
+                        sistema</p>
+                </div>
+                <!-- Grid de 6 Categorías -->
+                <div class="pob-grid" id="pob-grid-categorias">
+                    <div class="loading-shimmer" style="height:180px;grid-column:1/-1;border-radius:18px;"></div>
+                </div>
+            </div>
+
+            <!-- Modal: Detalle de Categoría de Población -->
+            <div class="modal-overlay" id="modalPoblacion" style="display:none;">
+                <div class="modal-glass modal-wide">
+                    <div class="modal-pob-header">
+                        <div id="modal-pob-icon" class="modal-pob-icon"></div>
+                        <div>
+                            <h2 class="modal-title" id="modal-pob-titulo">Categoría</h2>
+                            <p class="modal-subtitle" id="modal-pob-subtitulo">Listado de aprendices</p>
+                        </div>
+                        <button class="btn-lid btn-lid-cancel" onclick="cerrarModalPoblacion()"
+                            style="margin-left:auto;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="pob-search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="pob-search" class="form-input"
+                            placeholder="Buscar por nombre o documento..." oninput="filtrarTablaPoblacion(this.value)">
+                    </div>
+                    <div class="pob-table-wrap">
+                        <table class="pob-table" id="pob-tabla-detalle">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Ficha</th>
+                                    <th>Estado</th>
+                                    <th>Jornada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pob-tabla-body">
+                                <tr>
+                                    <td colspan="5" class="td-loading">Cargando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-pob-footer">
+                        <span id="modal-pob-total">0 registros</span>
+                        <button class="btn-lid btn-lid-primary" onclick="exportarPDFPoblacion()">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -397,6 +450,117 @@
         }
 
         document.addEventListener('DOMContentLoaded', cargarTodo);
+
+        // ===== TIPO DE POBLACIÓN =====
+        const CATEGORIAS_POB = [
+            { key: 'mujer', label: 'Mujer', desc: 'Aprendices de enfoque de género', icon: 'fas fa-venus', color: '#fce7f3', iconColor: '#be185d' },
+            { key: 'indigena', label: 'Indígena', desc: 'Comunidades y pueblos indígenas', icon: 'fas fa-feather-alt', color: '#fef3c7', iconColor: '#b45309' },
+            { key: 'narp', label: 'NARP', desc: 'Negros, Afro, Raizales y Palenqueros', icon: 'fas fa-globe', color: '#ede9fe', iconColor: '#6d28d9' },
+            { key: 'campesino', label: 'Campesino', desc: 'Comunidades rurales y campesinas', icon: 'fas fa-seedling', color: '#d1fae5', iconColor: '#065f46' },
+            { key: 'lgbtiq', label: 'LGBTIQ+', desc: 'Diversidades de orientación e identidad', icon: 'fas fa-rainbow', color: '#e0f2fe', iconColor: '#0369a1' },
+            { key: 'discapacidad', label: 'Discapacidad', desc: 'Aprendices con condición de discapacidad', icon: 'fas fa-wheelchair', color: '#fee2e2', iconColor: '#b91c1c' }
+        ];
+
+        let datosPoblacionActual = [];
+        let categoriaActual = '';
+
+        async function cargarGridPoblacion() {
+            const grid = document.getElementById('pob-grid-categorias');
+            if (!grid) return;
+            grid.innerHTML = CATEGORIAS_POB.map(c => `
+                <div class="pob-cat-card" onclick="abrirDetallePoblacion('${c.key}','${c.label}','${c.icon}','${c.color}','${c.iconColor}')">
+                    <div class="pob-cat-top">
+                        <div class="pob-cat-icon" style="background:${c.color};color:${c.iconColor};">
+                            <i class="${c.icon}"></i>
+                        </div>
+                        <span class="pob-cat-count" id="cnt-pob-${c.key}">—</span>
+                    </div>
+                    <div>
+                        <div class="pob-cat-name">${c.label}</div>
+                        <div class="pob-cat-desc">${c.desc}</div>
+                    </div>
+                    <div class="pob-cat-action"><i class="fas fa-arrow-right"></i> Ver listado</div>
+                </div>`).join('');
+
+            // Cargar contadores en paralelo
+            await Promise.all(CATEGORIAS_POB.map(async (c) => {
+                try {
+                    const res = await fetch(`api/poblacion.php?categoria=${c.key}`);
+                    const data = await res.json();
+                    const el = document.getElementById(`cnt-pob-${c.key}`);
+                    if (el) el.textContent = data.success ? (data.data || []).length : '0';
+                } catch {
+                    const el = document.getElementById(`cnt-pob-${c.key}`);
+                    if (el) el.textContent = '—';
+                }
+            }));
+        }
+
+        async function abrirDetallePoblacion(key, label, icon, color, iconColor) {
+            categoriaActual = key;
+            const modal = document.getElementById('modalPoblacion');
+            document.getElementById('modal-pob-titulo').textContent = label;
+            document.getElementById('modal-pob-subtitulo').textContent = 'Aprendices clasificados como ' + label;
+            const iconEl = document.getElementById('modal-pob-icon');
+            iconEl.style.background = color;
+            iconEl.style.color = iconColor;
+            iconEl.innerHTML = `<i class="${icon}"></i>`;
+            document.getElementById('pob-search').value = '';
+            document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`api/poblacion.php?categoria=${key}`);
+                const data = await res.json();
+                datosPoblacionActual = data.success ? (data.data || []) : [];
+                renderTablaPoblacion(datosPoblacionActual);
+                document.getElementById('modal-pob-total').textContent = datosPoblacionActual.length + ' registros';
+            } catch {
+                document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading">Error al cargar</td></tr>';
+            }
+        }
+
+        function renderTablaPoblacion(lista) {
+            const tbody = document.getElementById('pob-tabla-body');
+            if (!lista.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="td-loading">No hay aprendices registrados en esta categoría</td></tr>';
+                return;
+            }
+            tbody.innerHTML = lista.map(a => {
+                const estado = (a.estado || '').toLowerCase();
+                const estadoClass = estado.includes('lectiva') ? 'estado-lectiva' : estado.includes('retiro') ? 'estado-retiro' : estado.includes('cancel') ? 'estado-cancelado' : 'estado-otro';
+                return `<tr>
+                    <td><strong>${a.documento || '—'}</strong></td>
+                    <td>${a.nombre || ''} ${a.apellido || ''}</td>
+                    <td>${a.numero_ficha || '—'}</td>
+                    <td><span class="estado-badge ${estadoClass}">${a.estado || 'N/A'}</span></td>
+                    <td>${a.jornada || '—'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filtrarTablaPoblacion(query) {
+            const q = query.toLowerCase();
+            const filtrado = datosPoblacionActual.filter(a =>
+                `${a.nombre} ${a.apellido} ${a.documento}`.toLowerCase().includes(q)
+            );
+            renderTablaPoblacion(filtrado);
+            document.getElementById('modal-pob-total').textContent = filtrado.length + ' registros';
+        }
+
+        function cerrarModalPoblacion() { document.getElementById('modalPoblacion').style.display = 'none'; }
+
+        function exportarPDFPoblacion() { mostrarNotificacion('Función PDF en desarrollo', 'info'); }
+
+        // Cargar grid de población cuando se activa esa pestaña
+        const _switchTabOriginal = switchTab;
+        // Patch para cargar población al primer click
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('tab-btn-enfoque').addEventListener('click', () => {
+                const grid = document.getElementById('pob-grid-categorias');
+                if (grid && !grid.dataset.loaded) { cargarGridPoblacion(); grid.dataset.loaded = '1'; }
+            });
+        });
     </script>
 </body>
 
