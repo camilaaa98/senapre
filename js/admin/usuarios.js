@@ -119,45 +119,48 @@ function mostrarUsuarios(usuarios) {
 
     // Renderizar después de un pequeño delay para que carguen los estados
     setTimeout(() => {
-        tbody.innerHTML = usuarios.map((u, index) => `
-            <tr class="table-row-divider">
-                <td class="td-index">${startIndex + index + 1}</td>
-                <td>${u.nombre || ''} ${u.apellido || ''}</td>
-                <td>${u.correo}</td>
-                <td>${u.telefono || ''}</td>
-                <td><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
-                <td>
-                    <select onchange="cambiarEstadoUsuario('${u.id_usuario}', this.value)" 
-                            class="status-select-user ${esActivo(u.estado) ? 'bg-success-user' : 'bg-error-user'}">
-                        <option value="activo" ${esActivo(u.estado) ? 'selected' : ''}>Activo</option>
-                        <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''}>Inactivo</option>
-                    </select>
-                </td>
-                <td class="text-center">
-                    <div class="flex-center-gap">
-                        <i class="fas fa-${u.tiene_biometria ? 'check-circle' : 'times-circle'} ${u.tiene_biometria ? 'color-success' : 'color-error'}" 
-                           title="${u.tiene_biometria ? 'Biometría registrada' : 'Sin biometría'}"></i>
-                        <button onclick="registrarBiometriaUsuario('${u.id_usuario}')" 
-                                class="btn-icon-custom btn-purple btn-moderate" 
-                                title="Registrar/Actualizar Biometría">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
-                </td>
-                <td class="text-center">
-                    <div class="flex-center-gap">
-                        <button onclick="editarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-blue btn-moderate" 
-                                title="Editar Usuario">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="eliminarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-red btn-moderate" 
-                                title="Eliminar Usuario">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = usuarios.map((u, index) => {
+            const biometriaStatus = u.tiene_biometria 
+                ? `<i class="fas fa-check-circle color-success" title="Biometría registrada" style="margin-right: 5px;"></i>` 
+                : `<i class="fas fa-times-circle color-error" title="Sin biometría" style="margin-right: 5px;"></i>`;
+
+            return `
+                <tr class="table-row-divider">
+                    <td class="td-index">${startIndex + index + 1}</td>
+                    <td>${u.nombre || ''} ${u.apellido || ''}</td>
+                    <td>${u.correo}</td>
+                    <td>${u.telefono || ''}</td>
+                    <td><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
+                    <td>
+                        <select onchange="cambiarEstadoUsuario('${u.id_usuario}', this.value)" 
+                                class="status-select-user ${esActivo(u.estado) ? 'bg-success-user' : 'bg-error-user'}">
+                            <option value="activo" ${esActivo(u.estado) ? 'selected' : ''}>Activo</option>
+                            <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''}>Inactivo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="btn-action-container">
+                            ${biometriaStatus}
+                            <button onclick="registrarBiometriaUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-purple" 
+                                    title="Registrar/Actualizar Biometría">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <button onclick="editarUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-blue" 
+                                    title="Editar Usuario">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="eliminarUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-red" 
+                                    title="Eliminar Usuario">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }, 300);
 }
 

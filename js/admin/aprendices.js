@@ -449,28 +449,30 @@ function mostrarAprendices(aprendices) {
                 <td>${a.celular || a.telefono || ''}</td>
                 ${!esVocero ? `<td><span class="badge badge-ficha">${a.numero_ficha || a.ficha_id || 'N/A'}</span></td>` : ''}
                 <td>${estadoSelect}</td>
-                <td class="text-center action-buttons-wrapper">
+                <td class="btn-action-container">
                     <!-- Botón Biometría (oculto para inactivos) -->
                     ${esInactivo ?
                 `<span class="badge badge-secondary" style="font-size: 0.75rem; padding: 4px 8px;" title="Biometría deshabilitada">
-                            <i class="fas fa-ban"></i> Inactivo
+                            <i class="fas fa-ban"></i>
                         </span>` :
                 (a.tiene_biometria ?
                     `<button onclick="registrarBiometriaAprendiz('${a.documento}')" 
-                                    class="btn-icon-custom btn-green" 
+                                    class="btn-action btn-action-green" 
                                     title="Biometría Registrada - Click para actualizar">
                                 <i class="fas fa-user-check"></i>
                             </button>` :
                     `<button onclick="registrarBiometriaAprendiz('${a.documento}')" 
-                                    class="btn-icon-custom btn-orange" 
+                                    class="btn-action btn-action-purple" 
                                     title="Registrar Biometría">
                                 <i class="fas fa-camera"></i>
                             </button>`)
             }
 
-                    ${btnEditar}
-
-                    <!-- Botón Eliminar REMOVIDO por solicitud -->
+                    <button onclick="editarAprendiz('${a.documento}')" 
+                            class="btn-action btn-action-blue" 
+                            title="Editar Datos">
+                        <i class="fas fa-edit"></i>
+                    </button>
                 </td>
             </tr>
         `;
