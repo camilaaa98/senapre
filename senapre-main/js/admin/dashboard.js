@@ -20,13 +20,15 @@
         return;
     }
 
-    // Si tiene alcance de Liderazgo o Bienestar y NO es director, redirigir
-    if ((esRespLiderazgo || bienestarData.length > 0) && !authSystem.isAdmin()) {
-        if (esRespLiderazgo) {
-            window.location.href = 'admin-bienestar-historico.html';
-        } else {
-            window.location.href = 'admin-bienestar-dashboard.html';
-        }
+    // Si tiene alcance de Liderazgo y NO es director, redirigir directo al módulo premium
+    if (esRespLiderazgo && !authSystem.isAdmin()) {
+        window.location.href = 'liderazgo.html';
+        return;
+    }
+
+    // Otros roles de Bienestar (Jefes de área sin liderazgo)
+    if (bienestarData.length > 0 && !authSystem.isAdmin()) {
+        window.location.href = 'admin-bienestar-dashboard.html';
         return;
     }
 
