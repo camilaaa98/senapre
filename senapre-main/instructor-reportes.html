@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Reportes - SenApre</title>
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <h3>AsistNet</h3>
+                <div class="sidebar-subtitle">Instructor</div>
+            </div>
+            <nav class="sidebar-menu">
+                <li class="menu-item"><a href="instructor-dashboard" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div><span>Panel Principal</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-asistencia" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div><span>Registrar
+                            Asistencia</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-consultar" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div><span>Consultar Asistencias</span>
+                    </a></li>
+                <li class="menu-item"><a href="instructor-reportes" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div><span>Generar Reportes</span>
+                    </a></li>
+                <li class="menu-item"><a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div><span>Cerrar Sesión</span>
+                    </a></li>
+            </nav>
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="content-title">Generación de Reportes</h1>
+                <p class="content-description">Exportar datos de asistencia en múltiples formatos</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Reporte por Ficha</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; align-items: end;">
+                    <div class="form-group">
+                        <label class="form-label">Ficha</label>
+                        <select id="reporteFichaSelect" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha Inicio</label>
+                        <input type="date" id="reporteFechaInicio1" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha Fin</label>
+                        <input type="date" id="reporteFechaFin1" class="form-control">
+                    </div>
+                </div>
+                <div class="card-body-flex" style="justify-content: center; gap: 15px;">
+                    <button onclick="generarReporteFicha('excel')" class="btn-compact btn-excel">
+                        <i class="fas fa-file-excel"></i> Excel
+                    </button>
+                    <button onclick="generarReporteFicha('pdf')" class="btn-compact btn-pdf">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    <button onclick="generarReporteFicha('csv')" class="btn-compact"
+                        style="background: #2563eb; color: white;">
+                        <i class="fas fa-file-csv"></i> CSV
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/instructor/reportes.js"></script>
+
+</body>
+
+</html>
