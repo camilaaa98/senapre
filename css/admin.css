@@ -672,17 +672,68 @@
     font-size: 1.1rem;
 }
 
-/* ── Botones de Acción (Vibrantes) ─────────────────────── */
-.btn-blue {
-    background: #3b82f6 !important;
+/* ── Botones de Acción Premium (Vibrantes) ───────────────── */
+.btn-action-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-red {
-    background: #ef4444 !important;
+.btn-action {
+    width: 42px;
+    height: 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white !important;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn-purple {
-    background: #8b5cf6 !important;
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+}
+
+.btn-action:active {
+    transform: translateY(0);
+}
+
+.btn-action i {
+    pointer-events: none;
+}
+
+.btn-action-purple {
+    background: #8b5cf6 !important; /* Púrpura vibrante */
+}
+
+.btn-action-blue {
+    background: #3b82f6 !important; /* Azul vibrante */
+}
+
+.btn-action-red {
+    background: #ef4444 !important; /* Rojo vibrante */
+}
+
+.btn-action-green {
+    background: #10b981 !important; /* Verde vibrante */
+}
+
+.btn-action-orange {
+    background: #f59e0b !important; /* Naranja vibrante */
+}
+
+.btn-action:disabled {
+    background: #cbd5e1 !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .document-change-note {
