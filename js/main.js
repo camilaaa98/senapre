@@ -113,7 +113,9 @@ class AuthSystem {
             window.location.href = 'admin-bienestar-dashboard.html';
         } else if (areas.includes('voceros_y_representantes')) {
             // Jancy Esperanza Barreto Moreno - Liderazgo
-            window.location.href = 'liderazgo.html';
+            if (!window.location.pathname.includes('liderazgo.html')) {
+                window.location.href = 'liderazgo.html';
+            }
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
         } else if (['director', 'admin'].includes(rol)) {

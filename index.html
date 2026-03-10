@@ -162,9 +162,15 @@
                         // Panel exclusivo de Bienestar del Aprendiz
                         window.location.href = 'bienestar-aprendiz';
                     } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
-                        const isBienestar = data.data.bienestar_data && data.data.bienestar_data.includes('jefe_bienestar');
-                        if (isBienestar && userRol !== 'director') {
+                        const areas = data.data.bienestar_data || [];
+                        const isJefeBienestar = areas.includes('jefe_bienestar');
+                        const isLiderazgo = areas.includes('voceros_y_representantes');
+
+                        if (isJefeBienestar && userRol !== 'director') {
                             window.location.href = 'jefe-bienestar-dashboard';
+                        } else if (isLiderazgo && userRol !== 'director') {
+                            // Redirección directa para evitar parpadeo (Jancy Barreto)
+                            window.location.href = 'liderazgo.html';
                         } else {
                             window.location.href = 'admin-dashboard';
                         }
