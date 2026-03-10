@@ -38,7 +38,7 @@
                     <i class="fas fa-user-tie"></i>
                     <span>Representantes</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="switchTab('enfoque'); closeSidebar();">
+                <a href="liderazgo-poblacion.html" class="lid-sb-link">
                     <i class="fas fa-layer-group"></i>
                     <span>Tipo de Población</span>
                 </a>
@@ -106,9 +106,6 @@
                 <button class="tab-btn" onclick="switchTab('representantes')" role="tab" id="tab-btn-representantes">
                     <i class="fas fa-user-tie"></i> Representantes
                 </button>
-                <button class="tab-btn" onclick="switchTab('enfoque')" role="tab" id="tab-btn-enfoque">
-                    <i class="fas fa-layer-group"></i> Tipo de Población
-                </button>
                 <button class="tab-btn" onclick="switchTab('reuniones')" role="tab" id="tab-btn-reuniones">
                     <i class="fas fa-calendar-check"></i> Reuniones
                 </button>
@@ -128,19 +125,6 @@
                 </div>
             </div>
 
-            <!-- Panel: Tipo de Población -->
-            <div class="tab-panel" id="tab-enfoque" role="tabpanel" style="display:none;">
-                <!-- Encabezado del Panel -->
-                <div class="pob-header">
-                    <h2 class="pob-title"><i class="fas fa-layer-group"></i> Aprendices por Tipo de Población</h2>
-                    <p class="pob-subtitle">Clasificación de aprendices según enfoque diferencial registrado en el
-                        sistema</p>
-                </div>
-                <!-- Grid de 6 Categorías -->
-                <div class="pob-grid" id="pob-grid-categorias">
-                    <div class="loading-shimmer" style="height:180px;grid-column:1/-1;border-radius:18px;"></div>
-                </div>
-            </div>
 
             <!-- Modal: Detalle de Categoría de Población -->
             <div class="modal-overlay" id="modalPoblacion" style="display:none;">
