@@ -57,15 +57,13 @@ try {
 
     // GET - Listar asignaciones
     if ($method === 'GET') {
-        // En PG, id_usuario en la tabla usuarios suele ser numérico (SERIAL/INT)
-        $joinUsuario = $isPg ? "JOIN usuarios u ON a.id_usuario = CAST(u.id_usuario AS TEXT)" : "JOIN usuarios u ON a.id_usuario = u.id_usuario";
-
+        // Usar CAST en ambos lados para máxima compatibilidad entre motores (TEXT vs INT)
         $sql = "SELECT a.*, 
                        u.nombre || ' ' || u.apellido as nombre_instructor,
                        f.nombre_programa,
                        f.jornada
                 FROM asignacion_instructores a
-                $joinUsuario
+                JOIN usuarios u ON CAST(a.id_usuario AS TEXT) = CAST(u.id_usuario AS TEXT)
                 JOIN fichas f ON CAST(a.numero_ficha AS TEXT) = CAST(f.numero_ficha AS TEXT)
                 ORDER BY a.numero_ficha, a.dias_formacion";
         
