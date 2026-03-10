@@ -89,11 +89,11 @@
                 <div class="premium-header-stats" id="header-stats">
                     <div class="premium-stat-chip">
                         <i class="fas fa-users"></i>
-                        <span id="cnt-voceros">—</span> Voceros
+                        <span id="cnt-voceros">0</span> Voceros
                     </div>
                     <div class="premium-stat-chip">
                         <i class="fas fa-calendar-check"></i>
-                        <span id="cnt-reuniones">—</span> Reuniones
+                        <span id="cnt-reuniones">0</span> Reuniones
                     </div>
                 </div>
             </div>
@@ -249,7 +249,7 @@
 
             const areas = user.bienestar_data || [];
             const rol = (user.rol || '').toLowerCase();
-            const esDirector = ['director', 'admin'].includes(rol);
+            const esDirector = ['director', 'admin', 'administrativo'].includes(rol);
             const esLiderazgo = areas.includes('voceros_y_representantes');
 
             if (!esLiderazgo && !esDirector) {
@@ -257,15 +257,14 @@
                 return;
             }
 
-            // Personalizar nombre de usuario en topbar
-            const topbarUser = document.getElementById('lid-topbar-user');
-            if (topbarUser && user.nombre) {
-                topbarUser.textContent = user.nombre + ' ' + (user.apellido || '');
-            }
+            // Sidebar: mostrar "Liderazgo" como componente + nombre completo
             const roleDisplay = document.getElementById('lid-role-display');
-            if (roleDisplay && user.nombre) {
-                roleDisplay.textContent = user.nombre;
+            if (roleDisplay) {
+                roleDisplay.innerHTML = `<strong style="color:#6ee47b;display:block;">Liderazgo</strong><span style="font-size:0.72rem;opacity:0.8;">${(user.nombre || '') + ' ' + (user.apellido || '')}</span>`;
             }
+            // Topbar móvil
+            const topbarUser = document.getElementById('lid-topbar-user');
+            if (topbarUser) topbarUser.textContent = (user.nombre || '') + ' ' + (user.apellido || '');
         })();
     </script>
     <script>
@@ -304,7 +303,6 @@
             await Promise.all([
                 cargarLideres('principales', 'container-voceros', 'cnt-voceros'),
                 cargarLideres('representantes', 'container-representantes'),
-                cargarLideres('enfoque', 'container-enfoque'),
                 cargarReuniones()
             ]);
         }
@@ -451,29 +449,43 @@
 
         document.addEventListener('DOMContentLoaded', cargarTodo);
 
-        // ===== TIPO DE POBLACIÓN =====
+        // ===== TIPO DE POBLACIÓN (Patrón real de aprendices.js) =====
         const CATEGORIAS_POB = [
-            { key: 'mujer', label: 'Mujer', desc: 'Aprendices de enfoque de género', icon: 'fas fa-venus', color: '#fce7f3', iconColor: '#be185d' },
-            { key: 'indigena', label: 'Indígena', desc: 'Comunidades y pueblos indígenas', icon: 'fas fa-feather-alt', color: '#fef3c7', iconColor: '#b45309' },
-            { key: 'narp', label: 'NARP', desc: 'Negros, Afro, Raizales y Palenqueros', icon: 'fas fa-globe', color: '#ede9fe', iconColor: '#6d28d9' },
-            { key: 'campesino', label: 'Campesino', desc: 'Comunidades rurales y campesinas', icon: 'fas fa-seedling', color: '#d1fae5', iconColor: '#065f46' },
-            { key: 'lgbtiq', label: 'LGBTIQ+', desc: 'Diversidades de orientación e identidad', icon: 'fas fa-rainbow', color: '#e0f2fe', iconColor: '#0369a1' },
-            { key: 'discapacidad', label: 'Discapacidad', desc: 'Aprendices con condición de discapacidad', icon: 'fas fa-wheelchair', color: '#fee2e2', iconColor: '#b91c1c' }
+            { key: 'mujer', label: 'Mujer', desc: 'Aprendices de enfoque de género', icon: 'fas fa-venus', bg: '#fce7f3', col: '#be185d' },
+            { key: 'indigena', label: 'Indígena', desc: 'Comunidades y pueblos indígenas', icon: 'fas fa-feather-alt', bg: '#fef3c7', col: '#b45309' },
+            { key: 'narp', label: 'NARP', desc: 'Negros, Afro, Raizales y Palenqueros', icon: 'fas fa-globe', bg: '#ede9fe', col: '#6d28d9' },
+            { key: 'campesino', label: 'Campesino', desc: 'Comunidades rurales y campesinas', icon: 'fas fa-seedling', bg: '#d1fae5', col: '#065f46' },
+            { key: 'lgbtiq', label: 'LGBTIQ+', desc: 'Diversidades de orientación e identidad', icon: 'fas fa-rainbow', bg: '#e0f2fe', col: '#0369a1' },
+            { key: 'discapacidad', label: 'Discapacidad', desc: 'Aprendices con condición de discapacidad', icon: 'fas fa-wheelchair', bg: '#fee2e2', col: '#b91c1c' }
         ];
 
+        let _todosAprendicesPob = null;  // cache de la llamada única
         let datosPoblacionActual = [];
         let categoriaActual = '';
+
+        // Una sola llamada a la API para obtener TODOS los aprendices (igual que aprendices.js)
+        async function getTodosAprendicesPob() {
+            if (_todosAprendicesPob) return _todosAprendicesPob;
+            try {
+                const res = await fetch('api/aprendices.php?limit=-1');
+                const data = await res.json();
+                _todosAprendicesPob = data.success ? (data.data || []) : [];
+            } catch (e) {
+                console.error("Error al obtener aprendices:", e);
+                _todosAprendicesPob = [];
+            }
+            return _todosAprendicesPob;
+        }
 
         async function cargarGridPoblacion() {
             const grid = document.getElementById('pob-grid-categorias');
             if (!grid) return;
+            // Render las tarjetas de inmediato con spinner
             grid.innerHTML = CATEGORIAS_POB.map(c => `
-                <div class="pob-cat-card" onclick="abrirDetallePoblacion('${c.key}','${c.label}','${c.icon}','${c.color}','${c.iconColor}')">
+                <div class="pob-cat-card" onclick="abrirDetallePoblacion('${c.key}','${c.label}','${c.icon}','${c.bg}','${c.col}')">
                     <div class="pob-cat-top">
-                        <div class="pob-cat-icon" style="background:${c.color};color:${c.iconColor};">
-                            <i class="${c.icon}"></i>
-                        </div>
-                        <span class="pob-cat-count" id="cnt-pob-${c.key}">—</span>
+                        <div class="pob-cat-icon" style="background:${c.bg};color:${c.col};"><i class="${c.icon}"></i></div>
+                        <span class="pob-cat-count" id="cnt-pob-${c.key}"><i class="fas fa-spinner fa-spin" style="font-size:1rem;"></i></span>
                     </div>
                     <div>
                         <div class="pob-cat-name">${c.label}</div>
@@ -482,18 +494,20 @@
                     <div class="pob-cat-action"><i class="fas fa-arrow-right"></i> Ver listado</div>
                 </div>`).join('');
 
-            // Cargar contadores en paralelo
-            await Promise.all(CATEGORIAS_POB.map(async (c) => {
-                try {
-                    const res = await fetch(`api/poblacion.php?categoria=${c.key}`);
-                    const data = await res.json();
+            // UNA sola llamada a la API
+            try {
+                const todos = await getTodosAprendicesPob();
+                CATEGORIAS_POB.forEach(c => {
+                    const count = todos.filter(a => a[c.key] == 1).length;
                     const el = document.getElementById(`cnt-pob-${c.key}`);
-                    if (el) el.textContent = data.success ? (data.data || []).length : '0';
-                } catch {
+                    if (el) el.textContent = count;
+                });
+            } catch (e) {
+                CATEGORIAS_POB.forEach(c => {
                     const el = document.getElementById(`cnt-pob-${c.key}`);
                     if (el) el.textContent = '—';
-                }
-            }));
+                });
+            }
         }
 
         async function abrirDetallePoblacion(key, label, icon, color, iconColor) {
@@ -510,39 +524,40 @@
             modal.style.display = 'flex';
 
             try {
-                const res = await fetch(`api/poblacion.php?categoria=${key}`);
-                const data = await res.json();
-                datosPoblacionActual = data.success ? (data.data || []) : [];
+                const todos = await getTodosAprendicesPob();
+                // Filtrar por campo binario (igual que aprendices.js)
+                datosPoblacionActual = todos.filter(a => a[key] == 1);
                 renderTablaPoblacion(datosPoblacionActual);
                 document.getElementById('modal-pob-total').textContent = datosPoblacionActual.length + ' registros';
             } catch {
-                document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading">Error al cargar</td></tr>';
+                document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading">Error al cargar. Revise la conexión.</td></tr>';
             }
         }
 
         function renderTablaPoblacion(lista) {
             const tbody = document.getElementById('pob-tabla-body');
-            if (!lista.length) {
+            if (!lista || !lista.length) {
                 tbody.innerHTML = '<tr><td colspan="5" class="td-loading">No hay aprendices registrados en esta categoría</td></tr>';
                 return;
             }
             tbody.innerHTML = lista.map(a => {
-                const estado = (a.estado || '').toLowerCase();
-                const estadoClass = estado.includes('lectiva') ? 'estado-lectiva' : estado.includes('retiro') ? 'estado-retiro' : estado.includes('cancel') ? 'estado-cancelado' : 'estado-otro';
+                const est = (a.estado || '').toUpperCase();
+                const cls = est === 'LECTIVA' ? 'estado-lectiva' : est.includes('RETIRO') || est.includes('RETIRADO') ? 'estado-retiro' : est.includes('CANCEL') ? 'estado-cancelado' : 'estado-otro';
                 return `<tr>
                     <td><strong>${a.documento || '—'}</strong></td>
                     <td>${a.nombre || ''} ${a.apellido || ''}</td>
                     <td>${a.numero_ficha || '—'}</td>
-                    <td><span class="estado-badge ${estadoClass}">${a.estado || 'N/A'}</span></td>
-                    <td>${a.jornada || '—'}</td>
+                    <td><span class="estado-badge ${cls}">${a.estado || 'N/A'}</span></td>
+                    <td>${a.nombre_programa || a.jornada || '—'}</td>
                 </tr>`;
             }).join('');
         }
 
         function filtrarTablaPoblacion(query) {
-            const q = query.toLowerCase();
+            const q = query.toLowerCase().trim();
+            if (!q) { renderTablaPoblacion(datosPoblacionActual); document.getElementById('modal-pob-total').textContent = datosPoblacionActual.length + ' registros'; return; }
             const filtrado = datosPoblacionActual.filter(a =>
-                `${a.nombre} ${a.apellido} ${a.documento}`.toLowerCase().includes(q)
+                `${a.nombre} ${a.apellido} ${a.documento} ${a.numero_ficha}`.toLowerCase().includes(q)
             );
             renderTablaPoblacion(filtrado);
             document.getElementById('modal-pob-total').textContent = filtrado.length + ' registros';
@@ -552,15 +567,18 @@
 
         function exportarPDFPoblacion() { mostrarNotificacion('Función PDF en desarrollo', 'info'); }
 
-        // Cargar grid de población cuando se activa esa pestaña
+        // Parche para switchTab para cargar población al entrar
         const _switchTabOriginal = switchTab;
-        // Patch para cargar población al primer click
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('tab-btn-enfoque').addEventListener('click', () => {
+        switchTab = function (tab) {
+            _switchTabOriginal(tab);
+            if (tab === 'enfoque') {
                 const grid = document.getElementById('pob-grid-categorias');
-                if (grid && !grid.dataset.loaded) { cargarGridPoblacion(); grid.dataset.loaded = '1'; }
-            });
-        });
+                if (grid && !grid.dataset.loaded) {
+                    cargarGridPoblacion();
+                    grid.dataset.loaded = '1';
+                }
+            }
+        };
     </script>
 </body>
 

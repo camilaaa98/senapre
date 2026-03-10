@@ -513,3 +513,46 @@ body {
         flex-direction: column;
     }
 }
+
+/* === Utilidades de Color === */
+.icon-blue {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.icon-green {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.icon-amber {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.icon-red {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.icon-pink {
+    background: #fdf2f8;
+    color: #f472b6;
+}
+
+.icon-purple {
+    background: #f5f3ff;
+    color: #8b5cf6;
+}
+
+.area-liderazgo {
+    --area-color: #3b82f6;
+}
+
+.user-fullname {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: white;
+    display: inline-block;
+    margin-bottom: 2px;
+}

@@ -316,6 +316,100 @@
 }
 
 /* --- Asistencia y Biometría --- */
+.attendance-header {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--card-shadow);
+}
+
+.attendance-title {
+    color: var(--primary-dark);
+    margin: 0;
+    font-weight: 800;
+    font-family: 'Outfit';
+    font-size: 1.5rem;
+}
+
+.attendance-subtitle {
+    color: #64748b;
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+.attendance-header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-lid-pdf,
+.btn-lid-save {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Outfit';
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+.btn-lid-pdf {
+    background: #ef4444;
+}
+
+.btn-lid-pdf:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+.btn-lid-save {
+    background: var(--primary-dark);
+}
+
+.btn-lid-save:hover {
+    background: #001f2f;
+    transform: translateY(-2px);
+}
+
+.summary-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+}
+
+.summary-val {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    font-family: 'Outfit';
+}
+
+.summary-label {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* --- Asistencia y Biometría --- */
 .scanner-container {
     text-align: center;
     padding: 2.5rem;
@@ -323,6 +417,87 @@
     border-radius: 24px;
     border: 2px dashed #e2e8f0;
     transition: 0.3s;
+}
+
+.scanner-shield-icon {
+    font-size: 4rem;
+    color: var(--primary-sena);
+    opacity: 0.2;
+}
+
+.scanner-status-text {
+    color: var(--primary-dark);
+    margin-top: 1rem;
+    font-weight: 700;
+}
+
+.scanner-hint {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.manual-reg-box {
+    margin-top: 2rem;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.attendance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.attendance-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+}
+
+.item-name {
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 2px;
+}
+
+.item-sub {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.attendance-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-status {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #94a3b8;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.btn-status.active-present {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.btn-status.active-absent {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
 }
 
 .scanner-active {

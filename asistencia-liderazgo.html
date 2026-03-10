@@ -4,28 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toma de Asistencia Liderazgo - SenApre</title>
+    <title>Asistencia Biométrica Liderazgo - SenApre</title>
+    <meta name="description" content="Registro de asistencia biométrica para encuentros de liderazgo estudiantil.">
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/main.css?v=2.1.0">
     <link rel="stylesheet" href="css/admin.css?v=2.1.0">
+    <link rel="stylesheet" href="css/liderazgo-premium.css?v=1.1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Asistencia Biométrica Liderazgo - SenApre</title>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-            rel="stylesheet">
-        <link rel="stylesheet" href="css/main.css?v=2.1.0">
-        <link rel="stylesheet" href="css/admin.css?v=2.1.0">
-        <link rel="stylesheet" href="css/liderazgo-premium.css?v=1.1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    </head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+</head>
 
 <body>
     <div class="attendance-header">
@@ -33,16 +24,14 @@
             <a href="liderazgo.html" class="btn-back"><i class="fas fa-arrow-left"></i> Panel Liderazgo</a>
         </div>
         <div class="text-center">
-            <h1 id="meet-title" class="color-dark m-0 font-bold">Cargando reunión...</h1>
-            <p id="meet-date" class="color-muted mt-5"></p>
+            <h1 id="meet-title" class="attendance-title">Cargando reunión...</h1>
+            <p id="meet-date" class="attendance-subtitle"></p>
         </div>
-        <div>
-            <button onclick="generarPDF()" class="btn-primary-p btn-premium"
-                style="width: auto; padding: 12px 24px; background: #ef4444;">
+        <div class="attendance-header-actions">
+            <button onclick="generarPDF()" class="btn-lid-pdf">
                 <i class="fas fa-file-pdf"></i> PDF
             </button>
-            <button onclick="finalizarAsistencia()" class="btn-primary-p btn-premium"
-                style="width: auto; padding: 12px 24px; margin-left: 10px;">
+            <button onclick="finalizarAsistencia()" class="btn-lid-save">
                 <i class="fas fa-save"></i> Finalizar
             </button>
         </div>
@@ -70,15 +59,13 @@
                 <h3 class="color-dark mb-1rem">Escáner Biométrico</h3>
                 <div class="scanner-container">
                     <div id="sensorIcon" class="scanner-active">
-                        <i class="fas fa-user-shield"
-                            style="font-size: 4rem; color: var(--primary-sena); opacity: 0.2;"></i>
+                        <i class="fas fa-user-shield scanner-shield-icon"></i>
                         <div class="scan-line"></div>
                     </div>
-                    <h4 id="scannerStatus" class="color-dark">Buscando Rostro...</h4>
-                    <p class="color-muted mt-10" style="font-size: 0.85rem;">Encuadre el rostro para el registro
-                        automático</p>
+                    <h4 id="scannerStatus" class="scanner-status-text">Buscando Rostro...</h4>
+                    <p class="scanner-hint">Encuadre el rostro para el registro automático</p>
 
-                    <div class="mt-2rem pt-20" style="border-top: 1px solid #e2e8f0;">
+                    <div class="manual-reg-box">
                         <label class="form-label">Registro Manual (Doc)</label>
                         <input type="text" id="manualDoc" class="form-input" placeholder="Presione Enter"
                             onkeypress="if(event.key === 'Enter') registrarManual()">

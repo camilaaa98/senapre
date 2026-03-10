@@ -87,24 +87,21 @@
             <!-- Accesos Rápidos -->
             <div class="bien-quick-grid">
                 <div class="bien-quick-card" onclick="window.location.href='admin-aprendices.html'">
-                    <div class="bien-quick-icon" style="background:#e0f2fe;color:#0369a1;"><i
-                            class="fas fa-user-graduate"></i></div>
+                    <div class="bien-quick-icon icon-blue"><i class="fas fa-user-graduate"></i></div>
                     <div>
                         <h4>Gestión de Aprendices</h4>
                         <p>Administración completa y estados</p>
                     </div>
                 </div>
                 <div class="bien-quick-card" onclick="window.location.href='admin-reportes.html'">
-                    <div class="bien-quick-icon" style="background:#dcfce7;color:#15803d;"><i
-                            class="fas fa-chart-line"></i></div>
+                    <div class="bien-quick-icon icon-green"><i class="fas fa-chart-line"></i></div>
                     <div>
                         <h4>Reportes Generales</h4>
                         <p>Estadísticas y descargas PDF/Excel</p>
                     </div>
                 </div>
                 <div class="bien-quick-card" onclick="window.location.href='admin-aprendices.html#excusas'">
-                    <div class="bien-quick-icon" style="background:#fef3c7;color:#b45309;"><i
-                            class="fas fa-file-medical-alt"></i></div>
+                    <div class="bien-quick-icon icon-amber"><i class="fas fa-file-medical-alt"></i></div>
                     <div>
                         <h4>Control de Excusas</h4>
                         <p>Validación de soportes médicos</p>
@@ -135,9 +132,8 @@
                 </div>
 
                 <!-- Liderazgo -->
-                <div class="bien-area-card" style="--area-color:#3b82f6;">
-                    <div class="bien-area-icon" style="background:#eff6ff;color:#3b82f6;"><i class="fas fa-crown"></i>
-                    </div>
+                <div class="bien-area-card area-liderazgo">
+                    <div class="bien-area-icon icon-blue"><i class="fas fa-crown"></i></div>
                     <div class="bien-area-title">Liderazgo</div>
                     <div class="bien-area-desc">Gestión de líderes, reuniones masivas y comunicaciones institucionales.
                     </div>
@@ -270,7 +266,9 @@
             const topbarUser = document.getElementById('bien-topbar-user');
             if (topbarUser && user.nombre) topbarUser.textContent = user.nombre + ' ' + (user.apellido || '');
             const roleDisplay = document.getElementById('bien-role-display');
-            if (roleDisplay && user.nombre) roleDisplay.textContent = user.nombre;
+            if (roleDisplay && user.nombre) {
+                roleDisplay.innerHTML = `<span class="user-fullname">${user.nombre} ${user.apellido || ''}</span><br>Jefe de Bienestar`;
+            }
         })();
     </script>
     <script src="js/bienestar/jefe-bienestar-dashboard.js?v=1.0.0"></script>
