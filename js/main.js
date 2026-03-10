@@ -97,27 +97,30 @@ class AuthSystem {
     isAdmin() {
         if (!this.currentUser) return false;
         const rol = (this.currentUser.rol || '').toLowerCase();
-        // Solo Directores y Administradores generales son "Admins" reales para el dashboard central
-        return ['director', 'admin', 'administrador'].includes(rol);
+        // Solo Directores y Administradores generales son "Admins" reales con poder total
+        return ['director', 'admin'].includes(rol);
     }
 
     redirectToDashboard() {
         if (!this.currentUser) return;
         const rol = this.currentUser.rol.toLowerCase();
-
-        // Función interna para ofuscar (cifrado simple solicitado)
-        const encrypt = (path) => btoa(path);
+        const areas = this.currentUser.bienestar_data || [];
 
         if (rol === 'vocero') {
             window.location.href = 'vocero-dashboard';
-        } else if (rol === 'bienestar') {
-            const user = this.currentUser;
-            const esRespLiderazgo = user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes');
-            window.location.href = esRespLiderazgo ? 'admin-bienestar-historico' : 'bienestar-aprendiz';
+        } else if (areas.includes('jefe_bienestar')) {
+            // Erick Johana Yañez Sabaleta - Jefe de Bienestar
+            window.location.href = 'admin-bienestar-dashboard.html';
+        } else if (areas.includes('voceros_y_representantes')) {
+            // Jancy Esperanza Barreto Moreno - Liderazgo
+            window.location.href = 'liderazgo.html';
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
-        } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            window.location.href = 'admin-dashboard';
+        } else if (['director', 'admin'].includes(rol)) {
+            window.location.href = 'admin-dashboard.html';
+        } else {
+            // Otros administrativos o roles de apoyo
+            window.location.href = 'admin-dashboard.html';
         }
     }
 }
@@ -282,13 +285,23 @@ function aplicarRestriccionesDeRol() {
     // Actualizar visualización del rol en el sidebar
     const roleDisplay = document.getElementById('user-role-display');
     if (roleDisplay) {
-        let displayRole = user.rol.charAt(0).toUpperCase() + user.rol.slice(1);
+        let displayRole = 'Usuario';
+        const roleMap = {
+            'director': 'Director de Centro',
+            'administrativo': 'Personal Administrativo',
+            'instructor': 'Instructor SENA',
+            'vocero': 'Vocero Estudiantil',
+            'admin': 'Administrador Sistema'
+        };
+
+        displayRole = roleMap[rol] || displayRole;
+
         if (user.bienestar_data && user.bienestar_data.length > 0) {
             const areaMap = {
                 'jefe_bienestar': 'Jefe de Bienestar',
                 'voceros_y_representantes': 'Liderazgo',
-                'enfermeria': 'Promoción y Prevención de Enfermedades',
-                'socioemocional': 'Socioemocional',
+                'enfermeria': 'Bienestar (Salud)',
+                'socioemocional': 'Bienestar (Socioemocional)',
                 'deporte': 'Bienestar (Deporte)',
                 'arte': 'Bienestar (Cultura)',
                 'apoyos': 'Bienestar (Apoyos)'
@@ -360,10 +373,37 @@ function aplicarRestriccionesDeRol() {
     if ((esJefeBienestar || esRespLiderazgo) && !esDirector) {
         filtrarDashboardParaBienestar(esRespLiderazgo);
         ocultarMenusRestringidos(false, esRespLiderazgo, esDirector);
+    } else if (rol === 'administrativo') {
+        // El administrativo es un cargo de apoyo, no tiene panel de director
+        filtrarDashboardParaAdministrativo();
+        ocultarMenusAdministrativo();
     } else if (esDirector) {
         // Asegurar que el director vea todo el menú
         ocultarMenusRestringidos(false, false, true);
     }
+}
+
+function ocultarMenusAdministrativo() {
+    const menusSensibles = ['menu-usuarios', 'menu-programas', 'menu-asignaciones'];
+    menusSensibles.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+}
+
+function filtrarDashboardParaAdministrativo() {
+    if (!window.location.pathname.includes('admin-dashboard')) return;
+
+    // Ocultar tarjetas de alta gerencia o configuración
+    const idsOcultar = ['dashTotalUsuarios']; // Por ejemplo, no debe gestionar usuarios
+    idsOcultar.forEach(id => {
+        const el = document.getElementById(id);
+        const card = el?.closest('.stat-card');
+        if (card) card.style.display = 'none';
+    });
+
+    const title = document.querySelector('.content-title');
+    if (title) title.textContent = 'Panel de Apoyo Administrativo';
 }
 
 function filtrarDashboardParaVocero(scope) {
@@ -512,27 +552,21 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
         if (esDirector) permitido = true;
 
         if (esRespLiderazgo) {
-            const academicKeywords = ['aprendices', 'fichas', 'programas', 'asignar', 'asistencias', 'reportes', 'usuarios'];
-            const isAcademic = academicKeywords.some(key => text.includes(key));
+            // Responsable de Liderazgo (Jancy Barreto) tiene acceso muy limitado
+            const keywordsLiderazgo = ['bienestar', 'liderazgo', 'cerrar sesión'];
+            permitido = keywordsLiderazgo.some(key => text.includes(key));
 
-            // Permitir solo Liderazgo (antes Bienestar) y Cerrar Sesión
-            permitido = text.includes('bienestar') || text.includes('liderazgo') || text.includes('cerrar sesión');
-
-            // Rebranding dinámico de Bienestar a Liderazgo
+            // Rebranding dinámico de Bienestar a Liderazgo si no es Director
             if (text.includes('bienestar')) {
                 const span = item.querySelector('span');
                 if (span) span.textContent = 'Liderazgo Estudiantil';
                 const link = item.querySelector('a');
-                if (link && !link.href.includes('bienestar-dashboard')) {
-                    link.href = 'bienestar-dashboard';
-                }
+                if (link) link.href = 'liderazgo.html';
             }
 
-            // Si es académico, se oculta explícitamente
-            if (isAcademic && !text.includes('bienestar') && !text.includes('liderazgo')) permitido = false;
-
-            // Ocultar el Dashboard Administrativo
-            if (text === 'dashboard') permitido = false;
+            // Ocultar explícitamente menús administrativos para Liderazgo
+            const adminKeywords = ['usuarios', 'programas', 'fichas', 'asignar', 'asistencias', 'reportes', 'dashboard'];
+            if (adminKeywords.some(key => text.includes(key))) permitido = false;
         }
 
         if (!permitido) {

@@ -214,23 +214,36 @@
     background: #00324D;
 }
 
-/* ── Botón volver ─────────────────────────────────────────── */
-.btn-volver {
-    display: none;
-    margin-bottom: 20px;
+/* ── Botón volver (Estandarizado) ─────────────────────────── */
+.btn-back-container {
+    margin-bottom: 25px;
 }
 
-.btn-volver button {
+.btn-back {
     background: #64748b;
-    color: white;
+    color: white !important;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    transition: all 0.2s;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    background: #475569;
+    transform: translateX(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back i {
+    font-size: 0.8rem;
 }
 
 /* ── Panel estadísticas de población ──────────────────────── */
@@ -332,6 +345,127 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* ── Clases Auxiliares para Refactorización (SOLID) ──────── */
+.filter-label-small {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.f-width-180 {
+    width: 180px;
+}
+
+.f-width-220 {
+    width: 220px;
+}
+
+.f-width-auto {
+    width: auto;
+}
+
+.p-20 {
+    padding: 20px;
+}
+
+.p-15 {
+    padding: 8px 15px;
+}
+
+.pb-eee {
+    border-bottom: 1px solid #eee;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.mt-2rem {
+    margin-top: 2rem;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.d-grid {
+    display: grid;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-15 {
+    gap: 15px;
+}
+
+.gap-20 {
+    gap: 20px;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-1-2 {
+    grid-template-columns: 1fr 2fr;
+}
+
+.bg-excel {
+    background: #2d8600 !important;
+}
+
+.overflow-x {
+    overflow-x: auto;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.min-w-200 {
+    min-width: 200px;
+}
+
+.f-width-200 {
+    width: 200px;
+}
+
+.f-width-250 {
+    width: 250px;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.btn-none {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #64748b !important;
 }
 
 /* ── Clases para Voceros (Separación de Estilos) ─────────── */

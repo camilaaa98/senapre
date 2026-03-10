@@ -161,31 +161,28 @@ try {
         if ($action === 'saveReunion') {
             if (empty($data['titulo']) || empty($data['fecha'])) throw new Exception('Datos incompletos');
             
-            // Verificar si la columna 'hora' existe en bienestar_reuniones (PostgreSQL en Render puede variar)
-            $sql = "INSERT INTO bienestar_reuniones (titulo, fecha) VALUES (:t, :f)";
-            // Intentamos incluir hora si no falla, o concatenamos a la fecha si es necesario
-            // Por ahora, para resolver el error inmediato, omitimos la columna 'hora' si el error persiste
-            // Pero lo ideal es ajustar el INSERT para que sea robusto
+            // Intentamos insertar con todos los campos (Titulo, Fecha, Hora, Lugar)
+            $sql = "INSERT INTO bienestar_reuniones (titulo, fecha, hora, lugar) 
+                    VALUES (:t, :f, :h, :l)";
+            
             try {
-                $sqlHora = "INSERT INTO bienestar_reuniones (titulo, fecha, hora) VALUES (:t, :f, :h)";
-                $stmt = $conn->prepare($sqlHora);
+                $stmt = $conn->prepare($sql);
                 $stmt->execute([
                     ':t' => $data['titulo'],
                     ':f' => $data['fecha'],
-                    ':h' => $data['hora'] ?? '08:00'
+                    ':h' => $data['hora'] ?? '08:00',
+                    ':l' => $data['lugar'] ?? 'SENA'
                 ]);
             } catch (Exception $e) {
-                // Si falla por la columna hora, insertamos solo titulo y fecha
+                // Fallback si las columnas hora o lugar no existen en producción aún
                 $stmt = $conn->prepare("INSERT INTO bienestar_reuniones (titulo, fecha) VALUES (:t, :f)");
                 $stmt->execute([
                     ':t' => $data['titulo'],
                     ':f' => $data['fecha']
                 ]);
             }
+            
             $idReunion = $conn->lastInsertId();
-
-            // Lógica de notificaciones - En producción esto dispararía workers o servicios externos
-            // Por ahora registramos el éxito del proceso
             echo json_encode(['success' => true, 'message' => 'Reunión creada', 'id' => $idReunion]);
             exit;
         }

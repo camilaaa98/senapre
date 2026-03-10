@@ -40,6 +40,7 @@ try {
         $programa = isset($_GET['programa']) ? $_GET['programa'] : '';
         $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
         $jornada = isset($_GET['jornada']) ? $_GET['jornada'] : '';
+        $municipio = isset($_GET['municipio']) ? $_GET['municipio'] : '';
         
         // Construir query con filtros
         $where = [];
@@ -63,6 +64,11 @@ try {
         if (!empty($jornada)) {
             $where[] = "f.jornada = :jornada";
             $params[':jornada'] = $jornada;
+        }
+        
+        if (!empty($municipio)) {
+            $where[] = "f.municipio = :municipio";
+            $params[':municipio'] = $municipio;
         }
         
         $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -147,13 +153,16 @@ try {
                 if (!in_array('vocero_suplente', $existingCols)) {
                     $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_suplente TEXT");
                 }
+                if (!in_array('municipio', $existingCols)) {
+                    $conn->exec("ALTER TABLE fichas ADD COLUMN municipio TEXT DEFAULT 'Florencia'");
+                }
             }
         } catch (Exception $e) {
             // Ignorar en producción o si falla
         }
         
-        $sql = "INSERT INTO fichas (numero_ficha, nombre_programa, jornada, estado, instructor_lider, tipoFormacion) 
-                VALUES (:numero, :programa, :jornada, :estado, :instructor, :tipo)";
+        $sql = "INSERT INTO fichas (numero_ficha, nombre_programa, jornada, estado, instructor_lider, tipoFormacion, municipio) 
+                VALUES (:numero, :programa, :jornada, :estado, :instructor, :tipo, :municipio)";
         
         $stmt = $conn->prepare($sql);
         $stmt->execute([
@@ -162,7 +171,8 @@ try {
             ':jornada' => $data['jornada'] ?? 'Diurna',
             ':estado' => $data['estado'] ?? 'Activa',
             ':instructor' => $data['instructor_lider'] ?? null,
-            ':tipo' => $data['tipoFormacion'] ?? null
+            ':tipo' => $data['tipoFormacion'] ?? null,
+            ':municipio' => $data['municipio'] ?? 'Florencia'
         ]);
         
         echo json_encode([
@@ -230,6 +240,10 @@ try {
         if (array_key_exists('tipoFormacion', $data)) {
             $fields[] = "tipoFormacion = :tipo";
             $params[':tipo'] = $data['tipoFormacion'];
+        }
+        if (array_key_exists('municipio', $data)) {
+            $fields[] = "municipio = :municipio";
+            $params[':municipio'] = $data['municipio'];
         }
 
         if (empty($fields)) {

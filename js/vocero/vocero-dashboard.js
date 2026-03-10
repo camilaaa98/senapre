@@ -97,8 +97,8 @@ const VoceroDashboard = (() => {
         $('st-lectiva', resumen['LECTIVA'] || 0);
         $('st-cancelado', resumen['CANCELADO'] || 0);
         $('st-retirado', resumen['RETIRADO'] || 0);
-        const otros = total - (resumen['LECTIVA'] || 0) - (resumen['CANCELADO'] || 0) - (resumen['RETIRADO'] || 0);
-        $('st-otros', Math.max(0, otros));
+        // Mostrar conteo específico de Traslado en lugar de "otros" genérico
+        $('st-traslado', resumen['TRASLADO'] || 0);
     }
 
     // ────────────────────────────────────────────────────────────

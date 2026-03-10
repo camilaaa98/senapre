@@ -20,17 +20,28 @@
         return;
     }
 
-    // Si tiene alcance de Liderazgo o Bienestar y NO es director, redirigir
-    if ((esRespLiderazgo || bienestarData.length > 0) && !authSystem.isAdmin()) {
-        if (esRespLiderazgo) {
-            window.location.href = 'admin-bienestar-historico.html';
-        } else {
-            window.location.href = 'admin-bienestar-dashboard.html';
-        }
+    // Si accede con rol de Liderazgo (Jancy) → su único panel es liderazgo.html
+    if (esRespLiderazgo && !authSystem.isAdmin()) {
+        window.location.href = 'liderazgo.html';
         return;
     }
 
-    if (typeof authSystem !== 'undefined' && !authSystem.isAdmin()) {
+    // Si accede con rol de Jefe de Bienestar (Erick) pero no Director → panel bienestar
+    const esJefeBienestar = bienestarData.includes('jefe_bienestar');
+    if (esJefeBienestar && !authSystem.isAdmin()) {
+        window.location.href = 'admin-bienestar-dashboard.html';
+        return;
+    }
+
+    // Si tiene cualquier otra área de bienestar (sin ser director) → panel bienestar
+    if (bienestarData.length > 0 && !authSystem.isAdmin()) {
+        window.location.href = 'admin-bienestar-dashboard.html';
+        return;
+    }
+
+    // Permitir acceso a roles directivos y de apoyo administrativo
+    const rolesDash = ['director', 'admin', 'administrativo', 'coordinador'];
+    if (!rolesDash.includes(rol)) {
         window.location.href = 'index.html';
         return;
     }
