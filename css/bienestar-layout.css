@@ -385,6 +385,16 @@ body {
     flex-shrink: 0;
 }
 
+.bien-area-jefe .bien-area-icon {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 1.75rem !important;
+}
+
+.bien-area-jefe .bien-area-title {
+    font-size: 1.3rem !important;
+}
+
 .bien-area-title {
     font-size: 1rem;
     font-weight: 800;
@@ -514,6 +524,11 @@ body {
     }
 }
 
+/* === Utilidades de Espaciado === */
+.mb-25 {
+    margin-bottom: 25px !important;
+}
+
 /* === Utilidades de Color === */
 .icon-blue {
     background: #e0f2fe;
@@ -547,6 +562,26 @@ body {
 
 .area-liderazgo {
     --area-color: #3b82f6;
+}
+
+.area-salud {
+    --area-color: #ef4444;
+}
+
+.area-socioemocional {
+    --area-color: #f472b6;
+}
+
+.area-deporte {
+    --area-color: #f59e0b;
+}
+
+.area-cultura {
+    --area-color: #8b5cf6;
+}
+
+.area-apoyos {
+    --area-color: #10b981;
 }
 
 .user-fullname {
