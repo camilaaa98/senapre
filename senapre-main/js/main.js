@@ -112,12 +112,25 @@ class AuthSystem {
             window.location.href = 'vocero-dashboard';
         } else if (rol === 'bienestar') {
             const user = this.currentUser;
-            const esRespLiderazgo = user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes');
-            window.location.href = esRespLiderazgo ? 'admin-bienestar-historico' : 'bienestar-aprendiz';
+            const areas = user.bienestar_data || [];
+            if (areas.includes('voceros_y_representantes')) {
+                window.location.href = 'liderazgo.html';
+            } else if (areas.includes('jefe_bienestar')) {
+                window.location.href = 'jefe-bienestar-dashboard';
+            } else {
+                window.location.href = 'bienestar-aprendiz';
+            }
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
         } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            window.location.href = 'admin-dashboard';
+            const user = this.currentUser;
+            const areas = user.bienestar_data || [];
+            // Prioridad absoluta a Liderazgo para evitar selector de roles/dashboards intermedios
+            if (areas.includes('voceros_y_representantes') && rol !== 'director') {
+                window.location.href = 'liderazgo.html';
+            } else {
+                window.location.href = 'admin-dashboard';
+            }
         }
     }
 }
