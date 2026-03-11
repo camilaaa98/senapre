@@ -5,565 +5,230 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liderazgo Estudiantil - SenApre</title>
-    <meta name="description" content="Panel de Liderazgo Estudiantil SenApre. Gestión de voceros, reuniones y líderes.">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
     <link rel="stylesheet" href="css/liderazgo-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
 </head>
 
 <body>
     <div class="lid-container">
-
-        <!-- ===== SIDEBAR PROPIO DEL COMPONENTE LIDERAZGO ===== -->
+        <!-- SIDEBAR -->
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
                 <img src="assets/img/asi.png" alt="SenApre" class="lid-sb-logo">
                 <div class="lid-sb-brand">SenApre</div>
-                <div class="lid-sb-role" id="lid-role-display">Liderazgo Estudiantil</div>
+                <div class="lid-sb-role" id="lid-role-display">Liderazgo</div>
             </div>
-
             <nav class="lid-sb-nav">
                 <a href="liderazgo.html" class="lid-sb-link active">
-                    <i class="fas fa-th-large"></i>
-                    <span>Panel Principal</span>
+                    <i class="fas fa-th-large"></i><span>Panel Principal</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="switchTab('voceros'); closeSidebar();">
-                    <i class="fas fa-users"></i>
-                    <span>Voceros</span>
+                <a href="#" class="lid-sb-link" onclick="LiderazgoUI.switchTab('voceros');">
+                    <i class="fas fa-users"></i><span>Voceros</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="switchTab('representantes'); closeSidebar();">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Representantes</span>
+                <a href="#" class="lid-sb-link" onclick="LiderazgoUI.switchTab('representantes');">
+                    <i class="fas fa-user-tie"></i><span>Representantes</span>
                 </a>
                 <a href="liderazgo-poblacion.html" class="lid-sb-link">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Tipo de Población</span>
+                    <i class="fas fa-layer-group"></i><span>Tipo de Población</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="switchTab('reuniones'); closeSidebar();">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reuniones</span>
+                <a href="#" class="lid-sb-link" onclick="LiderazgoUI.switchTab('reuniones');">
+                    <i class="fas fa-calendar-check"></i><span>Reuniones</span>
                 </a>
                 <a href="asistencia-liderazgo.html" class="lid-sb-link">
-                    <i class="fas fa-clipboard-user"></i>
-                    <span>Asistencia</span>
+                    <i class="fas fa-clipboard-user"></i><span>Asistencia</span>
                 </a>
             </nav>
-
             <div class="lid-sb-footer">
                 <button class="lid-sb-logout" onclick="authSystem.logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Cerrar Sesión</span>
+                    <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
                 </button>
             </div>
         </aside>
 
-        <!-- Overlay móvil -->
-        <div class="lid-overlay" id="lid-overlay" onclick="closeSidebar()"></div>
-
-        <!-- ===== CONTENIDO PRINCIPAL ===== -->
+        <!-- MAIN -->
         <main class="lid-main">
-            <!-- Topbar Móvil -->
             <header class="lid-topbar">
-                <button class="lid-hamburger" id="lid-hamburger" onclick="openSidebar()">
+                <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
                     <i class="fas fa-bars"></i>
                 </button>
                 <span class="lid-topbar-title">Liderazgo Estudiantil</span>
                 <div class="lid-topbar-user" id="lid-topbar-user"></div>
             </header>
 
-            <!-- Header Premium -->
             <div class="premium-header">
                 <div class="premium-header-content">
-                    <div class="premium-header-icon">
-                        <i class="fas fa-crown"></i>
-                    </div>
+                    <div class="premium-header-icon"><i class="fas fa-crown"></i></div>
                     <div>
                         <h1 class="premium-header-title">Liderazgo Estudiantil</h1>
-                        <p class="premium-header-desc">Gestión de voceros, representantes y reuniones institucionales
-                        </p>
+                        <p class="premium-header-desc">Gestión integral de vocería y bienestar institucional</p>
                     </div>
                 </div>
-                <div class="premium-header-stats" id="header-stats">
-                    <div class="premium-stat-chip">
-                        <i class="fas fa-users"></i>
-                        <span id="cnt-voceros">0</span> Voceros
-                    </div>
-                    <div class="premium-stat-chip">
-                        <i class="fas fa-calendar-check"></i>
-                        <span id="cnt-reuniones">0</span> Reuniones
-                    </div>
+                <div class="premium-header-stats">
+                    <div class="premium-stat-chip"><i class="fas fa-users"></i> <span id="cnt-voceros">0</span> Voceros</div>
+                    <div class="premium-stat-chip"><i class="fas fa-calendar-check"></i> <span id="cnt-reuniones">0</span> Reuniones</div>
                 </div>
             </div>
 
-            <!-- Tabs de Navegación -->
-            <div class="tabs-premium" id="tabs-nav" role="tablist">
-                <button class="tab-btn active" onclick="switchTab('voceros')" role="tab" id="tab-btn-voceros">
-                    <i class="fas fa-users"></i> Voceros Principales
+            <!-- Tabs Segmentadas -->
+            <div class="tabs-premium" id="tabs-nav">
+                <button class="tab-btn active" id="tab-btn-voceros" onclick="LiderazgoUI.switchTab('voceros')">
+                    <i class="fas fa-user-shield"></i> Principales
                 </button>
-                <button class="tab-btn" onclick="switchTab('representantes')" role="tab" id="tab-btn-representantes">
+                <button class="tab-btn" id="tab-btn-suplentes" onclick="LiderazgoUI.switchTab('suplentes')">
+                    <i class="fas fa-user-friends"></i> Suplentes
+                </button>
+                <button class="tab-btn" id="tab-btn-enfoque" onclick="LiderazgoUI.switchTab('enfoque')">
+                    <i class="fas fa-feather-alt"></i> Enfoque Diferencial
+                </button>
+                <button class="tab-btn" id="tab-btn-representantes" onclick="LiderazgoUI.switchTab('representantes')">
                     <i class="fas fa-user-tie"></i> Representantes
                 </button>
-                <button class="tab-btn" onclick="switchTab('reuniones')" role="tab" id="tab-btn-reuniones">
-                    <i class="fas fa-calendar-check"></i> Reuniones
+                <button class="tab-btn" id="tab-btn-reuniones" onclick="LiderazgoUI.switchTab('reuniones')">
+                    <i class="fas fa-calendar-alt"></i> Reuniones
                 </button>
             </div>
 
-            <!-- Panel: Voceros -->
-            <div class="tab-panel" id="tab-voceros" role="tabpanel">
-                <div class="lideres-grid" id="container-voceros">
-                    <div class="loading-shimmer" style="height:280px;grid-column:1/-1;border-radius:24px;"></div>
-                </div>
+            <!-- Paneles -->
+            <div class="tab-panel" id="tab-voceros">
+                <div class="lideres-grid" id="container-voceros"></div>
             </div>
-
-            <!-- Panel: Representantes -->
-            <div class="tab-panel" id="tab-representantes" role="tabpanel" style="display:none;">
-                <div class="lideres-grid" id="container-representantes">
-                    <div class="loading-shimmer" style="height:280px;grid-column:1/-1;border-radius:24px;"></div>
-                </div>
+            <div class="tab-panel" id="tab-suplentes" style="display:none;">
+                <div class="lideres-grid" id="container-voceros-suplentes"></div>
             </div>
-
-
-            <!-- Modal: Detalle de Categoría de Población -->
-            <div class="modal-overlay" id="modalPoblacion" style="display:none;">
-                <div class="modal-glass modal-wide">
-                    <div class="modal-pob-header">
-                        <div id="modal-pob-icon" class="modal-pob-icon"></div>
-                        <div>
-                            <h2 class="modal-title" id="modal-pob-titulo">Categoría</h2>
-                            <p class="modal-subtitle" id="modal-pob-subtitulo">Listado de aprendices</p>
-                        </div>
-                        <button class="btn-lid btn-lid-cancel" onclick="cerrarModalPoblacion()"
-                            style="margin-left:auto;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="pob-search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="pob-search" class="form-input"
-                            placeholder="Buscar por nombre o documento..." oninput="filtrarTablaPoblacion(this.value)">
-                    </div>
-                    <div class="pob-table-wrap">
-                        <table class="pob-table" id="pob-tabla-detalle">
-                            <thead>
-                                <tr>
-                                    <th>Documento</th>
-                                    <th>Nombre Completo</th>
-                                    <th>Ficha</th>
-                                    <th>Estado</th>
-                                    <th>Jornada</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pob-tabla-body">
-                                <tr>
-                                    <td colspan="5" class="td-loading">Cargando...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-pob-footer">
-                        <span id="modal-pob-total">0 registros</span>
-                        <button class="btn-lid btn-lid-primary" onclick="exportarPDFPoblacion()">
-                            <i class="fas fa-file-pdf"></i> Exportar PDF
-                        </button>
-                    </div>
-                </div>
+            <div class="tab-panel" id="tab-enfoque" style="display:none;">
+                <div class="lideres-grid" id="container-enfoque"></div>
             </div>
-
-            <!-- Panel: Reuniones -->
-            <div class="tab-panel" id="tab-reuniones" role="tabpanel" style="display:none;">
-                <div class="reunion-grid" id="container-reuniones">
-                    <div class="loading-shimmer" style="height:280px;grid-column:1/-1;border-radius:24px;"></div>
-                </div>
+            <div class="tab-panel" id="tab-representantes" style="display:none;">
+                <div class="lideres-grid" id="container-representantes"></div>
+            </div>
+            <div class="tab-panel" id="tab-reuniones" style="display:none;">
+                <div class="reunion-grid" id="container-reuniones"></div>
             </div>
         </main>
     </div>
 
-    <!-- FAB Nueva Reunión -->
-    <button class="lid-fab" id="fab-reunion" onclick="abrirModalReunion()" title="Programar Reunión"
-        style="display:none;">
+    <!-- FAB -->
+    <button class="lid-fab" id="fab-reunion" style="display:none;" onclick="LiderazgoUI.abrirModalReunion()">
         <i class="fas fa-plus"></i>
     </button>
 
-    <!-- Modal: Nueva Reunión -->
-    <div class="modal-overlay" id="modalReunion" style="display:none;">
+    <!-- Modales -->
+    <div class="modal-overlay" id="modalEditLider" style="display:none;">
         <div class="modal-glass">
-            <h2 class="modal-title">Programar Reunión</h2>
-            <p class="modal-subtitle">Nueva sesión masiva con líderes estudiantiles.</p>
-            <form id="formReunion">
+            <h2 class="modal-title">Editar Líder</h2>
+            <form id="formEditLider">
+                <input type="hidden" id="edit-doc">
                 <div class="form-group">
-                    <label class="form-label">Título del Encuentro</label>
-                    <input type="text" id="tituloReunion" class="form-input" placeholder="Ej: Comité General de Voceros"
-                        required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" id="fechaReunion" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Hora</label>
-                        <input type="time" id="horaReunion" class="form-input" required>
-                    </div>
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="edit-correo" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Lugar o Enlace Virtual</label>
-                    <input type="text" id="lugarReunion" class="form-input" placeholder="Ej: Auditorio Bloque A">
+                    <label>Teléfono / Celular</label>
+                    <input type="text" id="edit-tel" class="form-input" required>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="cerrarModal()" class="btn-lid btn-lid-cancel">Descartar</button>
-                    <button type="submit" class="btn-lid btn-lid-primary">Registrar Reunión</button>
+                    <button type="button" onclick="document.getElementById('modalEditLider').style.display='none'" class="btn-lid btn-lid-cancel">Cancelar</button>
+                    <button type="submit" class="btn-lid btn-lid-primary">Actualizar Datos</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- main.js PRIMERO (define authSystem) -->
-    <script src="js/main.js?v=1.0.7"></script>
+    <!-- Scripts (SOLID Order) -->
+    <script src="js/main.js"></script>
+    <script src="js/liderazgo/liderazgo-data.js"></script>
+    <script src="js/liderazgo/liderazgo-ui.js"></script>
     <script>
-        // ===== GUARD DE ACCESO =====
-        (function () {
-            const user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
-                ? authSystem.getCurrentUser()
-                : JSON.parse(localStorage.getItem('user') || 'null');
+        // Init Logic
+        LiderazgoUI.init();
+        
+        async function cargarLiderazgo() {
+            // Cargar inicial (Principales)
+            const principales = await LiderazgoData.fetchLideres('principales');
+            LiderazgoUI.renderLideres(principales, 'container-voceros', 1, 'Principales');
+            document.getElementById('cnt-voceros').textContent = principales.length;
 
-            if (!user) { window.location.href = 'index.html'; return; }
+            // Carga diferida de otros para cache
+            LiderazgoData.fetchLideres('suplentes');
+            LiderazgoData.fetchLideres('enfoque');
+            LiderazgoData.fetchLideres('representantes');
+            
+            const reuniones = await LiderazgoData.fetchReuniones();
+            document.getElementById('cnt-reuniones').textContent = reuniones.length;
+        }
 
-            const areas = user.bienestar_data || [];
-            const rol = (user.rol || '').toLowerCase();
-            const esDirector = ['director', 'admin', 'administrativo'].includes(rol);
-            const esLiderazgo = areas.includes('voceros_y_representantes');
-
-            if (!esLiderazgo && !esDirector) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // Sidebar: mostrar "Liderazgo" como componente + nombre completo
-            const roleDisplay = document.getElementById('lid-role-display');
-            if (roleDisplay) {
-                roleDisplay.innerHTML = `<strong style="color:#6ee47b;display:block;">Liderazgo</strong><span style="font-size:0.72rem;opacity:0.8;">${(user.nombre || '') + ' ' + (user.apellido || '')}</span>`;
-            }
-            // Topbar móvil
-            const topbarUser = document.getElementById('lid-topbar-user');
-            if (topbarUser) topbarUser.textContent = (user.nombre || '') + ' ' + (user.apellido || '');
-        })();
-    </script>
-    <script>
-        // ===== LÓGICA PRINCIPAL DE LIDERAZGO =====
-        let currentTab = 'voceros';
-
-        // Navegación entre pestañas
-        function switchTab(tab) {
-            currentTab = tab;
+        // Extensión de LiderazgoUI para lógica local de este HTML
+        LiderazgoUI.switchTab = async function(tab) {
+            // Hide all
             document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.lid-sb-link').forEach(l => l.classList.remove('active'));
+            
+            // Show new
+            document.getElementById('tab-' + tab).style.display = 'block';
+            document.getElementById('tab-btn-' + tab).classList.add('active');
 
-            const panel = document.getElementById('tab-' + tab);
-            const btn = document.getElementById('tab-btn-' + tab);
-            if (panel) panel.style.display = 'block';
-            if (btn) btn.classList.add('active');
+            // FAB
+            document.getElementById('fab-reunion').style.display = (tab === 'reuniones') ? 'flex' : 'none';
 
-            // FAB solo en reuniones
-            const fab = document.getElementById('fab-reunion');
-            if (fab) fab.style.display = (tab === 'reuniones') ? 'flex' : 'none';
-        }
-
-        // Sidebar móvil
-        function openSidebar() {
-            document.getElementById('lid-sidebar').classList.add('open');
-            document.getElementById('lid-overlay').classList.add('visible');
-        }
-        function closeSidebar() {
-            document.getElementById('lid-sidebar').classList.remove('open');
-            document.getElementById('lid-overlay').classList.remove('visible');
-        }
-
-        // ===== CARGA DE DATOS =====
-        async function cargarTodo() {
-            await Promise.all([
-                cargarLideres('principales', 'container-voceros', 'cnt-voceros'),
-                cargarLideres('representantes', 'container-representantes'),
-                cargarReuniones()
-            ]);
-        }
-
-        async function cargarLideres(filtro, containerId, counterId = null) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = `<div class="loading-shimmer" style="height:280px;grid-column:1/-1;border-radius:24px;"></div>`;
-            try {
-                const res = await fetch(`api/liderazgo.php?action=getLideres&filtro=${filtro}`);
-                const data = await res.json();
-                if (data.success) {
-                    renderLideres(data.data, containerId);
-                    if (counterId) {
-                        const el = document.getElementById(counterId);
-                        if (el) el.textContent = data.data.length;
-                    }
-                }
-            } catch (e) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error al conectar con la API</p></div>`;
-            }
-        }
-
-        async function cargarReuniones() {
-            const container = document.getElementById('container-reuniones');
-            if (!container) return;
-            try {
-                const res = await fetch('api/liderazgo.php?action=getReuniones');
-                const data = await res.json();
-                if (data.success) {
-                    renderReuniones(data.data);
-                    const el = document.getElementById('cnt-reuniones');
-                    if (el) el.textContent = data.data.length;
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function renderLideres(lideres, containerId) {
-            const container = document.getElementById(containerId);
-            if (!lideres || !lideres.length) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-users-slash"></i>
-                        <p>No se encontraron registros en esta categoría.</p>
-                    </div>`;
-                return;
-            }
-            const badgeMap = {
-                'vocero': 'badge-vocero',
-                'representante': 'badge-representante',
-                'enfoque': 'badge-enfoque'
-            };
-            container.innerHTML = lideres.map(l => {
-                const tipo = (l.tipo || '').toLowerCase();
-                const badgeClass = Object.keys(badgeMap).find(k => tipo.includes(k)) ? badgeMap[Object.keys(badgeMap).find(k => tipo.includes(k))] : 'badge-enfoque';
-                return `
-                <div class="glass-card lider-card">
-                    <div class="lider-card-top">
-                        <div class="lider-avatar"><i class="fas fa-user-circle"></i></div>
-                        <div class="lider-info">
-                            <h3>${l.nombre} ${l.apellido}</h3>
-                            <span class="badge-premium ${badgeClass}">${l.tipo}</span>
-                        </div>
-                    </div>
-                    <div class="lider-details">
-                        <p><i class="fas fa-hashtag"></i> ${l.detalle}</p>
-                        <p><i class="fas fa-envelope"></i> ${l.correo || 'Correo no registrado'}</p>
-                    </div>
-                    <button class="btn-lid btn-lid-secondary" onclick="verSeguimiento('${l.documento}')">
-                        <i class="fas fa-list-check"></i> Consultar Trayectoria
-                    </button>
-                </div>`;
-            }).join('');
-        }
-
-        function renderReuniones(reuniones) {
-            const container = document.getElementById('container-reuniones');
-            if (!reuniones || !reuniones.length) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-calendar-times"></i>
-                        <p>No existen reuniones programadas actualmente.</p>
-                    </div>`;
-                return;
-            }
-            container.innerHTML = reuniones.map(r => `
-                <div class="reunion-card glass-card">
-                    <div class="reunion-header-row">
-                        <h3>${r.titulo}</h3>
-                        <span class="status-pill status-success"><i class="fas fa-bolt"></i> Activa</span>
-                    </div>
-                    <p class="reunion-meta"><i class="fas fa-clock"></i> ${r.fecha} | ${r.hora}</p>
-                    <p class="reunion-meta"><i class="fas fa-map-marker-alt"></i> ${r.lugar || 'Instalaciones SENA'}</p>
-                    <div class="reunion-actions">
-                        <button class="btn-lid btn-lid-primary" onclick="tomarAsistencia('${r.id}')">
-                            <i class="fas fa-clipboard-user"></i> Control de Asistencia
-                        </button>
-                        <button class="btn-lid btn-lid-icon" title="Exportar Acta">
-                            <i class="fas fa-file-export"></i>
-                        </button>
-                    </div>
-                </div>`).join('');
-        }
-
-        // Acciones
-        function abrirModalReunion() { document.getElementById('modalReunion').style.display = 'flex'; }
-        function cerrarModal() { document.getElementById('modalReunion').style.display = 'none'; }
-        function verSeguimiento(doc) { mostrarNotificacion('Cargando bitácora de seguimiento...', 'info'); }
-        function tomarAsistencia(id) { window.location.href = `asistencia-liderazgo.html?id=${id}`; }
-
-        document.getElementById('formReunion').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const data = {
-                titulo: document.getElementById('tituloReunion').value,
-                fecha: document.getElementById('fechaReunion').value,
-                hora: document.getElementById('horaReunion').value,
-                lugar: document.getElementById('lugarReunion').value
-            };
-            try {
-                const res = await fetch('api/liderazgo.php?action=saveReunion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await res.json();
-                if (result.success) {
-                    mostrarNotificacion('Evento programado exitosamente', 'success');
-                    cerrarModal();
-                    cargarReuniones();
-                    e.target.reset();
-                }
-            } catch (err) {
-                mostrarNotificacion('Error técnico al guardar el evento', 'error');
-            }
-        });
-
-        function mostrarNotificacion(msg, tipo) {
-            const n = document.createElement('div');
-            n.className = `notif notif-${tipo}`;
-            n.innerHTML = `<i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${msg}`;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3500);
-        }
-
-        document.addEventListener('DOMContentLoaded', cargarTodo);
-
-        // ===== TIPO DE POBLACIÓN (Patrón real de aprendices.js) =====
-        const CATEGORIAS_POB = [
-            { key: 'mujer', label: 'Mujer', desc: 'Aprendices de enfoque de género', icon: 'fas fa-venus', bg: '#fce7f3', col: '#be185d' },
-            { key: 'indigena', label: 'Indígena', desc: 'Comunidades y pueblos indígenas', icon: 'fas fa-feather-alt', bg: '#fef3c7', col: '#b45309' },
-            { key: 'narp', label: 'NARP', desc: 'Negros, Afro, Raizales y Palenqueros', icon: 'fas fa-globe', bg: '#ede9fe', col: '#6d28d9' },
-            { key: 'campesino', label: 'Campesino', desc: 'Comunidades rurales y campesinas', icon: 'fas fa-seedling', bg: '#d1fae5', col: '#065f46' },
-            { key: 'lgbtiq', label: 'LGBTIQ+', desc: 'Diversidades de orientación e identidad', icon: 'fas fa-rainbow', bg: '#e0f2fe', col: '#0369a1' },
-            { key: 'discapacidad', label: 'Discapacidad', desc: 'Aprendices con condición de discapacidad', icon: 'fas fa-wheelchair', bg: '#fee2e2', col: '#b91c1c' }
-        ];
-
-        let _todosAprendicesPob = null;  // cache de la llamada única
-        let datosPoblacionActual = [];
-        let categoriaActual = '';
-
-        // Una sola llamada a la API para obtener TODOS los aprendices (igual que aprendices.js)
-        async function getTodosAprendicesPob() {
-            if (_todosAprendicesPob) return _todosAprendicesPob;
-            try {
-                const res = await fetch('api/aprendices.php?limit=-1');
-                const data = await res.json();
-                _todosAprendicesPob = data.success ? (data.data || []) : [];
-            } catch (e) {
-                console.error("Error al obtener aprendices:", e);
-                _todosAprendicesPob = [];
-            }
-            return _todosAprendicesPob;
-        }
-
-        async function cargarGridPoblacion() {
-            const grid = document.getElementById('pob-grid-categorias');
-            if (!grid) return;
-            // Render las tarjetas de inmediato con spinner
-            grid.innerHTML = CATEGORIAS_POB.map(c => `
-                <div class="pob-cat-card" onclick="abrirDetallePoblacion('${c.key}','${c.label}','${c.icon}','${c.bg}','${c.col}')">
-                    <div class="pob-cat-top">
-                        <div class="pob-cat-icon" style="background:${c.bg};color:${c.col};"><i class="${c.icon}"></i></div>
-                        <span class="pob-cat-count" id="cnt-pob-${c.key}"><i class="fas fa-spinner fa-spin" style="font-size:1rem;"></i></span>
-                    </div>
-                    <div>
-                        <div class="pob-cat-name">${c.label}</div>
-                        <div class="pob-cat-desc">${c.desc}</div>
-                    </div>
-                    <div class="pob-cat-action"><i class="fas fa-arrow-right"></i> Ver listado</div>
-                </div>`).join('');
-
-            // UNA sola llamada a la API
-            try {
-                const todos = await getTodosAprendicesPob();
-                CATEGORIAS_POB.forEach(c => {
-                    const count = todos.filter(a => a[c.key] == 1).length;
-                    const el = document.getElementById(`cnt-pob-${c.key}`);
-                    if (el) el.textContent = count;
-                });
-            } catch (e) {
-                CATEGORIAS_POB.forEach(c => {
-                    const el = document.getElementById(`cnt-pob-${c.key}`);
-                    if (el) el.textContent = '—';
-                });
-            }
-        }
-
-        async function abrirDetallePoblacion(key, label, icon, color, iconColor) {
-            categoriaActual = key;
-            const modal = document.getElementById('modalPoblacion');
-            document.getElementById('modal-pob-titulo').textContent = label;
-            document.getElementById('modal-pob-subtitulo').textContent = 'Aprendices clasificados como ' + label;
-            const iconEl = document.getElementById('modal-pob-icon');
-            iconEl.style.background = color;
-            iconEl.style.color = iconColor;
-            iconEl.innerHTML = `<i class="${icon}"></i>`;
-            document.getElementById('pob-search').value = '';
-            document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
-            modal.style.display = 'flex';
-
-            try {
-                const todos = await getTodosAprendicesPob();
-                // Filtrar por campo binario (igual que aprendices.js)
-                datosPoblacionActual = todos.filter(a => a[key] == 1);
-                renderTablaPoblacion(datosPoblacionActual);
-                document.getElementById('modal-pob-total').textContent = datosPoblacionActual.length + ' registros';
-            } catch {
-                document.getElementById('pob-tabla-body').innerHTML = '<tr><td colspan="5" class="td-loading">Error al cargar. Revise la conexión.</td></tr>';
-            }
-        }
-
-        function renderTablaPoblacion(lista) {
-            const tbody = document.getElementById('pob-tabla-body');
-            if (!lista || !lista.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="td-loading">No hay aprendices registrados en esta categoría</td></tr>';
-                return;
-            }
-            tbody.innerHTML = lista.map(a => {
-                const est = (a.estado || '').toUpperCase();
-                const cls = est === 'LECTIVA' ? 'estado-lectiva' : est.includes('RETIRO') || est.includes('RETIRADO') ? 'estado-retiro' : est.includes('CANCEL') ? 'estado-cancelado' : 'estado-otro';
-                return `<tr>
-                    <td><strong>${a.documento || '—'}</strong></td>
-                    <td>${a.nombre || ''} ${a.apellido || ''}</td>
-                    <td>${a.numero_ficha || '—'}</td>
-                    <td><span class="estado-badge ${cls}">${a.estado || 'N/A'}</span></td>
-                    <td>${a.nombre_programa || a.jornada || '—'}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        function filtrarTablaPoblacion(query) {
-            const q = query.toLowerCase().trim();
-            if (!q) { renderTablaPoblacion(datosPoblacionActual); document.getElementById('modal-pob-total').textContent = datosPoblacionActual.length + ' registros'; return; }
-            const filtrado = datosPoblacionActual.filter(a =>
-                `${a.nombre} ${a.apellido} ${a.documento} ${a.numero_ficha}`.toLowerCase().includes(q)
-            );
-            renderTablaPoblacion(filtrado);
-            document.getElementById('modal-pob-total').textContent = filtrado.length + ' registros';
-        }
-
-        function cerrarModalPoblacion() { document.getElementById('modalPoblacion').style.display = 'none'; }
-
-        function exportarPDFPoblacion() { mostrarNotificacion('Función PDF en desarrollo', 'info'); }
-
-        // Parche para switchTab para cargar población al entrar
-        const _switchTabOriginal = switchTab;
-        switchTab = function (tab) {
-            _switchTabOriginal(tab);
-            if (tab === 'enfoque') {
-                const grid = document.getElementById('pob-grid-categorias');
-                if (grid && !grid.dataset.loaded) {
-                    cargarGridPoblacion();
-                    grid.dataset.loaded = '1';
-                }
+            // Load if not in cache
+            let containerId = `container-${tab}`;
+            if (tab === 'suplentes') containerId = 'container-voceros-suplentes';
+            
+            const cacheKey = tab;
+            const data = LiderazgoData.cache[cacheKey] || await LiderazgoData.fetchLideres(cacheKey);
+            
+            if (tab !== 'reuniones') {
+                this.renderLideres(data, containerId, LiderazgoData.pages[cacheKey], tab.charAt(0).toUpperCase() + tab.slice(1));
+            } else {
+                this.renderReuniones(LiderazgoData.cache.reuniones);
             }
         };
+
+        LiderazgoUI.renderReuniones = function(data) {
+            const container = document.getElementById('container-reuniones');
+            if(!data || !data.length) {
+                container.innerHTML = '<div class="empty-state"><p>No hay reuniones.</p></div>';
+                return;
+            }
+            container.innerHTML = data.map(r => `
+                <div class="reunion-card glass-card">
+                    <h3>${r.titulo}</h3>
+                    <p><i class="fas fa-calendar"></i> ${r.fecha} | ${r.hora}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${r.lugar}</p>
+                    <button class="btn-lid btn-lid-primary" onclick="window.location.href='asistencia-liderazgo.html?id=${r.id}'">Asistencia</button>
+                </div>
+            `).join('');
+        };
+
+        LiderazgoUI.editLider = function(doc) {
+            const cache = [...LiderazgoData.cache.principales, ...LiderazgoData.cache.suplentes, ...LiderazgoData.cache.enfoque, ...LiderazgoData.cache.representantes];
+            const lider = cache.find(l => l.documento === doc);
+            if (!lider) return;
+
+            document.getElementById('edit-doc').value = doc;
+            document.getElementById('edit-correo').value = lider.correo || '';
+            document.getElementById('edit-tel').value = lider.telefono || '';
+            document.getElementById('modalEditLider').style.display = 'flex';
+        };
+
+        document.getElementById('formEditLider').onsubmit = async (e) => {
+            e.preventDefault();
+            const doc = document.getElementById('edit-doc').value;
+            const res = await LiderazgoData.updateLider(doc, {
+                correo: document.getElementById('edit-correo').value,
+                telefono: document.getElementById('edit-tel').value
+            });
+            if (res.success) {
+                alert('Actualizado correctamente');
+                document.getElementById('modalEditLider').style.display = 'none';
+                cargarLiderazgo(); // Reload
+            }
+        };
+
+        cargarLiderazgo();
     </script>
 </body>
-
 </html>

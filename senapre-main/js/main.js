@@ -108,14 +108,18 @@ class AuthSystem {
         // Función interna para ofuscar (cifrado simple solicitado)
         const encrypt = (path) => btoa(path);
 
+        const areas = this.currentUser.bienestar_data || [];
+
+        // PRIORIDAD ALTA: Si tiene área de Liderazgo, ignorar otros roles y redirigir directo
+        if (areas.includes('voceros_y_representantes')) {
+            window.location.href = 'liderazgo.html';
+            return;
+        }
+
         if (rol === 'vocero') {
             window.location.href = 'vocero-dashboard';
         } else if (rol === 'bienestar') {
-            const user = this.currentUser;
-            const areas = user.bienestar_data || [];
-            if (areas.includes('voceros_y_representantes')) {
-                window.location.href = 'liderazgo.html';
-            } else if (areas.includes('jefe_bienestar')) {
+            if (areas.includes('jefe_bienestar')) {
                 window.location.href = 'jefe-bienestar-dashboard';
             } else {
                 window.location.href = 'bienestar-aprendiz';
@@ -123,14 +127,7 @@ class AuthSystem {
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
         } else if (['director', 'administrativo', 'coordinador', 'admin', 'administrador'].includes(rol)) {
-            const user = this.currentUser;
-            const areas = user.bienestar_data || [];
-            // Prioridad absoluta a Liderazgo para evitar selector de roles/dashboards intermedios
-            if (areas.includes('voceros_y_representantes') && rol !== 'director') {
-                window.location.href = 'liderazgo.html';
-            } else {
-                window.location.href = 'admin-dashboard';
-            }
+            window.location.href = 'admin-dashboard';
         }
     }
 }
