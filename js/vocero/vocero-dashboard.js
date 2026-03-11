@@ -14,7 +14,7 @@ const VoceroDashboard = (() => {
         vocTipo: '',
         aprendices: [],
         paginaActual: 1,
-        POR_PAG: 20,
+        POR_PAG: 10,
         INACTIVOS: new Set(['CANCELADO', 'RETIRADO', 'APLAZADO', 'TRASLADO', 'FINALIZADO']),
         COLORES: { 
             LECTIVA: '#39A900', CANCELADO: '#dc2626', RETIRADO: '#f59e0b', 

@@ -105,11 +105,26 @@ try {
 
         // Agregar campos de poblacion si vienen en el payload
         $pobFields = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        $primeraCat = '';
         foreach ($pobFields as $pf) {
             if (isset($poblacion[$pf])) {
+                $checkVal = $poblacion[$pf] ? 1 : 0;
                 $set[] = "$pf = :$pf";
-                $params[":$pf"] = $poblacion[$pf] ? 1 : 0;
+                $params[":$pf"] = $checkVal;
+                
+                // Si está marcado, lo tomamos como categoría principal para el campo tipo_poblacion
+                if ($checkVal === 1 && $primeraCat === '') {
+                    $primeraCat = ucfirst($pf);
+                    if ($primeraCat === 'Lgbtiq') $primeraCat = 'LGBTIQ+';
+                    if ($primeraCat === 'Indigena') $primeraCat = 'Indígena';
+                }
             }
+        }
+
+        // Si se encontró al menos una categoría, actualizamos tipo_poblacion para compatibilidad con Liderazgo
+        if ($primeraCat !== '') {
+            $set[] = "tipo_poblacion = :tpob";
+            $params[':tpob'] = $primeraCat;
         }
 
         if (empty($set)) {
@@ -125,7 +140,6 @@ try {
         $stmt->execute($params);
 
         if ($stmt->rowCount() > 0 || !empty($poblacion)) {
-            // Incluso si no hay rowCount (los datos eran iguales), devolvemos éxito.
             responder(200, true, 'Información actualizada correctamente');
         } else {
             responder(404, false, 'Aprendiz no encontrado en esta ficha');
