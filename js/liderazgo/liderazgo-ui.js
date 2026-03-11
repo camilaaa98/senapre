@@ -7,7 +7,7 @@ const LiderazgoUI = {
     currentTab: 'voceros',
     itemsPerPage: 6,
     
-    init() {
+    async init() {
         this.setupEventListeners();
         this.updateUserDisplay();
     },
@@ -130,11 +130,11 @@ const LiderazgoUI = {
         const paginatedItems = lideres.slice(start, end);
 
         let html = `
-        <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 8px; overflow: hidden; margin-top: 1rem;">
-            <table class="lid-table" style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif;">
+        <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 8px; overflow-x: auto; margin-top: 1rem;">
+            <table class="lid-table" style="width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif;">
                 <thead>
                     <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">N°</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">FICHA</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">DOCUMENTO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">NOMBRE COMPLETO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">CORREO</th>
@@ -154,7 +154,7 @@ const LiderazgoUI = {
             
             html += `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
-                    <td style="padding: 1rem; color: #64748b;">${index}</td>
+                    <td style="padding: 1rem; color: #64748b; font-weight: 700;">${l.numero_ficha || '—'}</td>
                     <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${l.documento}</td>
                     <td style="padding: 1rem; color: #475569;">${l.nombre} ${l.apellido}</td>
                     <td style="padding: 1rem; color: #64748b;">${l.correo || 'No disponible'}</td>
@@ -187,13 +187,17 @@ const LiderazgoUI = {
 
     renderPagination(page, totalPages, tipo) {
         return `
-        <div class="pagination-controls" style="grid-column: 1/-1;">
-            <button class="btn-lid btn-lid-secondary" ${page === 1 ? 'disabled' : ''} onclick="LiderazgoData.changePage('${tipo}', ${page - 1})">
-                <i class="fas fa-chevron-left"></i> Anterior
+        <div style="grid-column: 1/-1; display:flex; justify-content:center; align-items:center; gap: 15px; margin-top: 20px; padding: 10px;">
+            <button style="padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 6px; background: ${page === 1 ? '#f8fafc' : 'white'}; color: ${page === 1 ? '#cbd5e1' : '#475569'}; font-weight: 500; cursor: ${page === 1 ? 'not-allowed' : 'pointer'}; transition: all 0.2s;" ${page === 1 ? 'disabled' : ''} onclick="LiderazgoData.changePage('${tipo}', ${page - 1})">
+                <i class="fas fa-chevron-left" style="margin-right: 5px;"></i> Ant
             </button>
-            <span class="page-info">Página ${page} de ${totalPages}</span>
-            <button class="btn-lid btn-lid-secondary" ${page === totalPages ? 'disabled' : ''} onclick="LiderazgoData.changePage('${tipo}', ${page + 1})">
-                Siguiente <i class="fas fa-chevron-right"></i>
+            
+            <div style="background: #f1f5f9; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; color: #334155; font-weight: 600;">
+                <span style="color:#39A900;">${page}</span> / ${totalPages}
+            </div>
+            
+            <button style="padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 6px; background: ${page === totalPages ? '#f8fafc' : 'white'}; color: ${page === totalPages ? '#cbd5e1' : '#475569'}; font-weight: 500; cursor: ${page === totalPages ? 'not-allowed' : 'pointer'}; transition: all 0.2s;" ${page === totalPages ? 'disabled' : ''} onclick="LiderazgoData.changePage('${tipo}', ${page + 1})">
+                Sig <i class="fas fa-chevron-right" style="margin-left: 5px;"></i>
             </button>
         </div>`;
     },

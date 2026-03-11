@@ -443,6 +443,25 @@
     display: inline-block;
 }
 
+.voc-btn-edit-circ {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.voc-btn-edit-circ:hover {
+    background: #0284c7;
+    color: white;
+}
+
 /* ── Responsivo ───────────────────────────────────────────── */
 @media (max-width: 900px) {
     .voc-sidebar {

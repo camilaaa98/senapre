@@ -210,51 +210,17 @@ const VoceroDashboard = (() => {
             const est = (a.estado || '').toUpperCase();
             const badge = ({ LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado', APLAZADO: 'badge-aplazado', TRASLADO: 'badge-aplazado' })[est] || 'badge-default';
             const doc = a.documento || '';
-            // Generar selectores de población interactivos
-            const cats = [
-                { id: 'mujer', label: 'M', title: 'Mujer', color: 'bg-mujer' },
-                { id: 'indigena', label: 'I', title: 'Indígena', color: 'bg-indigena' },
-                { id: 'narp', label: 'N', title: 'NARP', color: 'bg-narp' },
-                { id: 'campesino', label: 'C', title: 'Campesino', color: 'bg-campesino' },
-                { id: 'lgbtiq', label: 'L', title: 'LGBTIQ+', color: 'bg-lgbtiq' },
-                { id: 'discapacidad', label: 'D', title: 'Discapacidad', color: 'bg-discapacidad' }
-            ];
-
-            let pobCol = '<div class="poblacion-toggles-inline">';
-            cats.forEach(c => {
-                const checked = a[c.id] == 1 ? 'checked' : '';
-                pobCol += `
-                    <label class="pob-toggle-label ${c.color}" title="${c.title}">
-                        <input type="checkbox" onchange="VoceroDashboard.togglePoblacion('${a.documento}', '${c.id}', this.checked)" ${checked}>
-                        <span>${c.label}</span>
-                    </label>
-                `;
-            });
-            pobCol += '</div>';
 
             return `<tr id="fila-${doc}" data-doc="${doc}" data-ficha="${vocFicha}">
                 <td>${ini + i + 1}</td>
                 <td><strong>${doc}</strong></td>
-                <td><strong>${a.nombre || ''} ${a.apellido || ''}</strong></td>
-                <td>${pobCol}</td>
-                <td>
-                    <span class="voc-campo" id="correo-txt-${doc}">${a.correo || '—'}</span>
-                    <input class="voc-input voc-edit-input hidden" id="correo-inp-${doc}" value="${a.correo || ''}" placeholder="correo@ejemplo.com">
-                </td>
-                <td>
-                    <span class="voc-campo" id="cel-txt-${doc}">${a.celular || '—'}</span>
-                    <input class="voc-input voc-edit-input hidden" id="cel-inp-${doc}" value="${a.celular || ''}" placeholder="310 000 0000">
-                </td>
+                <td>${a.nombre || ''} ${a.apellido || ''}</td>
+                <td><span id="correo-txt-${doc}">${a.correo || '—'}</span></td>
+                <td><span id="cel-txt-${doc}">${a.celular || '—'}</span></td>
                 <td><span class="badge ${badge}">${a.estado || '—'}</span></td>
                 <td>
-                    <button class="voc-btn voc-btn-edit" onclick="VoceroDashboard.editarFila('${doc}')" id="btn-edit-${doc}" title="Editar contacto">
+                    <button class="voc-btn-edit-circ" onclick="VoceroDashboard.editarFila('${doc}')" title="Editar contacto">
                         <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="voc-btn voc-btn-save hidden" onclick="VoceroDashboard.guardarFila('${doc}')" id="btn-save-${doc}" title="Guardar">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="voc-btn voc-btn-cancel hidden" onclick="VoceroDashboard.cancelarEdicion('${doc}')" id="btn-cancel-${doc}" title="Cancelar">
-                        <i class="fas fa-times"></i>
                     </button>
                 </td>
             </tr>`;
@@ -264,7 +230,7 @@ const VoceroDashboard = (() => {
         if (el) el.innerHTML = `<table>
             <thead><tr>
                 <th>N°</th><th>Documento</th><th>Nombre Completo</th>
-                <th>Población</th><th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
+                <th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
             </tr></thead>
             <tbody>${filas}</tbody>
         </table>`;
@@ -274,22 +240,70 @@ const VoceroDashboard = (() => {
     }
 
     // ────────────────────────────────────────────────────────────
-    // EDICIÓN INLINE
+    // EDICIÓN EN MODAL
     // ────────────────────────────────────────────────────────────
     function editarFila(doc) {
-        _toggle(doc, true);
+        const a = aprendices.find(x => x.documento === doc);
+        if (!a) return;
+        
+        // Crear modal si no existe en HTML
+        let modal = document.getElementById('modalEditVocero');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalEditVocero';
+            modal.className = 'modal-overlay';
+            modal.style.zIndex = '1000';
+            modal.innerHTML = `
+                <div class="modal-glass" style="max-width: 500px; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
+                        <h2 style="font-family: 'Outfit'; font-size: 1.5rem; color: #1e293b; margin: 0;">
+                            <i class="fas fa-user-edit" style="color: #39A900; margin-right: 10px;"></i>Editar Información
+                        </h2>
+                        <button type="button" onclick="document.getElementById('modalEditVocero').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                    </div>
+                    
+                    <form id="formEditVocero" onsubmit="VoceroDashboard.guardarFormularioEdicion(event)">
+                        <input type="hidden" id="edit-doc-modal">
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #64748b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Aprendiz</label>
+                            <input type="text" id="edit-nombre-display" class="voc-input" readonly style="background-color: #f8fafc; color: #94a3b8; cursor: not-allowed; width:100%;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Correo Electrónico</label>
+                            <input type="email" id="edit-correo-modal" class="voc-input" style="width:100%;">
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Celular / Teléfono</label>
+                            <input type="text" id="edit-cel-modal" class="voc-input" style="width:100%;">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button type="button" onclick="document.getElementById('modalEditVocero').style.display='none'" class="voc-btn" style="background: white; border: 1px solid #cbd5e1; color: #475569;">Cancelar</button>
+                            <button type="submit" class="voc-btn voc-btn-save" style="display:flex; align-items:center; gap:8px;" id="btn-save-modal">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        document.getElementById('edit-doc-modal').value = a.documento;
+        document.getElementById('edit-nombre-display').value = `${a.documento} - ${a.nombre || ''} ${a.apellido || ''}`;
+        document.getElementById('edit-correo-modal').value = a.correo || '';
+        document.getElementById('edit-cel-modal').value = a.celular || '';
+        
+        modal.style.display = 'flex';
     }
 
-    function cancelarEdicion(doc) {
-        _toggle(doc, false);
-    }
+    async function guardarFormularioEdicion(e) {
+        e.preventDefault();
+        const doc = document.getElementById('edit-doc-modal').value;
+        const correo = document.getElementById('edit-correo-modal').value.trim();
+        const celular = document.getElementById('edit-cel-modal').value.trim();
 
-    async function guardarFila(doc) {
-        const correo = document.getElementById(`correo-inp-${doc}`)?.value.trim() || '';
-        const celular = document.getElementById(`cel-inp-${doc}`)?.value.trim() || '';
-
-        const btn = document.getElementById(`btn-save-${doc}`);
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; }
+        const btn = document.getElementById('btn-save-modal');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...'; }
 
         try {
             const resp = await fetch('api/vocero/dashboard.php', {
@@ -310,50 +324,19 @@ const VoceroDashboard = (() => {
                 if (cT) cT.textContent = correo || '—';
                 if (cB) cB.textContent = celular || '—';
 
-                _toggle(doc, false);
+                document.getElementById('modalEditVocero').style.display = 'none';
                 _toast('✅ Información actualizada correctamente');
             } else {
                 _toast('❌ ' + (json.message || 'Error al guardar'), 'error');
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i>'; }
             }
         } catch {
             _toast('❌ Error de conexión. Intente de nuevo.', 'error');
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i>'; }
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios'; }
         }
     }
 
-    function _toggle(doc, modoEdicion) {
-        ['correo', 'cel'].forEach(campo => {
-            const txt = document.getElementById(`${campo}-txt-${doc}`);
-            const inp = document.getElementById(`${campo}-inp-${doc}`);
-            if (txt) {
-                if (modoEdicion) txt.classList.add('hidden');
-                else txt.classList.remove('hidden');
-            }
-            if (inp) {
-                if (modoEdicion) inp.classList.remove('hidden');
-                else inp.classList.add('hidden');
-            }
-        });
-        const btnEdit = document.getElementById(`btn-edit-${doc}`);
-        const btnSave = document.getElementById(`btn-save-${doc}`);
-        const btnCancel = document.getElementById(`btn-cancel-${doc}`);
 
-        if (btnEdit) {
-            if (modoEdicion) btnEdit.classList.add('hidden');
-            else btnEdit.classList.remove('hidden');
-        }
-        if (btnSave) {
-            if (modoEdicion) btnSave.classList.remove('hidden');
-            else btnSave.classList.add('hidden');
-            btnSave.disabled = false;
-            btnSave.innerHTML = '<i class="fas fa-check"></i>';
-        }
-        if (btnCancel) {
-            if (modoEdicion) btnCancel.classList.remove('hidden');
-            else btnCancel.classList.add('hidden');
-        }
-    }
 
     // ────────────────────────────────────────────────────────────
     // EXPORTAR PDF
@@ -496,7 +479,7 @@ const VoceroDashboard = (() => {
     }
 
     // ── API PÚBLICA ────────────────────────────────────────────
-    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFila, cancelarEdicion, togglePoblacion };
+    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFormularioEdicion, togglePoblacion };
 
 })();
 

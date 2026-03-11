@@ -152,7 +152,7 @@ try {
 
         // Obtener fichas activas para asignación
         if ($action === 'getFichasActivas') {
-            $sql = "SELECT numero_ficha, nombre_programa FROM fichas WHERE estado = 'ACTIVO' ORDER BY numero_ficha DESC";
+            $sql = "SELECT numero_ficha, nombre_programa FROM fichas WHERE UPPER(COALESCE(estado, 'ACTIVO')) IN ('ACTIVO', 'FORMACION', 'EN FORMACION', 'LECTIVA') OR estado = '' ORDER BY numero_ficha DESC";
             $stmt = $conn->query($sql);
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
             exit;
@@ -301,8 +301,21 @@ try {
                 $ficha = $data['numero_ficha'];
                 $columna = $tipo === 'principal' ? 'vocero_principal' : 'vocero_suplente';
                 $sql = "UPDATE fichas SET $columna = :doc WHERE numero_ficha = :ficha";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([':doc' => $doc, ':ficha' => $ficha]);
+                
+                try {
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([':doc' => $doc, ':ficha' => $ficha]);
+                } catch(Exception $e) {
+                    try {
+                        $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_principal TEXT");
+                    } catch(Exception $e2) {}
+                    try {
+                        $conn->exec("ALTER TABLE fichas ADD COLUMN vocero_suplente TEXT");
+                    } catch(Exception $e3) {}
+                    
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([':doc' => $doc, ':ficha' => $ficha]);
+                }
                 echo json_encode(['success' => true, 'message' => "Vocero $tipo asignado a la ficha $ficha"]);
                 exit;
             }
