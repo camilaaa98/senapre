@@ -68,29 +68,46 @@ try {
         }
 
         if (!empty($poblacion)) {
-            // Filtro por población unificado: busca en el campo texto y en el campo booleano correspondiente
-            $pob_lower = strtolower($poblacion);
+            // Filtro por población unificado y flexible (Insensible a mayúsculas/minúsculas)
+            $pob_search = trim($poblacion);
+            $pob_lower = strtolower($pob_search);
             
-            // Mapeo de categorías a columnas booleanas
+            // Mapeo exhaustivo de categorías a columnas booleanas y variaciones de texto
             $mapeoBool = [
                 'mujer' => 'mujer',
-                'indígena' => 'indigena',
                 'indigena' => 'indigena',
+                'indígena' => 'indigena',
                 'narp' => 'narp',
+                'afro' => 'narp',
+                'negro' => 'narp',
                 'campesino' => 'campesino',
-                'lgbtiq+' => 'lgbtiq',
+                'campesina' => 'campesino',
+                'lgbt' => 'lgbtiq',
+                'lgbti' => 'lgbtiq',
                 'lgbtiq' => 'lgbtiq',
-                'discapacidad' => 'discapacidad'
+                'lgbtiq+' => 'lgbtiq',
+                'discapacidad' => 'discapacidad',
+                'discapacitado' => 'discapacidad'
             ];
             
-            $colBool = $mapeoBool[$pob_lower] ?? null;
+            $colBool = null;
+            // Buscar si alguna de nuestras llaves está contenida en la búsqueda o viceversa
+            foreach($mapeoBool as $key => $col) {
+                if (strpos($pob_lower, $key) !== false || strpos($key, $pob_lower) !== false) {
+                    $colBool = $col;
+                    break;
+                }
+            }
             
             if ($colBool) {
-                $where[] = "(a.tipo_poblacion LIKE :poblacion OR a.$colBool = 1)";
+                // ILIKE es PostgreSQL (insensible a mayúsculas), LIKE es SQLite (insensible por defecto en strings)
+                // Usamos una combinación robusta
+                $where[] = "(a.tipo_poblacion ILIKE :pob_exact OR a.tipo_poblacion ILIKE :pob_wild OR a.$colBool = 1)";
             } else {
-                $where[] = "a.tipo_poblacion LIKE :poblacion";
+                $where[] = "(a.tipo_poblacion ILIKE :pob_exact OR a.tipo_poblacion ILIKE :pob_wild)";
             }
-            $params[':poblacion'] = "%$poblacion%";
+            $params[':pob_exact'] = "$pob_search";
+            $params[':pob_wild'] = "%$pob_search%";
         }
         
         $whereSql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
