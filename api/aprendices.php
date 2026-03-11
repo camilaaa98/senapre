@@ -75,19 +75,12 @@ try {
             // Mapeo exhaustivo de categorías a columnas booleanas y variaciones de texto
             $mapeoBool = [
                 'mujer' => 'mujer',
-                'indigena' => 'indigena',
-                'indígena' => 'indigena',
+                'indigen' => 'indigena', // Captura indigena e indígena
                 'narp' => 'narp',
                 'afro' => 'narp',
-                'negro' => 'narp',
                 'campesino' => 'campesino',
-                'campesina' => 'campesino',
                 'lgbt' => 'lgbtiq',
-                'lgbti' => 'lgbtiq',
-                'lgbtiq' => 'lgbtiq',
-                'lgbtiq+' => 'lgbtiq',
-                'discapacidad' => 'discapacidad',
-                'discapacitado' => 'discapacidad'
+                'discapacidad' => 'discapacidad'
             ];
             
             $colBool = null;

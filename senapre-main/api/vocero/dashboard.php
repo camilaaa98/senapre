@@ -115,8 +115,9 @@ try {
                 // Si está marcado, lo tomamos como categoría principal para el campo tipo_poblacion
                 if ($checkVal === 1 && $primeraCat === '') {
                     $primeraCat = ucfirst($pf);
-                    if ($primeraCat === 'Lgbtiq') $primeraCat = 'LGBTIQ+';
+                    if ($pf === 'lgbtiq') $primeraCat = 'lgbti'; // Estandarizado por usuario (minúscula)
                     if ($primeraCat === 'Indigena') $primeraCat = 'Indígena';
+                    // Campesino ya queda como 'Campesino' por el ucfirst($pf)
                 }
             }
         }
