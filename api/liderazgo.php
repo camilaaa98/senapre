@@ -161,14 +161,15 @@ try {
         // Obtener aprendices en LECTIVA
         if ($action === 'getAprendicesLectiva') {
             $ficha = $_GET['ficha'] ?? null;
+            $camposPob = "documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad";
             if ($ficha) {
                 // Solo de una ficha específica
-                $sql = "SELECT documento, nombre, apellido, tipo_poblacion, jornada FROM aprendices WHERE numero_ficha = :ficha AND estado = 'LECTIVA' ORDER BY nombre ASC";
+                $sql = "SELECT $camposPob, jornada FROM aprendices WHERE numero_ficha = :ficha AND estado = 'LECTIVA' ORDER BY nombre ASC";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([':ficha' => $ficha]);
             } else {
                 // Todos los lectiva (para enfoque y rpte)
-                $sql = "SELECT documento, nombre, apellido, numero_ficha, tipo_poblacion FROM aprendices WHERE estado = 'LECTIVA' ORDER BY nombre ASC";
+                $sql = "SELECT $camposPob FROM aprendices WHERE estado = 'LECTIVA' ORDER BY nombre ASC";
                 $stmt = $conn->query($sql);
             }
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);

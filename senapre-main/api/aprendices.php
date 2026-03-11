@@ -68,8 +68,28 @@ try {
         }
 
         if (!empty($poblacion)) {
-            // Filtro por población (maneja multi-selección almacenada como texto)
-            $where[] = "a.tipo_poblacion LIKE :poblacion";
+            // Filtro por población unificado: busca en el campo texto y en el campo booleano correspondiente
+            $pob_lower = strtolower($poblacion);
+            
+            // Mapeo de categorías a columnas booleanas
+            $mapeoBool = [
+                'mujer' => 'mujer',
+                'indígena' => 'indigena',
+                'indigena' => 'indigena',
+                'narp' => 'narp',
+                'campesino' => 'campesino',
+                'lgbtiq+' => 'lgbtiq',
+                'lgbtiq' => 'lgbtiq',
+                'discapacidad' => 'discapacidad'
+            ];
+            
+            $colBool = $mapeoBool[$pob_lower] ?? null;
+            
+            if ($colBool) {
+                $where[] = "(a.tipo_poblacion LIKE :poblacion OR a.$colBool = 1)";
+            } else {
+                $where[] = "a.tipo_poblacion LIKE :poblacion";
+            }
             $params[':poblacion'] = "%$poblacion%";
         }
         
