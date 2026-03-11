@@ -1,6 +1,6 @@
 <?php
-error_reporting(0);
-@ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT');
@@ -46,7 +46,8 @@ try {
 
         // 2. Obtener aprendices de esa ficha (todos los estados)
         $stmt2 = $conn->prepare("
-            SELECT documento, nombre, apellido, correo, celular, estado, tipo_poblacion
+            SELECT documento, nombre, apellido, correo, celular, estado, tipo_poblacion,
+                   mujer, indigena, narp, campesino, lgbtiq, discapacidad
             FROM aprendices
             WHERE TRIM(numero_ficha) = :f
             ORDER BY apellido, nombre
@@ -74,10 +75,11 @@ try {
     // ─── PUT: Actualizar correo / celular de un aprendiz ────
     if ($method === 'PUT') {
         $body = json_decode(file_get_contents('php://input'), true);
-        $doc     = trim($body['documento']  ?? '');
-        $correo  = trim($body['correo']     ?? '');
-        $celular = trim($body['celular']    ?? '');
-        $ficha   = trim($body['numero_ficha'] ?? '');
+        $doc       = trim($body['documento']  ?? '');
+        $correo    = trim($body['correo']     ?? '');
+        $celular   = trim($body['celular']    ?? '');
+        $ficha     = trim($body['numero_ficha'] ?? '');
+        $poblacion = $body['poblacion'] ?? []; // Objeto con los 6 checks
 
         if (!$doc || !$ficha) {
             responder(400, false, 'Se requiere documento y numero_ficha');
@@ -86,8 +88,18 @@ try {
         // Solo actualizar los campos que vengan con valor
         $set    = [];
         $params = [':doc' => $doc, ':ficha' => $ficha];
+        
         if ($correo !== '')  { $set[] = 'correo = :correo';   $params[':correo']  = $correo; }
         if ($celular !== '') { $set[] = 'celular = :celular'; $params[':celular'] = $celular; }
+
+        // Agregar campos de poblacion si vienen en el payload
+        $pobFields = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        foreach ($pobFields as $pf) {
+            if (isset($poblacion[$pf])) {
+                $set[] = "$pf = :$pf";
+                $params[":$pf"] = $poblacion[$pf] ? 1 : 0;
+            }
+        }
 
         if (empty($set)) {
             responder(400, false, 'Sin campos para actualizar');
@@ -101,7 +113,8 @@ try {
         ");
         $stmt->execute($params);
 
-        if ($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0 || !empty($poblacion)) {
+            // Incluso si no hay rowCount (los datos eran iguales), devolvemos éxito.
             responder(200, true, 'Información actualizada correctamente');
         } else {
             responder(404, false, 'Aprendiz no encontrado en esta ficha');
@@ -111,6 +124,6 @@ try {
     responder(405, false, 'Método no permitido');
 
 } catch (Exception $e) {
-    responder(500, false, 'Error interno del servidor');
+    responder(500, false, 'Error en producción: ' . $e->getMessage());
 }
 ?>

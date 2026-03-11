@@ -1,6 +1,6 @@
 <?php
-error_reporting(0);
-@ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT');
@@ -124,6 +124,6 @@ try {
     responder(405, false, 'Método no permitido');
 
 } catch (Exception $e) {
-    responder(500, false, 'Error interno del servidor');
+    responder(500, false, 'Error en producción: ' . $e->getMessage());
 }
 ?>
