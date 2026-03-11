@@ -134,7 +134,7 @@ try {
 
     responder(405, false, 'Método no permitido');
 
-} catch (Exception $e) {
-    responder(500, false, 'Error en producción: ' . $e->getMessage());
+} catch (Throwable $e) {
+    responder(500, false, '[V2.6-DEBUG] Error fatal: ' . $e->getMessage());
 }
 ?>
