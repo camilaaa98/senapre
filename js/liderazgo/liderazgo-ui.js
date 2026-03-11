@@ -134,7 +134,7 @@ const LiderazgoUI = {
             <table class="lid-table" style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif;">
                 <thead>
                     <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">#</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">N°</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">DOCUMENTO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">NOMBRE COMPLETO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">CORREO</th>

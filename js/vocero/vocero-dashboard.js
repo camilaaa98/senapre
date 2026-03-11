@@ -263,7 +263,7 @@ const VoceroDashboard = (() => {
         const el = document.getElementById('voc-tabla-body');
         if (el) el.innerHTML = `<table>
             <thead><tr>
-                <th>#</th><th>Documento</th><th>Nombre Completo</th>
+                <th>N°</th><th>Documento</th><th>Nombre Completo</th>
                 <th>Población</th><th>Correo</th><th>Celular</th><th>Estado</th><th>Editar</th>
             </tr></thead>
             <tbody>${filas}</tbody>
