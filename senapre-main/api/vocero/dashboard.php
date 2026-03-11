@@ -25,6 +25,17 @@ try {
             responder(400, false, 'Se requiere id_usuario');
         }
 
+        // AUTO-MIGRACIÓN (Parche temporal para producción)
+        $pobCols = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+        foreach ($pobCols as $pc) {
+            try {
+                // En PG 'IF NOT EXISTS' es más seguro, en SQLite usamos try-catch silenciado
+                $conn->exec("ALTER TABLE aprendices ADD COLUMN $pc INTEGER DEFAULT 0");
+            } catch (Exception $e_mig) { 
+                // Ignorar si ya existe
+            }
+        }
+
         // 1. Buscar ficha asignada
         $stmt = $conn->prepare("
             SELECT numero_ficha, nombre_programa, estado, tipoFormacion,
