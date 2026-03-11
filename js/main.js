@@ -106,22 +106,21 @@ class AuthSystem {
         const rol = this.currentUser.rol.toLowerCase();
         const areas = this.currentUser.bienestar_data || [];
 
+        // PRIORIDAD ALTA: Si tiene área de Liderazgo (Jancy), redirigir directo sin importar el rol
+        if (areas.includes('voceros_y_representantes')) {
+            if (!window.location.pathname.includes('liderazgo.html')) {
+                window.location.href = 'liderazgo.html';
+                return;
+            }
+        }
+
         if (rol === 'vocero') {
             window.location.href = 'vocero-dashboard';
         } else if (areas.includes('jefe_bienestar')) {
-            // Erick Johana Yañez Sabaleta - Jefe de Bienestar
             window.location.href = 'admin-bienestar-dashboard.html';
-        } else if (areas.includes('voceros_y_representantes')) {
-            // Jancy Esperanza Barreto Moreno - Liderazgo
-            if (!window.location.pathname.includes('liderazgo.html')) {
-                window.location.href = 'liderazgo.html';
-            }
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard';
-        } else if (['director', 'admin'].includes(rol)) {
-            window.location.href = 'admin-dashboard.html';
         } else {
-            // Otros administrativos o roles de apoyo
             window.location.href = 'admin-dashboard.html';
         }
     }
@@ -311,6 +310,12 @@ function aplicarRestriccionesDeRol() {
             const displayAreas = user.bienestar_data.map(a => areaMap[a] || a);
             displayRole = displayAreas[0]; // Mostrar la primera area como rol
         }
+        
+        // Parche visual: Si es Liderazgo, forzar el título limpio
+        if (user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes')) {
+            displayRole = 'Liderazgo Estudiantil';
+        }
+
         roleDisplay.textContent = displayRole;
     }
 
