@@ -277,7 +277,137 @@ const VoceroDashboard = (() => {
     // EDICIÓN INLINE
     // ────────────────────────────────────────────────────────────
     function editarFila(doc) {
-        _toggle(doc, true);
+        const a = aprendices.find(x => String(x.documento) === String(doc));
+        if (!a) {
+            console.error('Aprendiz no encontrado:', doc, aprendices);
+            return;
+        }
+
+        // Crear modal si no existe en HTML
+        let modal = document.getElementById('modalEditVocero');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalEditVocero';
+            modal.className = 'modal-overlay';
+            modal.style.zIndex = '999999';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            
+            modal.innerHTML = `
+                <div class="modal-glass" style="max-width: 500px; width: 90%; padding: 2.5rem; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
+                        <h2 style="font-family: 'Outfit'; font-size: 1.5rem; color: #1e293b; margin: 0;">
+                            <i class="fas fa-user-edit" style="color: #39A900; margin-right: 10px;"></i>Editar Contacto
+                        </h2>
+                        <button type="button" onclick="document.getElementById('modalEditVocero').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                    </div>
+                    
+                    <form id="formEditVocero" onsubmit="VoceroDashboard.guardarFormularioEdicion(event)">
+                        <input type="hidden" id="edit-doc-modal">
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #64748b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Aprendiz</label>
+                            <input type="text" id="edit-nombre-display" class="voc-input" readonly style="background-color: #f8fafc; color: #94a3b8; cursor: not-allowed; width:94%;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Correo Electrónico</label>
+                            <input type="email" id="edit-correo-modal" class="voc-input" style="width:94%;">
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:5px;">Celular / Teléfono</label>
+                            <input type="text" id="edit-cel-modal" class="voc-input" style="width:94%;">
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <label style="color: #1e293b; font-size: 0.85rem; font-weight: 600; display:block; margin-bottom:10px;">Tipos de Población</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:10px;" id="edit-pob-container">
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-mujer"> Mujer</label>
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-indigena"> Indígena</label>
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-narp"> NARP</label>
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-campesino"> Campesino</label>
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-lgbtiq"> LGBTIQ+</label>
+                                <label style="display:flex; align-items:center; gap:5px; font-size:0.85rem;"><input type="checkbox" id="edit-pob-discapacidad"> Discapacidad</label>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button type="button" onclick="document.getElementById('modalEditVocero').style.display='none'" class="voc-btn" style="background: white; border: 1px solid #cbd5e1; color: #475569;">Cancelar</button>
+                            <button type="submit" class="voc-btn voc-btn-save" style="display:flex; align-items:center; gap:8px;" id="btn-save-modal">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        document.getElementById('edit-doc-modal').value = a.documento;
+        document.getElementById('edit-nombre-display').value = `${a.documento} - ${a.nombre || ''} ${a.apellido || ''}`;
+        document.getElementById('edit-correo-modal').value = a.correo || '';
+        document.getElementById('edit-cel-modal').value = a.celular || '';
+        
+        ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'].forEach(pob => {
+            document.getElementById(`edit-pob-${pob}`).checked = a[pob] == 1;
+        });
+        
+        modal.style.display = 'flex';
+    }
+
+    async function guardarFormularioEdicion(e) {
+        e.preventDefault();
+        const doc = document.getElementById('edit-doc-modal').value;
+        const correo = document.getElementById('edit-correo-modal').value.trim();
+        const celular = document.getElementById('edit-cel-modal').value.trim();
+        
+        const poblacionData = {};
+        ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'].forEach(pob => {
+            poblacionData[pob] = document.getElementById(`edit-pob-${pob}`).checked ? 1 : 0;
+        });
+
+        const btn = document.getElementById('btn-save-modal');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...'; }
+
+        try {
+            const resp = await fetch('api/vocero/dashboard.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ documento: doc, numero_ficha: vocFicha, correo, celular, poblacion: poblacionData })
+            });
+            const json = await resp.json();
+
+            if (json.success) {
+                // Actualizar datos locales
+                const a = aprendices.find(x => String(x.documento) === String(doc));
+                if (a) { 
+                    if (correo !== undefined) a.correo = correo; 
+                    if (celular !== undefined) a.celular = celular;
+                    Object.assign(a, poblacionData);
+                }
+
+                // Actualizar spans en pantalla (solo si usan el viejo ID)
+                const cT = document.getElementById(`correo-txt-${doc}`);
+                const cB = document.getElementById(`cel-txt-${doc}`);
+                if (cT) cT.textContent = correo || '—';
+                if (cB) cB.textContent = celular || '—';
+
+                document.getElementById('modalEditVocero').style.display = 'none';
+                _toast('✅ Información actualizada correctamente');
+                
+                // Refrescar opcional (descomentar si la info no se muestra real-time)
+                // renderTabla();
+            } else {
+                _toast('❌ ' + (json.message || 'Error al guardar'), 'error');
+            }
+        } catch {
+            _toast('❌ Error de conexión. Intente de nuevo.', 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios'; }
+        }
     }
 
     function cancelarEdicion(doc) {
@@ -496,7 +626,7 @@ const VoceroDashboard = (() => {
     }
 
     // ── API PÚBLICA ────────────────────────────────────────────
-    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFila, cancelarEdicion, togglePoblacion };
+    return { init, cargarDatos, renderTabla, irPagina, exportarPDF, editarFila, guardarFormularioEdicion, guardarFila, cancelarEdicion, togglePoblacion };
 
 })();
 
