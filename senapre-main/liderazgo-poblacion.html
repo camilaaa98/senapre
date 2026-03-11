@@ -188,9 +188,14 @@
 
             renderGrid() {
                  let html = CATEGORIAS.map(c => {
-                    const count = todosAprendices.filter(a => 
-                        a.tipo_poblacion === c.label || a[c.key] == 1
-                    ).length;
+                    const count = todosAprendices.filter(a => {
+                        const tp = (a.tipo_poblacion || '').toLowerCase();
+                        const key = c.key.toLowerCase();
+                        // Búsqueda flexible: coincide por campo boolean O por coincidencia de texto (campesino, lgbt, etc)
+                        const matchText = tp.includes(key) || (key === 'lgbtiq' && (tp.includes('lgbt') || tp.includes('plus')));
+                        const matchBool = a[c.key] == 1;
+                        return matchText || matchBool;
+                    }).length;
                     return `
                     <div style="background:${c.bg}; color:${c.col}; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="PoblacionUI.abrirDetalle('${c.key}')" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                         <i class="${c.icon}" style="font-size:1.4rem; margin-bottom:8px;"></i>
@@ -227,7 +232,13 @@
                 
                 document.getElementById('tabla-poblacion-titulo').innerHTML = `Detalle de Aprendices: <strong>${cat.label}</strong> <span style="font-size:0.8rem; color:#64748b; margin-left:1rem; font-weight:normal;">(Vocero: ${vocero})</span>`;
                 
-                currentCatData = todosAprendices.filter(a => a.tipo_poblacion === cat.label || a[cat.key] == 1);
+                currentCatData = todosAprendices.filter(a => {
+                    const tp = (a.tipo_poblacion || '').toLowerCase();
+                    const key = cat.key.toLowerCase();
+                    const matchText = tp.includes(key) || (key === 'lgbtiq' && (tp.includes('lgbt') || tp.includes('plus')));
+                    const matchBool = a[cat.key] == 1;
+                    return matchText || matchBool;
+                });
                 this.renderTabla(currentCatData);
                 this.currentKey = key;
                 this.currentLabel = cat.label;
