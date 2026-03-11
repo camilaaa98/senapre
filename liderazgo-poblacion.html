@@ -60,8 +60,10 @@
             <!-- Dashboard Analytics -->
             <div class="reports-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px; margin-bottom:30px;">
                 <div class="glass-card">
-                    <h3 style="margin-bottom:15px;">% Aprendices por Población</h3>
-                    <canvas id="chartPoblacion" height="200"></canvas>
+                    <h3 style="margin-bottom:15px; text-align:center;">% Aprendices por Población</h3>
+                    <div style="max-width:220px; margin:0 auto;">
+                        <canvas id="chartPoblacion" height="200"></canvas>
+                    </div>
                 </div>
                 <div class="glass-card">
                     <h3 style="margin-bottom:15px;">Top 5 Fichas (Lectivas)</h3>
@@ -128,6 +130,17 @@
                 const user = authSystem.getCurrentUser();
                 document.getElementById('lid-topbar-user').textContent = `${user.nombre} ${user.apellido}`;
                 
+                try {
+                    const resR = await fetch('api/liderazgo.php?action=getResponsable&area=voceros_y_representantes').then(r => r.json());
+                    if (resR.success && resR.data) {
+                        document.getElementById('lid-role-display').innerHTML = `
+                            <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
+                            <span style="font-size:0.75rem;opacity:0.9;color:white;display:block;margin-top:2px;text-transform:uppercase;">${resR.data.nombre} ${resR.data.apellido}</span>
+                            <span style="font-size:0.65rem;opacity:0.6;color:white;display:block;">${resR.data.correo}</span>
+                        `;
+                    }
+                } catch(e) {}
+
                 await this.fetchData();
                 this.renderGrid();
                 this.renderCharts();
@@ -150,7 +163,7 @@
 
             renderGrid() {
                  document.getElementById('pob-grid-categorias').innerHTML = CATEGORIAS.map(c => {
-                    const count = todosAprendices.filter(a => a[c.key] == 1).length;
+                    const count = todosAprendices.filter(a => a.tipo_poblacion === c.label).length;
                     return `
                     <div class="glass-card" onclick="PoblacionUI.abrirDetalle('${c.key}')" style="cursor:pointer">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -170,7 +183,7 @@
                 const vocero = vocerosEnfoqueMap[key] || 'No asignado';
                 document.getElementById('vocero-enfoque-lbl').innerHTML = `<i class="fas fa-crown"></i> Vocero: ${vocero}`;
                 
-                currentCatData = todosAprendices.filter(a => a[key] == 1);
+                currentCatData = todosAprendices.filter(a => a.tipo_poblacion === cat.label);
                 this.renderTabla(currentCatData);
                 document.getElementById('modalPoblacion').style.display = 'flex';
                 this.currentKey = key;
@@ -197,17 +210,17 @@
                     data: {
                         labels: CATEGORIAS.map(c => c.label),
                         datasets: [{
-                            data: CATEGORIAS.map(c => todosAprendices.filter(a => a[c.key] == 1).length),
+                            data: CATEGORIAS.map(c => todosAprendices.filter(a => a.tipo_poblacion === c.label).length),
                             backgroundColor: CATEGORIAS.map(c => c.bg),
                             borderColor: CATEGORIAS.map(c => c.col)
                         }]
                     }
                 });
 
-                // Chart Top 5 Fichas Lectivas
-                const fichasLectivas = todosAprendices.filter(a => a.estado === 'LECTIVA');
+                // Chart Top 5 Fichas Lectivas (Solo con población vulnerable)
+                const pobVulnerable = todosAprendices.filter(a => a.estado === 'LECTIVA' && a.tipo_poblacion && a.tipo_poblacion !== 'Ninguna' && a.tipo_poblacion !== 'null');
                 const counts = {};
-                fichasLectivas.forEach(a => {
+                pobVulnerable.forEach(a => {
                     const f = a.numero_ficha;
                     if (f) counts[f] = (counts[f] || 0) + 1;
                 });
@@ -219,10 +232,14 @@
                     data: {
                         labels: sorted.map(s => s[0]),
                         datasets: [{
-                            label: 'Aprendices',
+                            label: 'Aprendices de Población',
                             data: sorted.map(s => s[1]),
-                            backgroundColor: '#39A900'
+                            backgroundColor: '#39A900',
+                            borderRadius: 4
                         }]
+                    },
+                    options: {
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                     }
                 });
             },

@@ -44,6 +44,61 @@
     padding: 1rem;
 }
 
+/* Liderazgo Table Design */
+.table-responsive {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+}
+
+.lid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.lid-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    padding: 1.2rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.lid-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    vertical-align: middle;
+}
+
+.lid-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+}
+
+.text-primary { color: var(--lid-primary); }
+.text-accent { color: var(--lid-secondary); }
+
+
 /* Biometric Overlay */
 .biometric-scanner-container {
     position: relative;

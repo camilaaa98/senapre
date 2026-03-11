@@ -67,6 +67,9 @@
                     </div>
                 </div>
                 <div class="premium-header-stats">
+                    <button class="btn-lid btn-lid-primary" onclick="LiderazgoUI.abrirModalAsignacion()" style="margin-right:1rem;">
+                        <i class="fas fa-user-plus"></i> Asignar Roles
+                    </button>
                     <div class="premium-stat-chip"><i class="fas fa-users"></i> <span id="cnt-voceros">0</span> Voceros</div>
                     <div class="premium-stat-chip"><i class="fas fa-calendar-check"></i> <span id="cnt-reuniones">0</span> Reuniones</div>
                 </div>
@@ -132,6 +135,65 @@
                 <div class="form-actions">
                     <button type="button" onclick="document.getElementById('modalEditLider').style.display='none'" class="btn-lid btn-lid-cancel">Cancelar</button>
                     <button type="submit" class="btn-lid btn-lid-primary">Actualizar Datos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Asignación de Roles -->
+    <div class="modal-overlay" id="modalAsignarRol" style="display:none;">
+        <div class="modal-glass modal-wide" style="max-width: 600px;">
+            <h2 class="modal-title"><i class="fas fa-user-plus"></i> Asignar Roles Estudiantiles</h2>
+            <form id="formAsignarRol">
+                <div class="form-group">
+                    <label>Selecciona el Tipo de Rol</label>
+                    <select id="asig-tipo" class="form-input" required onchange="LiderazgoUI.cambioTipoRolAsignacion(this.value)">
+                        <option value="">Seleccione...</option>
+                        <option value="principal">Vocero Principal de Ficha</option>
+                        <option value="suplente">Vocero Suplente de Ficha</option>
+                        <option value="enfoque">Vocero de Enfoque Diferencial</option>
+                        <option value="representante">Representante de Jornada</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grp-ficha" style="display:none;">
+                    <label>Ficha</label>
+                    <select id="asig-ficha" class="form-input" onchange="LiderazgoUI.cargarAprendicesParaRol(this.value)">
+                        <option value="">Cargando fichas...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grp-enfoque" style="display:none;">
+                    <label>Categoría Diferencial</label>
+                    <select id="asig-cat" class="form-input">
+                        <option value="Mujer">Mujer</option>
+                        <option value="Indígena">Indígena</option>
+                        <option value="NARP">NARP</option>
+                        <option value="Campesino">Campesino</option>
+                        <option value="LGBTIQ+">LGBTIQ+</option>
+                        <option value="Discapacidad">Discapacidad</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grp-jornada" style="display:none;">
+                    <label>Jornada</label>
+                    <select id="asig-jornada" class="form-input">
+                        <option value="DIURNA">DIURNA</option>
+                        <option value="TARDE">TARDE</option>
+                        <option value="NOCTURNA">NOCTURNA</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="grp-aprendiz" style="display:none;">
+                    <label>Seleccionar Aprendiz (Solo Lectiva)</label>
+                    <select id="asig-aprendiz" class="form-input" required>
+                        <option value="">Seleccione ficha/rol primero...</option>
+                    </select>
+                </div>
+
+                <div class="form-actions" style="margin-top:2rem;">
+                    <button type="button" onclick="document.getElementById('modalAsignarRol').style.display='none'" class="btn-lid btn-lid-cancel">Cancelar</button>
+                    <button type="submit" class="btn-lid btn-lid-primary">Asignar Rol</button>
                 </div>
             </form>
         </div>

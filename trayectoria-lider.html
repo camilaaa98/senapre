@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trayectoria del Líder - SenApre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
+    <link rel="stylesheet" href="css/liderazgo-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
+</head>
+
+<body>
+    <div class="lid-container">
+        <!-- SIDEBAR -->
+        <aside class="lid-sidebar" id="lid-sidebar">
+            <div class="lid-sb-header">
+                 <img src="assets/img/asi.png" alt="SenApre" class="lid-sb-logo">
+                 <div class="lid-sb-brand">SenApre</div>
+                 <div class="lid-sb-role" id="lid-role-display">Liderazgo</div>
+            </div>
+            <nav class="lid-sb-nav">
+                <a href="liderazgo.html" class="lid-sb-link">
+                    <i class="fas fa-th-large"></i><span>Panel Principal</span>
+                </a>
+                <a href="liderazgo-poblacion.html" class="lid-sb-link">
+                    <i class="fas fa-layer-group"></i><span>Tipo de Población</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="lid-main">
+            <header class="lid-topbar">
+                <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="lid-topbar-title">Trayectoria de Liderazgo</span>
+                <div class="lid-topbar-user" id="lid-topbar-user"></div>
+            </header>
+
+            <div class="premium-header">
+                <div class="premium-header-content">
+                    <div class="premium-header-icon" style="background: linear-gradient(135deg, #0369a1, #0284c7);"><i class="fas fa-route"></i></div>
+                    <div>
+                        <h1 class="premium-header-title">Historial de Asistencia y Participación</h1>
+                        <p class="premium-header-desc" id="lbl-lider-info">Cargando información del líder...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top:2rem;">
+                <h3 style="margin-bottom:1rem; color:var(--lid-dark); font-family:'Outfit';">Reuniones y Eventos Institucionales</h3>
+                <div class="table-responsive">
+                    <table class="lid-table">
+                        <thead>
+                            <tr>
+                                <th>FECHA</th>
+                                <th>TÍTULO DE REUNIÓN</th>
+                                <th>ESTADO DE ASISTENCIA</th>
+                                <th>NOTAS / REGISTRO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-trayectoria">
+                            <tr><td colspan="4" style="text-align:center;">Cargando historial...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = authSystem.getCurrentUser();
+            if(user) document.getElementById('lid-topbar-user').textContent = `${user.nombre} ${user.apellido}`;
+
+            try {
+                const resR = await fetch('api/liderazgo.php?action=getResponsable&area=voceros_y_representantes').then(r => r.json());
+                if(resR.success && resR.data) {
+                    document.getElementById('lid-role-display').innerHTML = `
+                        <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
+                        <span style="font-size:0.75rem;opacity:0.9;color:white;display:block;margin-top:2px;text-transform:uppercase;">${resR.data.nombre} ${resR.data.apellido}</span>
+                        <span style="font-size:0.65rem;opacity:0.6;color:white;display:block;">${resR.data.correo}</span>
+                    `;
+                }
+            } catch(e) {}
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const doc = urlParams.get('doc');
+            if(!doc) {
+                document.getElementById('tabla-trayectoria').innerHTML = '<tr><td colspan="4" style="text-align:center;">No se ha proporcionado un documento válido.</td></tr>';
+                return;
+            }
+
+            document.getElementById('lbl-lider-info').innerHTML = `Líder ID: <strong>${doc}</strong>`;
+
+            try {
+                const res = await fetch(`api/liderazgo.php?action=getHistorialAsistencia&documento=${doc}`).then(r => r.json());
+                const tbody = document.getElementById('tabla-trayectoria');
+                
+                if(!res.success || !res.data || res.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">El líder no registra asistencia a eventos aún.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = res.data.map(h => {
+                    let pill = 'status-pending';
+                    if(h.estado === 'asistio') pill = 'status-success';
+                    if(h.estado === 'ausente') pill = 'status-danger';
+                    if(h.estado === 'justificado') pill = 'status-warning';
+
+                    return `
+                    <tr>
+                        <td><strong>${new Date(h.fecha_reunion).toLocaleDateString()}</strong></td>
+                        <td>${h.titulo}</td>
+                        <td><span class="status-pill inline-flex ${pill}">${h.estado.toUpperCase()}</span></td>
+                        <td>${h.nota ? h.nota : (h.fecha_registro ? 'Registrado vía sistema' : 'Sin registro')}</td>
+                    </tr>
+                    `;
+                }).join('');
+            } catch(e) {
+                document.getElementById('tabla-trayectoria').innerHTML = '<tr><td colspan="4" style="text-align:center;">Error al cargar trayectoria.</td></tr>';
+            }
+        });
+    </script>
+</body>
+</html>

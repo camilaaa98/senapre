@@ -15,23 +15,68 @@ const LiderazgoUI = {
     setupEventListeners() {
         document.addEventListener('DOMContentLoaded', () => {
             // Initial loads
+            const formAsig = document.getElementById('formAsignarRol');
+            if (formAsig) {
+                formAsig.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const tipo = document.getElementById('asig-tipo').value;
+                    const doc = document.getElementById('asig-aprendiz').value;
+                    const ficha = document.getElementById('asig-ficha').value;
+                    const cat = document.getElementById('asig-cat').value;
+                    const jor = document.getElementById('asig-jornada').value;
+
+                    try {
+                        const res = await fetch('api/liderazgo.php?action=asignarRol', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                tipo_rol: tipo,
+                                documento: doc,
+                                numero_ficha: ficha,
+                                categoria: cat,
+                                jornada: jor
+                            })
+                        }).then(r => r.json());
+
+                        if (res.success) {
+                            alert(res.message);
+                            document.getElementById('modalAsignarRol').style.display = 'none';
+                            // Reload data
+                            if (typeof cargarLiderazgo === 'function') cargarLiderazgo();
+                        } else {
+                            alert('Error: ' + res.message);
+                        }
+                    } catch(err) {
+                        alert('Error de conexión');
+                    }
+                };
+            }
         });
     },
 
-    updateUserDisplay() {
+    async updateUserDisplay() {
         const user = authSystem.getCurrentUser();
         if (!user) return;
-
-        const roleDisplay = document.getElementById('lid-role-display');
-        if (roleDisplay) {
-            roleDisplay.innerHTML = `
-                <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
-                <span style="font-size:0.75rem;opacity:0.9;color:white;display:block;margin-top:2px;">${user.nombre} ${user.apellido}</span>
-            `;
-        }
         
         const topbarUser = document.getElementById('lid-topbar-user');
         if (topbarUser) topbarUser.textContent = `${user.nombre} ${user.apellido}`;
+
+        try {
+            const res = await fetch('api/liderazgo.php?action=getResponsable&area=voceros_y_representantes');
+            const data = await res.json();
+            if (data.success && data.data) {
+                const roleDisplay = document.getElementById('lid-role-display');
+                if (roleDisplay) {
+                    roleDisplay.innerHTML = `
+                        <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
+                        <span style="font-size:0.75rem;opacity:0.9;color:white;display:block;margin-top:2px;text-transform:uppercase;">${data.data.nombre} ${data.data.apellido}</span>
+                        <span style="font-size:0.65rem;opacity:0.6;color:white;display:block;">${data.data.correo}</span>
+                    `;
+                }
+            }
+        } catch (e) {
+            console.error('Error fetching responsable:', e);
+        }
     },
 
     switchTab(tab) {
@@ -65,42 +110,47 @@ const LiderazgoUI = {
         const end = start + this.itemsPerPage;
         const paginatedItems = lideres.slice(start, end);
 
-        const badgeMap = {
-            'vocero': 'badge-vocero',
-            'representante': 'badge-representante',
-            'enfoque': 'badge-enfoque'
-        };
-
-        let html = paginatedItems.map(l => {
-            const tipo = (l.tipo || '').toLowerCase();
-            const badgeClass = Object.keys(badgeMap).find(k => tipo.includes(k)) 
-                ? badgeMap[Object.keys(badgeMap).find(k => tipo.includes(k))] 
-                : 'badge-enfoque';
-            
-            // UI Request: Ficha instead of #
-            return `
-            <div class="glass-card lider-card">
-                <div class="lider-card-top">
-                    <div class="lider-avatar"><i class="fas fa-user-circle"></i></div>
-                    <div class="lider-info">
-                        <h3>${l.nombre} ${l.apellido}</h3>
-                        <span class="badge-premium ${badgeClass}">${l.tipo}</span>
-                    </div>
-                </div>
-                <div class="lider-details">
-                    <p><i class="fas fa-chalkboard"></i> Ficha: ${l.detalle}</p>
-                    <p><i class="fas fa-envelope"></i> ${l.correo || 'Correo no registrado'}</p>
-                </div>
-                <div class="lider-actions" style="margin-top:1rem; display:flex; gap:10px;">
-                    <button class="btn-lid btn-lid-secondary" onclick="LiderazgoUI.editLider('${l.documento}')" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-lid btn-lid-primary" style="flex:1" onclick="LiderazgoUI.verSeguimiento('${l.documento}')">
-                        <i class="fas fa-list-check"></i> Consultar Trayectoria
-                    </button>
-                </div>
-            </div>`;
-        }).join('');
+        let html = `
+        <div class="table-responsive">
+            <table class="lid-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>DOCUMENTO</th>
+                        <th>NOMBRE COMPLETO</th>
+                        <th>CORREO</th>
+                        <th>CELULAR</th>
+                        <th>ESTADO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        paginatedItems.forEach((l, i) => {
+            const index = start + i + 1;
+            const estadoClass = l.estado === 'LECTIVA' ? 'status-success' : 'status-pending';
+            html += `
+                <tr>
+                    <td>${index}</td>
+                    <td><strong>${l.documento}</strong></td>
+                    <td>${l.nombre} ${l.apellido}</td>
+                    <td>${l.correo || 'No disponible'}</td>
+                    <td>${l.telefono || 'N/A'}</td>
+                    <td><span class="status-pill ${estadoClass}">${l.estado}</span></td>
+                    <td>
+                        <button class="btn-icon text-primary" onclick="LiderazgoUI.editLider('${l.documento}')" title="Editar"><i class="fas fa-pen"></i></button>
+                        <button class="btn-icon text-accent" onclick="LiderazgoUI.verSeguimiento('${l.documento}')" title="Trayectoria"><i class="fas fa-route"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+        </div>
+        `;
 
         const totalPages = Math.ceil(lideres.length / this.itemsPerPage);
         if (totalPages > 1) {
@@ -169,6 +219,57 @@ const LiderazgoUI = {
                 if (typeof cargarLiderazgo === 'function') cargarLiderazgo();
             }
         };
+    },
+
+    async abrirModalAsignacion() {
+        document.getElementById('formAsignarRol').reset();
+        document.getElementById('grp-ficha').style.display = 'none';
+        document.getElementById('grp-enfoque').style.display = 'none';
+        document.getElementById('grp-jornada').style.display = 'none';
+        document.getElementById('grp-aprendiz').style.display = 'none';
+        document.getElementById('modalAsignarRol').style.display = 'flex';
+
+        // Pre-load fichas
+        const asigFicha = document.getElementById('asig-ficha');
+        try {
+            const res = await fetch('api/liderazgo.php?action=getFichasActivas').then(r => r.json());
+            if (res.success) {
+                asigFicha.innerHTML = '<option value="">Seleccione Ficha...</option>' + 
+                    res.data.map(f => `<option value="${f.numero_ficha}">${f.numero_ficha} - ${f.nombre_programa}</option>`).join('');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
+    async cambioTipoRolAsignacion(tipo) {
+        document.getElementById('grp-ficha').style.display = (tipo === 'principal' || tipo === 'suplente') ? 'block' : 'none';
+        document.getElementById('grp-enfoque').style.display = (tipo === 'enfoque') ? 'block' : 'none';
+        document.getElementById('grp-jornada').style.display = (tipo === 'representante') ? 'block' : 'none';
+        document.getElementById('grp-aprendiz').style.display = 'none';
+
+        if (tipo === 'enfoque' || tipo === 'representante') {
+            await this.cargarAprendicesParaRol();
+        } else {
+            document.getElementById('asig-ficha').value = '';
+        }
+    },
+
+    async cargarAprendicesParaRol(ficha = null) {
+        document.getElementById('grp-aprendiz').style.display = 'block';
+        const asigAprendiz = document.getElementById('asig-aprendiz');
+        asigAprendiz.innerHTML = '<option value="">Cargando aprendices...</option>';
+        
+        try {
+            const url = ficha ? `api/liderazgo.php?action=getAprendicesLectiva&ficha=${ficha}` : `api/liderazgo.php?action=getAprendicesLectiva`;
+            const res = await fetch(url).then(r => r.json());
+            if (res.success) {
+                asigAprendiz.innerHTML = '<option value="">Seleccione Aprendiz...</option>' + 
+                    res.data.map(a => `<option value="${a.documento}">${a.nombre} ${a.apellido} (${a.documento})</option>`).join('');
+            }
+        } catch (e) {
+            asigAprendiz.innerHTML = '<option value="">Error al cargar.</option>';
+        }
     },
 
     verSeguimiento(documento) {
