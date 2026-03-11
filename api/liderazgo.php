@@ -36,41 +36,43 @@ try {
             
             $lideres = [];
 
-            // 1. Voceros Principales y Suplentes de Fichas
-            if ($filtro === 'todos' || $filtro === 'principales' || $filtro === 'suplentes') {
-                $sqlFichas = "SELECT 'ficha' as origen, f.numero_ficha, f.nombre_programa, 
-                              vp.documento as doc_p, vp.nombre as nom_p, vp.apellido as ape_p, vp.correo as cor_p, vp.celular as tel_p, vp.tipo_poblacion as pob_p,
-                              vs.documento as doc_s, vs.nombre as nom_s, vs.apellido as ape_s, vs.correo as cor_s, vs.celular as tel_s, vs.tipo_poblacion as pob_s
-                              FROM fichas f
-                              LEFT JOIN aprendices vp ON f.vocero_principal = vp.documento
-                              LEFT JOIN aprendices vs ON f.vocero_suplente = vs.documento
-                              WHERE f.vocero_principal IS NOT NULL OR f.vocero_suplente IS NOT NULL";
-                $stmt = $conn->query($sqlFichas);
-                $resFichas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // 1. Voceros Principales de Fichas
+            if ($filtro === 'todos' || $filtro === 'principales') {
+                $sqlPrincipales = "SELECT f.numero_ficha, a.documento, a.nombre, a.apellido, a.correo, a.celular, a.tipo_poblacion
+                                 FROM fichas f
+                                 JOIN aprendices a ON f.vocero_principal = a.documento";
+                $stmt = $conn->query($sqlPrincipales);
+                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($res as $row) {
+                    $lideres[] = [
+                        'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
+                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Vocero Principal',
+                        'detalle' => $row['numero_ficha'],
+                        'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
+                    ];
+                }
+            }
 
-                foreach ($resFichas as $row) {
-                    if (($filtro === 'todos' || $filtro === 'principales') && $row['doc_p']) {
-                        $lideres[] = [
-                            'documento' => $row['doc_p'], 'nombre' => $row['nom_p'], 'apellido' => $row['ape_p'],
-                            'correo' => $row['cor_p'], 'telefono' => $row['tel_p'], 'tipo' => 'Vocero Principal',
-                            'detalle' => $row['numero_ficha'],
-                            'poblacion' => $row['pob_p'] ?? 'Ninguna'
-                        ];
-                    }
-                    if (($filtro === 'todos' || $filtro === 'suplentes') && $row['doc_s']) {
-                        $lideres[] = [
-                            'documento' => $row['doc_s'], 'nombre' => $row['nom_s'], 'apellido' => $row['ape_s'],
-                            'correo' => $row['cor_s'], 'telefono' => $row['tel_s'], 'tipo' => 'Vocero Suplente',
-                            'detalle' => $row['numero_ficha'],
-                            'poblacion' => $row['pob_s'] ?? 'Ninguna'
-                        ];
-                    }
+            // 1.5 Voceros Suplentes de Fichas
+            if ($filtro === 'todos' || $filtro === 'suplentes') {
+                $sqlSuplentes = "SELECT f.numero_ficha, a.documento, a.nombre, a.apellido, a.correo, a.celular, a.tipo_poblacion
+                                 FROM fichas f
+                                 JOIN aprendices a ON f.vocero_suplente = a.documento";
+                $stmt = $conn->query($sqlSuplentes);
+                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($res as $row) {
+                    $lideres[] = [
+                        'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
+                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Vocero Suplente',
+                        'detalle' => $row['numero_ficha'],
+                        'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
+                    ];
                 }
             }
 
             // 2. Voceros de Enfoque Diferencial
             if ($filtro === 'todos' || $filtro === 'enfoque') {
-                $sqlEnfoque = "SELECT v.tipo_poblacion, a.documento, a.nombre, a.apellido, a.correo, a.celular, a.numero_ficha, a.tipo_poblacion as pob_a
+                $sqlEnfoque = "SELECT v.tipo_poblacion as cat_pob, a.documento, a.nombre, a.apellido, a.correo, a.celular, a.numero_ficha, a.tipo_poblacion as pob_a
                                FROM voceros_enfoque v
                                JOIN aprendices a ON v.documento = a.documento";
                 $stmt = $conn->query($sqlEnfoque);
@@ -78,9 +80,9 @@ try {
                 foreach ($resEnfoque as $row) {
                     $lideres[] = [
                         'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
-                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Vocero Enfoque',
+                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Vocero Enfoque ' . $row['cat_pob'],
                         'detalle' => $row['numero_ficha'],
-                        'poblacion' => $row['pob_a'] ?? $row['tipo_poblacion']
+                        'poblacion' => $row['pob_a'] ?? $row['cat_pob']
                     ];
                 }
             }
@@ -95,7 +97,7 @@ try {
                 foreach ($resRep as $row) {
                     $lideres[] = [
                         'documento' => $row['documento'], 'nombre' => $row['nombre'], 'apellido' => $row['apellido'],
-                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Representante',
+                        'correo' => $row['correo'], 'telefono' => $row['celular'], 'tipo' => 'Representante ' . $row['jornada'],
                         'detalle' => $row['numero_ficha'],
                         'poblacion' => $row['pob_a'] ?? 'Ninguna'
                     ];

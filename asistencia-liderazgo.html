@@ -5,88 +5,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asistencia Biométrica Liderazgo - SenApre</title>
-    <meta name="description" content="Registro de asistencia biométrica para encuentros de liderazgo estudiantil.">
-    <link rel="icon" href="assets/img/logosena.png" type="image/png">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css?v=2.1.0">
     <link rel="stylesheet" href="css/admin.css?v=2.1.0">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=1.1.0">
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
-<body>
-    <div class="attendance-header">
-        <div>
-            <a href="liderazgo.html" class="btn-back"><i class="fas fa-arrow-left"></i> Panel Liderazgo</a>
-        </div>
+<body class="bg-light">
+    <div class="attendance-header" style="background:var(--lid-secondary); color:white; padding:1.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <a href="liderazgo.html" class="btn-lid btn-lid-secondary" style="color:white; border-color:white;"><i class="fas fa-arrow-left"></i> Volver</a>
         <div class="text-center">
-            <h1 id="meet-title" class="attendance-title">Cargando reunión...</h1>
-            <p id="meet-date" class="attendance-subtitle"></p>
+            <h1 id="meet-title" style="font-size:1.5rem; margin:0;">Reunión Liderazgo</h1>
+            <p id="meet-date" style="opacity:0.8; font-size:0.9rem; margin-top:5px;"></p>
         </div>
-        <div class="attendance-header-actions">
-            <button onclick="generarPDF()" class="btn-lid-pdf">
-                <i class="fas fa-file-pdf"></i> PDF
-            </button>
-            <button onclick="finalizarAsistencia()" class="btn-lid-save">
-                <i class="fas fa-save"></i> Finalizar
-            </button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="generarReportePDF()" class="btn-lid btn-lid-primary"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button onclick="finalizar()" class="btn-lid btn-lid-accent" style="background:var(--lid-accent); color:var(--lid-secondary); font-weight:700;">FINALIZAR</button>
         </div>
     </div>
 
-    <div class="container p-20">
-        <div class="summary-bar">
-            <div class="summary-item">
-                <span class="summary-val" id="count-total">0</span>
-                <span class="summary-label">Total Líderes</span>
+    <div class="container" style="max-width:1200px; margin:20px auto; padding:0 20px;">
+        <div class="summary-bar" style="display:flex; gap:20px; margin-bottom:20px;">
+            <div class="glass-card" style="flex:1; text-align:center; padding:15px;">
+                <div id="count-total" style="font-size:1.5rem; font-weight:800;">0</div>
+                <div style="font-size:0.8rem; color:var(--lid-text-muted);">TOTAL LÍDERES</div>
             </div>
-            <div class="summary-item">
-                <span class="summary-val" id="count-present">0</span>
-                <span class="summary-label">Presentes</span>
+            <div class="glass-card" style="flex:1; text-align:center; padding:15px; border-bottom:4px solid var(--lid-primary);">
+                <div id="count-present" style="font-size:1.5rem; font-weight:800; color:var(--lid-primary);">0</div>
+                <div style="font-size:0.8rem; color:var(--lid-text-muted);">PRESENTES</div>
             </div>
-            <div class="summary-item">
-                <span class="summary-val" id="count-absent">0</span>
-                <span class="summary-label">Ausentes</span>
+            <div class="glass-card" style="flex:1; text-align:center; padding:15px;">
+                <div id="count-absent" style="font-size:1.5rem; font-weight:800; color:#ef4444;">0</div>
+                <div style="font-size:0.8rem; color:var(--lid-text-muted);">AUSENTES</div>
             </div>
         </div>
 
-        <div class="attendance-layout">
-            <!-- Panel de Biometría -->
-            <div class="glass-card p-2rem">
-                <h3 class="color-dark mb-1rem">Escáner Biométrico</h3>
-                <div class="scanner-container">
-                    <div id="sensorIcon" class="scanner-active">
-                        <i class="fas fa-user-shield scanner-shield-icon"></i>
-                        <div class="scan-line"></div>
+        <div class="main-layout" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            
+            <!-- BIOMETRIA -->
+            <div class="glass-card">
+                <h3 style="margin-bottom:15px;"><i class="fas fa-video"></i> Reconocimiento Facial</h3>
+                <div class="biometric-scanner-container" style="height:350px;">
+                    <video id="webcam" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+                    <div class="biometric-overlay"></div>
+                    <div id="bio-points" class="biometric-points"></div>
+                    <div id="scan-feedback" style="position:absolute; bottom:20px; left:0; width:100%; text-align:center; font-weight:700; color:var(--lid-accent); text-shadow:0 0 10px rgba(0,0,0,0.5);">
+                        ESCANEANDO...
                     </div>
-                    <h4 id="scannerStatus" class="scanner-status-text">Buscando Rostro...</h4>
-                    <p class="scanner-hint">Encuadre el rostro para el registro automático</p>
-
-                    <div class="manual-reg-box">
-                        <label class="form-label">Registro Manual (Doc)</label>
-                        <input type="text" id="manualDoc" class="form-input" placeholder="Presione Enter"
-                            onkeypress="if(event.key === 'Enter') registrarManual()">
+                </div>
+                
+                <div style="margin-top:20px;">
+                    <label style="font-size:0.8rem; font-weight:600; color:var(--lid-text-muted);">DETECCIÓN RECIENTE:</label>
+                    <div id="recent-detection" class="glass-card" style="margin-top:5px; background:#f1f5f9; padding:10px; display:flex; align-items:center; gap:15px;">
+                        <i class="fas fa-face-smile" style="font-size:1.5rem; color:var(--lid-text-muted);"></i>
+                        <div>Esperando detección...</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Listado de Asistencia -->
-            <div class="glass-card p-2rem">
-                <h3 class="color-dark mb-1rem">Estado de Asistencia</h3>
-                <div class="attendance-list" id="list-container">
-                    <div class="text-center p-3rem color-muted">
-                        <i class="fas fa-spinner fa-spin fa-2x"></i>
-                        <p>Sincronizando líderes...</p>
-                    </div>
+            <!-- LISTADO -->
+            <div class="glass-card" style="display:flex; flex-direction:column;">
+                <h3 style="margin-bottom:15px;"><i class="fas fa-list-check"></i> Registro de Asistencia</h3>
+                <div id="list-container" style="flex:1; overflow-y:auto; max-height:500px; padding-right:10px;">
+                    <p style="text-align:center; color:var(--lid-text-muted); padding:20px;">Cargando listado...</p>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script src="js/main.js"></script>
+    <script src="js/liderazgo/biometria-lider.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const meetingId = urlParams.get('id');
@@ -95,48 +88,43 @@
 
         async function init() {
             if (!meetingId) {
-                mostrarNotificacion('ID de reunión no válido', 'error');
-                setTimeout(() => window.location.href = 'liderazgo.html', 1500);
+                alert('ID de reunión no válido');
+                window.location.href = 'liderazgo.html';
                 return;
             }
-            await cargarDatosReunion();
-            await cargarLideresYAsistencia();
 
-            // Simular inicio de escáner biométrico
-            setTimeout(() => {
-                document.getElementById('scannerStatus').textContent = 'Listo para leer';
-            }, 1000);
+            await cargarDatos();
+            
+            // Iniciar Biometría
+            BiometriaLider.init('webcam', 'bio-points');
+            
+            document.addEventListener('faceDetected', async (e) => {
+                const id = e.detail.id;
+                await registrarAsistencia(id);
+            });
         }
 
-        async function cargarDatosReunion() {
-            try {
-                const res = await fetch('api/liderazgo.php?action=getReuniones');
-                const r = await res.json();
-                const meet = r.data.find(m => m.id == meetingId);
+        async function cargarDatos() {
+            const [resM, resL, resA] = await Promise.all([
+                fetch('api/liderazgo.php?action=getReuniones').then(r => r.json()),
+                fetch('api/liderazgo.php?action=getLideres&filtro=todos').then(r => r.json()),
+                fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`).then(r => r.json())
+            ]);
+
+            if (resM.success) {
+                const meet = resM.data.find(m => m.id == meetingId);
                 if (meet) {
                     document.getElementById('meet-title').textContent = meet.titulo;
-                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora} | ${meet.lugar || 'Sede Principal'}`;
+                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora} | ${meet.lugar}`;
                 }
-            } catch (e) { console.error(e); }
-        }
+            }
 
-        async function cargarLideresYAsistencia() {
-            try {
-                const [resLid, resAsis] = await Promise.all([
-                    fetch('api/liderazgo.php?action=getLideres&filtro=todos'),
-                    fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`)
-                ]);
-
-                const rLid = await resLid.json();
-                const rAsis = await resAsis.json();
-
-                if (rLid.success) {
-                    leaders = rLid.data;
-                    attendance = rAsis.success ? rAsis.data : [];
-                    renderLista();
-                    updateSummary();
-                }
-            } catch (e) { console.error(e); }
+            if (resL.success) {
+                leaders = resL.data;
+                attendance = resA.success ? resA.data : [];
+                renderLista();
+                updateCounter();
+            }
         }
 
         function renderLista() {
@@ -145,116 +133,101 @@
             attendance.forEach(a => asisMap[a.id_aprendiz] = a);
 
             container.innerHTML = leaders.map(l => {
-                const hasAsis = asisMap[l.documento];
-                const state = hasAsis ? hasAsis.estado : 'pendiente';
-
+                const asis = asisMap[l.documento];
+                const isPresent = asis && asis.estado === 'asistio';
+                const isAbsent = asis && asis.estado === 'ausente';
+                
                 return `
-                <div class="attendance-item">
-                    <div class="item-info">
-                        <p class="item-name">${l.nombre} ${l.apellido}</p>
-                        <p class="item-sub">${l.tipo} | Ficha: ${l.detalle} | ${l.documento}</p>
+                <div class="glass-card" style="margin-bottom:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; border-left:5px solid ${isPresent ? 'var(--lid-primary)' : (isAbsent ? '#ef4444' : '#cbd5e1')};">
+                    <div>
+                        <div style="font-weight:700; font-size:0.95rem;">${l.nombre} ${l.apellido}</div>
+                        <div style="font-size:0.75rem; color:var(--lid-text-muted);">${l.tipo} | Ficha: ${l.detalle}</div>
                     </div>
-                    <div class="attendance-controls">
-                        <span class="status-badge ${state === 'asistio' ? 'status-presente' : (state === 'ausente' ? 'status-ausente' : 'status-espera')}">
-                            ${state === 'asistio' ? '✓ Presente' : (state === 'ausente' ? 'Ausente' : 'Pendiente')}
-                        </span>
-                        <div class="ml-10">
-                            <button class="btn-status ${state === 'asistio' ? 'active-present' : ''}" 
-                                    onclick="marcar('${l.documento}', 'asistio', this)">P</button>
-                            <button class="btn-status ${state === 'ausente' ? 'active-absent' : ''}" 
-                                    onclick="marcar('${l.documento}', 'ausente', this)">A</button>
-                        </div>
+                    <div style="display:flex; gap:5px;">
+                        <button onclick="registrarAsistencia('${l.documento}', 'asistio')" class="btn-lid" style="padding:5px 10px; background:${isPresent ? 'var(--lid-primary)' : 'white'}; color:${isPresent ? 'white' : 'var(--lid-text)'}; border:1px solid #cbd5e1;">P</button>
+                        <button onclick="registrarAsistencia('${l.documento}', 'ausente')" class="btn-lid" style="padding:5px 10px; background:${isAbsent ? '#ef4444' : 'white'}; color:${isAbsent ? 'white' : 'var(--lid-text)'}; border:1px solid #cbd5e1;">A</button>
                     </div>
-                </div>
-            `;
+                </div>`;
             }).join('');
         }
 
-        async function marcar(doc, state, btn) {
+        async function registrarAsistencia(id, estado = 'asistio') {
+            const leader = leaders.find(l => l.documento === id);
+            if (!leader) return;
+
+            // Visual feedback biometria
+            if (estado === 'asistio' && event && event.type !== 'click') {
+                const recent = document.getElementById('recent-detection');
+                recent.style.background = '#dcfce7';
+                recent.innerHTML = `
+                    <i class="fas fa-check-circle" style="font-size:1.5rem; color:var(--lid-primary);"></i>
+                    <div>
+                        <div style="font-weight:700;">${leader.nombre}</div>
+                        <div style="font-size:0.75rem;">Detectado como ${leader.tipo}</div>
+                    </div>`;
+                setTimeout(() => recent.style.background = '#f1f5f9', 2000);
+            }
+
             try {
                 const res = await fetch('api/liderazgo.php?action=registrarAsistencia', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id_reunion: meetingId, id_aprendiz: doc, estado: state })
+                    body: JSON.stringify({ id_reunion: meetingId, id_aprendiz: id, estado })
                 });
-                const result = await res.json();
-                if (result.success) {
-                    if (result.alerta_fallas) {
-                        mostrarNotificacion(`¡ALERTA! El aprendiz ${doc} ha acumulado 3 fallas. Rol revocado.`, 'error', 8000);
-                    }
-                    cargarLideresYAsistencia();
+                const data = await res.json();
+                if (data.success) {
+                    await refreshAttendance();
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        async function registrarManual() {
-            const doc = document.getElementById('manualDoc').value;
-            if (!doc) return;
-            await marcar(doc, 'asistio', null);
-            document.getElementById('manualDoc').value = '';
-
-            // Feedback visual del sensor
-            const sensor = document.getElementById('sensorIcon');
-            sensor.style.background = '#dcfce7';
-            setTimeout(() => sensor.style.background = 'white', 500);
+        async function refreshAttendance() {
+            const res = await fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`);
+            const data = await res.json();
+            if (data.success) {
+                attendance = data.data;
+                renderLista();
+                updateCounter();
+            }
         }
 
-        function updateSummary() {
-            const total = leaders.length;
-            const present = attendance.filter(a => a.estado === 'asistio').length;
-            const absent = attendance.filter(a => a.estado === 'ausente').length;
-
-            document.getElementById('count-total').textContent = total;
-            document.getElementById('count-present').textContent = present;
-            document.getElementById('count-absent').textContent = absent;
+        function updateCounter() {
+            document.getElementById('count-total').textContent = leaders.length;
+            document.getElementById('count-present').textContent = attendance.filter(a => a.estado === 'asistio').length;
+            document.getElementById('count-absent').textContent = attendance.filter(a => a.estado === 'ausente').length;
         }
 
-        function generarPDF() {
+        function finalizar() {
+            if(confirm('¿Desea finalizar el registro y volver al panel?')) {
+                window.location.href = 'liderazgo.html';
+            }
+        }
+
+        function generarReportePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
-            const title = document.getElementById('meet-title').textContent;
-            const date = document.getElementById('meet-date').textContent;
-
             doc.setFontSize(18);
-            doc.setTextColor(57, 169, 0);
-            doc.text('Reporte de Asistencia Liderazgo Estudiantil', 14, 20);
-
-            doc.setFontSize(11);
-            doc.setTextColor(100);
-            doc.text(`Encuentro: ${title}`, 14, 28);
-            doc.text(`Detalles: ${date}`, 14, 34);
-
-            const rows = leaders.map(l => {
+            doc.text('Asistencia Biométrica SenApre', 14, 20);
+            doc.text(document.getElementById('meet-title').textContent, 14, 30);
+            
+            const tableBody = leaders.map(l => {
                 const asis = attendance.find(a => a.id_aprendiz === l.documento);
-                return [
-                    `${l.nombre} ${l.apellido}`,
-                    l.documento,
-                    l.detalle,
-                    l.tipo,
-                    asis ? asis.estado.toUpperCase() : 'PENDIENTE',
-                    asis ? asis.fecha_registro : '-'
-                ];
+                return [l.nombre + ' ' + l.apellido, l.tipo, l.detalle, asis ? asis.estado.toUpperCase() : 'PENDIENTE'];
             });
 
             doc.autoTable({
-                head: [['Nombre', 'Documento', 'Ficha', 'Cargo', 'Estado', 'Fecha/Hora']],
-                body: rows,
                 startY: 40,
-                theme: 'striped',
+                head: [['Nombre', 'Rol', 'Ficha', 'Estado']],
+                body: tableBody,
                 headStyles: { fillColor: [0, 50, 77] }
             });
 
-            doc.save(`Asistencia_${title.replace(/ /g, '_')}.pdf`);
-        }
-
-        function finalizarAsistencia() {
-            mostrarNotificacion('Asistencia finalizada y guardada', 'success');
-            setTimeout(() => window.location.href = 'liderazgo.html', 1500);
+            doc.save('Asistencia_Liderazgo.pdf');
         }
 
         init();
     </script>
 </body>
-
 </html>

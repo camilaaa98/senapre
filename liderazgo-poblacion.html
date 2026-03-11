@@ -5,214 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tipo de Población - Liderazgo SenApre</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
     <link rel="stylesheet" href="css/liderazgo-layout.css?v=1.0.0">
-    <style>
-        /* Ajustes específicos para la página de población */
-        .pob-header {
-            margin-bottom: 2rem;
-        }
-
-        .pob-title {
-            font-size: 1.8rem;
-            color: var(--lid-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .pob-subtitle {
-            color: #64748b;
-            font-size: 1rem;
-        }
-
-        .pob-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .pob-cat-card {
-            background: white;
-            border-radius: 20px;
-            padding: 1.8rem;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pob-cat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
-            border-color: var(--lid-primary);
-        }
-
-        .pob-cat-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .pob-cat-icon {
-            width: 54px;
-            height: 54px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .pob-cat-count {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #1e293b;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .pob-cat-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .pob-cat-desc {
-            font-size: 0.9rem;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .pob-cat-action {
-            margin-top: auto;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--lid-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Modal Table Premium */
-        .pob-search-bar {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 0.8rem 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .pob-search-bar input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            outline: none;
-            font-size: 0.95rem;
-        }
-
-        .pob-table-wrap {
-            max-height: 500px;
-            overflow-y: auto;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .pob-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .pob-table th {
-            background: #f1f5f9;
-            padding: 1rem;
-            text-align: left;
-            position: sticky;
-            top: 0;
-            color: #475569;
-            font-weight: 600;
-        }
-
-        .pob-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
-        }
-
-        .modal-pob-footer {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
-    </style>
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <div class="lid-container">
-        <!-- Sidebar Específico -->
+        <!-- SIDEBAR -->
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
                 <img src="assets/img/asi.png" alt="SenApre" class="lid-sb-logo">
                 <div class="lid-sb-brand">SenApre</div>
-                <div class="lid-sb-role" id="lid-role-display">Liderazgo Estudiantil</div>
+                <div class="lid-sb-role" id="lid-role-display">Liderazgo</div>
             </div>
-
+            <!-- Mismo nav que liderazgo.html -->
             <nav class="lid-sb-nav">
                 <a href="liderazgo.html" class="lid-sb-link">
-                    <i class="fas fa-th-large"></i>
-                    <span>Panel Principal</span>
-                </a>
-                <a href="liderazgo.html#voceros" class="lid-sb-link">
-                    <i class="fas fa-users"></i>
-                    <span>Voceros</span>
-                </a>
-                <a href="liderazgo.html#representantes" class="lid-sb-link">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Representantes</span>
+                    <i class="fas fa-th-large"></i><span>Panel Principal</span>
                 </a>
                 <a href="liderazgo-poblacion.html" class="lid-sb-link active">
-                    <i class="fas fa-layer-group"></i>
-                    <span>Tipo de Población</span>
-                </a>
-                <a href="liderazgo.html#reuniones" class="lid-sb-link">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reuniones</span>
+                    <i class="fas fa-layer-group"></i><span>Tipo de Población</span>
                 </a>
                 <a href="asistencia-liderazgo.html" class="lid-sb-link">
-                    <i class="fas fa-clipboard-user"></i>
-                    <span>Asistencia</span>
+                    <i class="fas fa-clipboard-user"></i><span>Asistencia</span>
                 </a>
             </nav>
-
-            <div class="lid-sb-footer">
-                <button class="lid-sb-logout" onclick="authSystem.logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Cerrar Sesión</span>
-                </button>
-            </div>
         </aside>
 
         <main class="lid-main">
-            <!-- Topbar Móvil -->
             <header class="lid-topbar">
-                <button class="lid-hamburger" id="lid-hamburger"
-                    onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
+                <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
                     <i class="fas fa-bars"></i>
                 </button>
                 <span class="lid-topbar-title">Tipo de Población</span>
@@ -221,205 +49,220 @@
 
             <div class="premium-header">
                 <div class="premium-header-content">
-                    <div class="premium-header-icon" style="background: linear-gradient(135deg, #39A900, #2d8500);">
-                        <i class="fas fa-users-viewfinder"></i>
-                    </div>
+                    <div class="premium-header-icon" style="background: linear-gradient(135deg, #39A900, #2d8500);"><i class="fas fa-users-viewfinder"></i></div>
                     <div>
                         <h1 class="premium-header-title">Enfoque Diferencial</h1>
-                        <p class="premium-header-desc">Clasificación de aprendices por vulnerabilidad y diversidad</p>
+                        <p class="premium-header-desc">Analítica y gestión de aprendices por diversidad</p>
                     </div>
                 </div>
             </div>
 
-            <div class="pob-header">
-                <h2 class="pob-title"><i class="fas fa-layer-group"></i> Aprendices por Tipo de Población</h2>
-                <p class="pob-subtitle">Relación real obtenida de la base de datos centralizada.</p>
+            <!-- Dashboard Analytics -->
+            <div class="reports-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:20px; margin-bottom:30px;">
+                <div class="glass-card">
+                    <h3 style="margin-bottom:15px;">% Aprendices por Población</h3>
+                    <canvas id="chartPoblacion" height="200"></canvas>
+                </div>
+                <div class="glass-card">
+                    <h3 style="margin-bottom:15px;">Top 5 Fichas (Lectivas)</h3>
+                    <canvas id="chartFichas" height="200"></canvas>
+                </div>
             </div>
 
-            <div class="pob-grid" id="pob-grid-categorias">
-                <!-- Se carga dinámicamente -->
-                <div class="loading-shimmer" style="height:200px; border-radius:20px;"></div>
-                <div class="loading-shimmer" style="height:200px; border-radius:20px;"></div>
-                <div class="loading-shimmer" style="height:200px; border-radius:20px;"></div>
-            </div>
+            <div class="pob-grid" id="pob-grid-categorias"></div>
         </main>
     </div>
 
-    <!-- Modal: Detalle de Categoría -->
+    <!-- Modal: Detalle con PDF -->
     <div class="modal-overlay" id="modalPoblacion" style="display:none;">
-        <div class="modal-glass modal-wide" style="max-width: 900px;">
-            <div class="modal-pob-header" style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+        <div class="modal-glass modal-wide" style="max-width: 950px;">
+            <div class="modal-pob-header" style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;">
                 <div id="modal-pob-icon" class="pob-cat-icon"></div>
                 <div>
                     <h2 class="modal-title" id="modal-pob-titulo">Categoría</h2>
-                    <p class="modal-subtitle" id="modal-pob-subtitulo">Listado de aprendices</p>
+                    <p id="vocero-enfoque-lbl" style="color:var(--lid-primary); font-weight:600; font-size:0.9rem; margin-top:5px;"></p>
                 </div>
-                <button class="btn-lid btn-lid-cancel" onclick="cerrarModalPoblacion()"
-                    style="margin-left:auto; background:none; border:none; font-size:1.5rem; cursor:pointer;">
-                    &times;
-                </button>
+                <button class="btn-lid btn-lid-cancel" onclick="document.getElementById('modalPoblacion').style.display='none'" style="margin-left:auto;">&times;</button>
             </div>
 
-            <div class="pob-search-bar">
-                <i class="fas fa-search" style="color:#94a3b8;"></i>
-                <input type="text" id="pob-search" placeholder="Buscar por nombre, documento o ficha..."
-                    oninput="filtrarTablaPoblacion(this.value)">
+            <div class="pob-search-bar" style="display:flex; gap:10px; margin-bottom:1rem;">
+                <input type="text" id="pob-search" class="form-input" placeholder="Buscar..." oninput="PoblacionUI.filtrar(this.value)" style="flex:1">
+                <button class="btn-lid btn-lid-secondary" onclick="PoblacionUI.addAprendiz()">
+                    <i class="fas fa-plus"></i> Agregar Aprendiz
+                </button>
             </div>
 
             <div class="pob-table-wrap">
                 <table class="pob-table">
-                    <thead>
-                        <tr>
-                            <th>Documento</th>
-                            <th>Aprendiz</th>
-                            <th>Ficha</th>
-                            <th>Estado</th>
-                            <th>Programa</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pob-tabla-body">
-                        <tr>
-                            <td colspan="5" style="text-align:center; padding:3rem; color:#64748b;">Cargando
-                                aprendices...</td>
-                        </tr>
-                    </tbody>
+                    <thead><tr><th>Documento</th><th>Nombre</th><th>Ficha</th><th>Estado</th></tr></thead>
+                    <tbody id="pob-tabla-body"></tbody>
                 </table>
             </div>
 
-            <div class="modal-pob-footer">
-                <span id="modal-pob-total" style="font-weight:600; color:#475569;">0 registros</span>
-                <button class="btn-lid btn-lid-primary" onclick="window.print()"
-                    style="padding:0.6rem 1.2rem; border-radius:10px; background:var(--lid-primary); color:white; border:none; display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                    <i class="fas fa-print"></i> Imprimir Reporte
+            <div class="modal-pob-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+                <span id="modal-pob-total">0 registros</span>
+                <button class="btn-lid btn-lid-primary" onclick="PoblacionUI.exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF Oficial
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="js/main.js?v=1.0.7"></script>
+    <script src="js/main.js"></script>
     <script>
-        // === IDENTIDAD Y ACCESO ===
-        const user = authSystem.getCurrentUser();
-        if (!user) window.location.href = 'index.html';
-
-        document.getElementById('lid-role-display').innerHTML = `
-            <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
-            <span style="font-size:0.75rem;opacity:0.9;">${user.nombre} ${user.apellido}</span>
-        `;
-        document.getElementById('lid-topbar-user').textContent = `${user.nombre} ${user.apellido}`;
-
-        // === LÓGICA DE DATOS ===
         const CATEGORIAS = [
-            { key: 'mujer', label: 'Mujer', desc: 'Aprendices de enfoque de género', icon: 'fas fa-venus', bg: '#fce7f3', col: '#be185d' },
-            { key: 'indigena', label: 'Indígena', desc: 'Comunidades y pueblos originarios', icon: 'fas fa-feather-alt', bg: '#fef3c7', col: '#b45309' },
-            { key: 'narp', label: 'NARP', desc: 'Negros, Afro, Raizales y Palenqueros', icon: 'fas fa-globe-africa', bg: '#ede9fe', col: '#6d28d9' },
-            { key: 'campesino', label: 'Campesino', desc: 'Población rural y tradicional', icon: 'fas fa-tractor', bg: '#d1fae5', col: '#065f46' },
-            { key: 'lgbtiq', label: 'LGBTIQ+', desc: 'Diversidad de género y orientación', icon: 'fas fa-rainbow', bg: '#e0f2fe', col: '#0369a1' },
-            { key: 'discapacidad', label: 'Discapacidad', desc: 'Aprendices con necesidades especiales', icon: 'fas fa-wheelchair', bg: '#fee2e2', col: '#b91c1c' }
+            { key: 'mujer', label: 'Mujer', icon: 'fas fa-venus', bg: '#fce7f3', col: '#be185d' },
+            { key: 'indigena', label: 'Indígena', icon: 'fas fa-feather-alt', bg: '#fef3c7', col: '#b45309' },
+            { key: 'narp', label: 'NARP', icon: 'fas fa-globe-africa', bg: '#ede9fe', col: '#6d28d9' },
+            { key: 'campesino', label: 'Campesino', icon: 'fas fa-tractor', bg: '#d1fae5', col: '#065f46' },
+            { key: 'lgbtiq', label: 'LGBTIQ+', icon: 'fas fa-rainbow', bg: '#e0f2fe', col: '#0369a1' },
+            { key: 'discapacidad', label: 'Discapacidad', icon: 'fas fa-wheelchair', bg: '#fee2e2', col: '#b91c1c' }
         ];
 
         let todosAprendices = [];
-        let datosFiltradosModal = [];
+        let currentCatData = [];
+        let vocerosEnfoqueMap = {};
 
-        async function inicializar() {
-            try {
-                const res = await fetch('api/aprendices.php?limit=-1');
-                const data = await res.json();
-                if (data.success) {
-                    todosAprendices = data.data || [];
-                    renderGrid();
+        const PoblacionUI = {
+            async init() {
+                const user = authSystem.getCurrentUser();
+                document.getElementById('lid-topbar-user').textContent = `${user.nombre} ${user.apellido}`;
+                
+                await this.fetchData();
+                this.renderGrid();
+                this.renderCharts();
+            },
+
+            async fetchData() {
+                const [resA, resV] = await Promise.all([
+                    fetch('api/aprendices.php?limit=-1').then(r => r.json()),
+                    fetch('api/liderazgo.php?action=getLideres&filtro=enfoque').then(r => r.json())
+                ]);
+                
+                todosAprendices = resA.success ? resA.data : [];
+                if (resV.success) {
+                    resV.data.forEach(v => {
+                        const cat = v.tipo.replace('Vocero Enfoque ', '').toLowerCase();
+                        vocerosEnfoqueMap[cat] = `${v.nombre} ${v.apellido}`;
+                    });
                 }
-            } catch (e) {
-                console.error("Error al cargar datos:", e);
-                document.getElementById('pob-grid-categorias').innerHTML = '<p style="grid-column:1/-1; text-align:center; color:red;">Error al conectar con la base de datos.</p>';
-            }
-        }
+            },
 
-        function renderGrid() {
-            const grid = document.getElementById('pob-grid-categorias');
-            grid.innerHTML = CATEGORIAS.map(c => {
-                const count = todosAprendices.filter(a => a[c.key] == 1).length;
-                return `
-                <div class="pob-cat-card" onclick="abrirDetalle('${c.key}')">
-                    <div class="pob-cat-top">
-                        <div class="pob-cat-icon" style="background:${c.bg}; color:${c.col};">
-                            <i class="${c.icon}"></i>
+            renderGrid() {
+                 document.getElementById('pob-grid-categorias').innerHTML = CATEGORIAS.map(c => {
+                    const count = todosAprendices.filter(a => a[c.key] == 1).length;
+                    return `
+                    <div class="glass-card" onclick="PoblacionUI.abrirDetalle('${c.key}')" style="cursor:pointer">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="background:${c.bg}; color:${c.col}; width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
+                                <i class="${c.icon}"></i>
+                            </div>
+                            <span style="font-size:2rem; font-weight:800; font-family:'Outfit';">${count}</span>
                         </div>
-                        <div class="pob-cat-count">${count}</div>
-                    </div>
-                    <div>
-                        <div class="pob-cat-name">${c.label}</div>
-                        <div class="pob-cat-desc">${c.desc}</div>
-                    </div>
-                    <div class="pob-cat-action">
-                        Ver listado detallado <i class="fas fa-arrow-right"></i>
-                    </div>
-                </div>`;
-            }).join('');
-        }
+                        <h3 style="margin-top:1rem;">${c.label}</h3>
+                    </div>`;
+                }).join('');
+            },
 
-        function abrirDetalle(key) {
-            const cat = CATEGORIAS.find(c => c.key === key);
-            const modal = document.getElementById('modalPoblacion');
-            const iconModal = document.getElementById('modal-pob-icon');
+            abrirDetalle(key) {
+                const cat = CATEGORIAS.find(c => c.key === key);
+                document.getElementById('modal-pob-titulo').textContent = cat.label;
+                const vocero = vocerosEnfoqueMap[key] || 'No asignado';
+                document.getElementById('vocero-enfoque-lbl').innerHTML = `<i class="fas fa-crown"></i> Vocero: ${vocero}`;
+                
+                currentCatData = todosAprendices.filter(a => a[key] == 1);
+                this.renderTabla(currentCatData);
+                document.getElementById('modalPoblacion').style.display = 'flex';
+                this.currentKey = key;
+            },
 
-            document.getElementById('modal-pob-titulo').textContent = cat.label;
-            document.getElementById('modal-pob-subtitulo').textContent = `Aprendices clasificados como ${cat.label} en el sistema.`;
-            iconModal.style.background = cat.bg;
-            iconModal.style.color = cat.col;
-            iconModal.innerHTML = `<i class="${cat.icon}"></i>`;
+            renderTabla(lista) {
+                const tbody = document.getElementById('pob-tabla-body');
+                tbody.innerHTML = lista.map(a => `
+                    <tr>
+                        <td><strong>${a.documento}</strong></td>
+                        <td>${a.nombre} ${a.apellido}</td>
+                        <td>${a.numero_ficha || 'N/A'}</td>
+                        <td><span class="status-pill ${a.estado === 'LECTIVA' ? 'status-success' : ''}">${a.estado}</span></td>
+                    </tr>
+                `).join('');
+                document.getElementById('modal-pob-total').textContent = `${lista.length} registros`;
+            },
 
-            datosFiltradosModal = todosAprendices.filter(a => a[key] == 1);
-            renderTabla(datosFiltradosModal);
+            renderCharts() {
+                // Chart % Población
+                const ctx1 = document.getElementById('chartPoblacion').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: CATEGORIAS.map(c => c.label),
+                        datasets: [{
+                            data: CATEGORIAS.map(c => todosAprendices.filter(a => a[c.key] == 1).length),
+                            backgroundColor: CATEGORIAS.map(c => c.bg),
+                            borderColor: CATEGORIAS.map(c => c.col)
+                        }]
+                    }
+                });
 
-            modal.style.display = 'flex';
-        }
+                // Chart Top 5 Fichas Lectivas
+                const fichasLectivas = todosAprendices.filter(a => a.estado === 'LECTIVA');
+                const counts = {};
+                fichasLectivas.forEach(a => {
+                    const f = a.numero_ficha;
+                    if (f) counts[f] = (counts[f] || 0) + 1;
+                });
+                const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5);
 
-        function renderTabla(lista) {
-            const tbody = document.getElementById('pob-tabla-body');
-            document.getElementById('modal-pob-total').textContent = `${lista.length} registros encontrados`;
+                const ctx2 = document.getElementById('chartFichas').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: sorted.map(s => s[0]),
+                        datasets: [{
+                            label: 'Aprendices',
+                            data: sorted.map(s => s[1]),
+                            backgroundColor: '#39A900'
+                        }]
+                    }
+                });
+            },
 
-            if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">No hay aprendices en esta categoría.</td></tr>';
-                return;
+            exportPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const cat = CATEGORIAS.find(c => c.key === this.currentKey);
+                const vocero = vocerosEnfoqueMap[this.currentKey] || 'No asignado';
+
+                // Títulos
+                doc.setFontSize(18);
+                doc.setTextColor(57, 169, 0); // SENA Green
+                doc.text('REPORTE OFICIAL DE POBLACIÓN - SENAPRE', 105, 20, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setTextColor(0, 50, 77); // Navy
+                doc.text(`Categoría: ${cat.label}`, 20, 35);
+                doc.text(`Vocero de Enfoque: ${vocero}`, 20, 42);
+                doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 160, 35);
+
+                const tableData = currentCatData.map(a => [a.documento, `${a.nombre} ${a.apellido}`, a.numero_ficha, a.estado]);
+                
+                doc.autoTable({
+                    startY: 50,
+                    head: [['Documento', 'Aprendiz', 'Ficha', 'Estado']],
+                    body: tableData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [57, 169, 0] }
+                });
+
+                doc.save(`Reporte_${cat.label}_SenApre.pdf`);
+            },
+
+            addAprendiz() {
+                alert('Funcionalidad de asignación para la categoría: ' + this.currentKey);
             }
+        };
 
-            tbody.innerHTML = lista.map(a => `
-                <tr>
-                    <td><strong>${a.documento}</strong></td>
-                    <td>${a.nombre} ${a.apellido}</td>
-                    <td>${a.numero_ficha || 'N/A'}</td>
-                    <td>
-                        <span style="padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; 
-                            background: ${a.estado === 'LECTIVA' ? '#dcfce7' : '#f1f5f9'}; 
-                            color: ${a.estado === 'LECTIVA' ? '#166534' : '#475569'};">
-                            ${a.estado}
-                        </span>
-                    </td>
-                    <td style="font-size: 0.8rem; color: #64748b;">${a.nombre_programa || '—'}</td>
-                </tr>
-            `).join('');
-        }
-
-        function filtrarTablaPoblacion(query) {
-            const q = query.toLowerCase();
-            const resultados = datosFiltradosModal.filter(a =>
-                `${a.nombre} ${a.apellido} ${a.documento} ${a.numero_ficha}`.toLowerCase().includes(q)
-            );
-            renderTabla(resultados);
-        }
-
-        function cerrarModalPoblacion() {
-            document.getElementById('modalPoblacion').style.display = 'none';
-        }
-
-        window.onclick = function (event) {
-            const modal = document.getElementById('modalPoblacion');
-            if (event.target == modal) cerrarModalPoblacion();
-        }
-
-        document.addEventListener('DOMContentLoaded', inicializar);
+        PoblacionUI.init();
     </script>
 </body>
-
 </html>

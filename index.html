@@ -153,29 +153,21 @@
 
                     // Redirigir según el rol exacto — cada rol a su página exclusiva
                     const userRol = data.data.rol.toLowerCase();
-                    if (userRol === 'vocero') {
-                        // Panel exclusivo de voceros — sin módulos del director
+                    const areas = data.data.bienestar_data || [];
+
+                    // PRIORIDAD ALTA: Liderazgo (Jancy Barreto)
+                    if (areas.includes('voceros_y_representantes') && userRol !== 'director') {
+                        window.location.href = 'liderazgo.html';
+                    } else if (userRol === 'vocero') {
                         window.location.href = 'vocero-dashboard';
                     } else if (userRol === 'instructor') {
                         window.location.href = 'instructor-dashboard';
                     } else if (userRol === 'bienestar') {
-                        // Panel exclusivo de Bienestar del Aprendiz
                         window.location.href = 'bienestar-aprendiz';
-                    } else if (userRol === 'administrativo' || userRol === 'coordinador' || userRol === 'director' || userRol === 'admin' || userRol === 'administrador') {
-                        const areas = data.data.bienestar_data || [];
-                        const isJefeBienestar = areas.includes('jefe_bienestar');
-                        const isLiderazgo = areas.includes('voceros_y_representantes');
-
-                        if (isJefeBienestar && userRol !== 'director') {
-                            window.location.href = 'jefe-bienestar-dashboard';
-                        } else if (isLiderazgo && userRol !== 'director') {
-                            // Redirección directa para evitar parpadeo (Jancy Barreto)
-                            window.location.href = 'liderazgo.html';
-                        } else {
-                            window.location.href = 'admin-dashboard';
-                        }
+                    } else if (areas.includes('jefe_bienestar') && userRol !== 'director') {
+                        window.location.href = 'jefe-bienestar-dashboard';
                     } else {
-                        throw new Error('Rol de usuario no reconocido: ' + data.data.rol);
+                        window.location.href = 'admin-dashboard';
                     }
                 } else {
                     throw new Error(data.message || 'Credenciales inválidas');
