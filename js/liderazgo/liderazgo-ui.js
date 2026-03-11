@@ -51,6 +51,25 @@ const LiderazgoUI = {
                     }
                 };
             }
+
+            const formEdit = document.getElementById('formEditLider');
+            if (formEdit) {
+                formEdit.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const doc = document.getElementById('edit-doc').value;
+                    const correo = document.getElementById('edit-correo').value;
+                    const tel = document.getElementById('edit-tel').value;
+
+                    const res = await LiderazgoData.updateLider(doc, { correo, telefono: tel });
+                    if (res.success) {
+                        alert('Datos actualizados correctamente');
+                        document.getElementById('modalEditLider').style.display = 'none';
+                        if (typeof cargarLiderazgo === 'function') cargarLiderazgo();
+                    } else {
+                        alert('Error al actualizar: ' + (res.message || 'Desconocido'));
+                    }
+                };
+            }
         });
     },
 
@@ -111,17 +130,17 @@ const LiderazgoUI = {
         const paginatedItems = lideres.slice(start, end);
 
         let html = `
-        <div class="table-responsive">
-            <table class="lid-table">
+        <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 8px; overflow: hidden; margin-top: 1rem;">
+            <table class="lid-table" style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif;">
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>DOCUMENTO</th>
-                        <th>NOMBRE COMPLETO</th>
-                        <th>CORREO</th>
-                        <th>CELULAR</th>
-                        <th>ESTADO</th>
-                        <th>ACCIONES</th>
+                    <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">#</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">DOCUMENTO</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">NOMBRE COMPLETO</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">CORREO</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">CELULAR</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem; text-align:center;">ESTADO</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem; text-align:center;">EDITAR</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,18 +148,24 @@ const LiderazgoUI = {
         
         paginatedItems.forEach((l, i) => {
             const index = start + i + 1;
-            const estadoClass = l.estado === 'LECTIVA' ? 'status-success' : 'status-pending';
+            const isLectiva = l.estado === 'LECTIVA';
+            const pillBg = isLectiva ? '#e6f4ea' : '#fef3c7';
+            const pillColor = isLectiva ? '#1e8e3e' : '#b45309';
+            
             html += `
-                <tr>
-                    <td>${index}</td>
-                    <td><strong>${l.documento}</strong></td>
-                    <td>${l.nombre} ${l.apellido}</td>
-                    <td>${l.correo || 'No disponible'}</td>
-                    <td>${l.telefono || 'N/A'}</td>
-                    <td><span class="status-pill ${estadoClass}">${l.estado}</span></td>
-                    <td>
-                        <button class="btn-icon text-primary" onclick="LiderazgoUI.editLider('${l.documento}')" title="Editar"><i class="fas fa-pen"></i></button>
-                        <button class="btn-icon text-accent" onclick="LiderazgoUI.verSeguimiento('${l.documento}')" title="Trayectoria"><i class="fas fa-route"></i></button>
+                <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
+                    <td style="padding: 1rem; color: #64748b;">${index}</td>
+                    <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${l.documento}</td>
+                    <td style="padding: 1rem; color: #475569;">${l.nombre} ${l.apellido}</td>
+                    <td style="padding: 1rem; color: #64748b;">${l.correo || 'No disponible'}</td>
+                    <td style="padding: 1rem; color: #64748b;">${l.telefono || 'N/A'}</td>
+                    <td style="padding: 1rem; text-align:center;">
+                        <span style="background:${pillBg}; color:${pillColor}; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; display: inline-block;">${l.estado}</span>
+                    </td>
+                    <td style="padding: 1rem; text-align:center;">
+                        <button style="background: #e0f2fe; color: #0284c7; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#bae6fd'" onmouseout="this.style.background='#e0f2fe'" onclick="LiderazgoUI.editLider('${l.documento}')" title="Editar">
+                            <i class="fas fa-pen" style="font-size: 0.85rem;"></i>
+                        </button>
                     </td>
                 </tr>
             `;
@@ -174,8 +199,27 @@ const LiderazgoUI = {
     },
 
     editLider(documento) {
-        // Implementation for editing
-        console.log('Edit', documento);
+        let lider = null;
+        const caches = [LiderazgoData.cache.principales, LiderazgoData.cache.suplentes, LiderazgoData.cache.enfoque, LiderazgoData.cache.representantes];
+        for (const cache of caches) {
+            if (cache) {
+                const found = cache.find(l => String(l.documento) === String(documento));
+                if (found) { lider = found; break; }
+            }
+        }
+
+        if (!lider) {
+            alert('Líder no encontrado en la memoria actual.');
+            return;
+        }
+
+        document.getElementById('edit-doc').value = lider.documento;
+        document.getElementById('edit-doc-display').value = lider.documento;
+        document.getElementById('edit-nombre-display').value = `${lider.nombre} ${lider.apellido}`;
+        document.getElementById('edit-correo').value = lider.correo || '';
+        document.getElementById('edit-tel').value = lider.telefono || '';
+        
+        document.getElementById('modalEditLider').style.display = 'flex';
     },
 
     abrirModalReunion() {
