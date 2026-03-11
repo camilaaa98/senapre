@@ -134,13 +134,12 @@
                         <input type="text" class="voc-input" id="filtro-search"
                             placeholder="Buscar nombre o documento..." oninput="filtrarTabla()">
                         <select class="voc-select" id="filtro-estado" onchange="filtrarTabla()">
-                            <option value="">Solo activos (Lectiva)</option>
-                            <option value="TODOS">Ver todos</option>
                             <option value="LECTIVA">Lectiva</option>
                             <option value="CANCELADO">Cancelado</option>
                             <option value="RETIRADO">Retirado</option>
                             <option value="APLAZADO">Aplazado</option>
                             <option value="TRASLADO">Traslado</option>
+                            <option value="TODOS">Ver todos</option>
                         </select>
                         <button class="voc-btn voc-btn-pdf" onclick="exportarPDF()">
                             <i class="fas fa-file-pdf"></i> Exportar PDF

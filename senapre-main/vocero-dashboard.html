@@ -25,13 +25,13 @@
             </div>
             <nav class="voc-nav">
                 <a href="vocero-dashboard" class="active"><i class="fas fa-home"></i> Inicio</a>
-                <a href="#voc-resumen-seccion" onclick="irA('voc-resumen-seccion')">
+                <a href="javascript:void(0)" onclick="irA('voc-resumen-seccion')">
                     <i class="fas fa-chart-bar"></i> Informe de Estados
                 </a>
-                <a href="#voc-seccion-aprendices" onclick="irA('voc-seccion-aprendices')">
+                <a href="javascript:void(0)" onclick="irA('voc-seccion-aprendices')">
                     <i class="fas fa-user-graduate"></i> Listado de Aprendices
                 </a>
-                <a href="#" onclick="exportarPDF()">
+                <a href="javascript:void(0)" onclick="exportarPDF()">
                     <i class="fas fa-file-pdf"></i> Exportar PDF
                 </a>
             </nav>
@@ -79,8 +79,8 @@
                     <div class="voc-stat-sm-label">Retirado</div>
                 </div>
                 <div class="voc-stat-sm s-gris">
-                    <div class="voc-stat-sm-num" id="st-otros">—</div>
-                    <div class="voc-stat-sm-label">Otros</div>
+                    <div class="voc-stat-sm-num" id="st-traslado">0</div>
+                    <div class="voc-stat-sm-label">Traslado</div>
                 </div>
             </div>
 
@@ -89,7 +89,7 @@
 
                 <!-- Gráfica de Dona -->
                 <div class="voc-chart-card">
-                    <h3><i class="fas fa-chart-pie"></i> Distribución por Estado</h3>
+                    <h3><i class="fas fa-chart-pie"></i> Distribución de acuerdo al Estado del Aprendiz</h3>
                     <div class="voc-chart-wrap">
                         <canvas id="chart-dona"></canvas>
                     </div>
@@ -97,7 +97,7 @@
 
                 <!-- Gráfica de Barras -->
                 <div class="voc-chart-card">
-                    <h3><i class="fas fa-chart-bar"></i> Aprendices por Estado</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Aprendices de acuerdo a su Estado</h3>
                     <div class="voc-chart-wrap">
                         <canvas id="chart-barras"></canvas>
                     </div>
@@ -105,7 +105,7 @@
             </div>
 
             <!-- ── Tabla Resumen Oficial de Estados ───────────── -->
-            <div class="voc-tabla-estados" style="margin-bottom: 25px;">
+            <div class="voc-tabla-estados mb-25">
                 <h3><i class="fas fa-table"></i> Resumen Oficial de Aprendices</h3>
                 <table>
                     <thead>
@@ -134,13 +134,12 @@
                         <input type="text" class="voc-input" id="filtro-search"
                             placeholder="Buscar nombre o documento..." oninput="filtrarTabla()">
                         <select class="voc-select" id="filtro-estado" onchange="filtrarTabla()">
-                            <option value="">Solo activos (Lectiva)</option>
-                            <option value="TODOS">Ver todos</option>
                             <option value="LECTIVA">Lectiva</option>
                             <option value="CANCELADO">Cancelado</option>
                             <option value="RETIRADO">Retirado</option>
                             <option value="APLAZADO">Aplazado</option>
                             <option value="TRASLADO">Traslado</option>
+                            <option value="TODOS">Ver todos</option>
                         </select>
                         <button class="voc-btn voc-btn-pdf" onclick="exportarPDF()">
                             <i class="fas fa-file-pdf"></i> Exportar PDF
@@ -171,7 +170,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/main.js?v=1.0.7"></script>
+    <script>
+        // ===== GUARD: Solo voceros autenticados =====
+        (function () {
+            const user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
+                ? authSystem.getCurrentUser()
+                : JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) { window.location.href = 'index.html'; return; }
+            const rol = (user.rol || '').toLowerCase();
+            if (rol !== 'vocero') { window.location.href = 'index.html'; }
+        })();
+    </script>
     <script src="js/vocero/vocero-dashboard.js?v=2.0.0"></script>
 </body>
 

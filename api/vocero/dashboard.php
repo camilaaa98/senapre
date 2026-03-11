@@ -46,7 +46,8 @@ try {
 
         // 2. Obtener aprendices de esa ficha (todos los estados)
         $stmt2 = $conn->prepare("
-            SELECT documento, nombre, apellido, correo, celular, estado, tipo_poblacion
+            SELECT documento, nombre, apellido, correo, celular, estado, tipo_poblacion,
+                   mujer, indigena, narp, campesino, lgbtiq, discapacidad
             FROM aprendices
             WHERE TRIM(numero_ficha) = :f
             ORDER BY apellido, nombre
