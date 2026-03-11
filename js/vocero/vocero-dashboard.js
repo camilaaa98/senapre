@@ -243,8 +243,11 @@ const VoceroDashboard = (() => {
     // EDICIÓN EN MODAL
     // ────────────────────────────────────────────────────────────
     function editarFila(doc) {
-        const a = aprendices.find(x => x.documento === doc);
-        if (!a) return;
+        const a = aprendices.find(x => String(x.documento) === String(doc));
+        if (!a) {
+            console.error('Aprendiz no encontrado:', doc, aprendices);
+            return;
+        }
         
         // Crear modal si no existe en HTML
         let modal = document.getElementById('modalEditVocero');
@@ -252,9 +255,18 @@ const VoceroDashboard = (() => {
             modal = document.createElement('div');
             modal.id = 'modalEditVocero';
             modal.className = 'modal-overlay';
-            modal.style.zIndex = '1000';
+            modal.style.zIndex = '99999';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
             modal.innerHTML = `
-                <div class="modal-glass" style="max-width: 500px; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                <div class="modal-glass" style="max-width: 500px; width: 90%; padding: 2rem; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
                         <h2 style="font-family: 'Outfit'; font-size: 1.5rem; color: #1e293b; margin: 0;">
                             <i class="fas fa-user-edit" style="color: #39A900; margin-right: 10px;"></i>Editar Información
