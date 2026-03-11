@@ -350,6 +350,29 @@ try {
                 exit;
             }
         }
+        
+        // Agregar aprendiz a una población
+        if ($action === 'addPoblacion') {
+            if (empty($data['documento']) || empty($data['tipo_poblacion'])) throw new Exception('Datos incompletos');
+            $doc = $data['documento'];
+            $pob_text = $data['tipo_poblacion'];
+            
+            // Se actualiza en la tabla de aprendices
+            $sql = "UPDATE aprendices SET tipo_poblacion = :pob WHERE documento = :doc";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([':pob' => $pob_text, ':doc' => $doc]);
+            
+            // También tratamos de marcarlo en la tabla vieja correspondiente si existe
+            $pob_lower = strtolower($pob_text);
+            if (in_array($pob_lower, ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'])) {
+                try {
+                    $conn->prepare("INSERT INTO $pob_lower (documento) VALUES (:doc)")->execute([':doc' => $doc]);
+                } catch(Exception $e) {} // Ignorar si ya existe
+            }
+            
+            echo json_encode(['success' => true, 'message' => "Aprendiz asignado a $pob_text"]);
+            exit;
+        }
     }
 
 } catch (Exception $e) {

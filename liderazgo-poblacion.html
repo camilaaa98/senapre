@@ -79,9 +79,14 @@
             <div class="glass-card" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1rem;">
                     <h3 id="tabla-poblacion-titulo" style="color: #0c4a6e; font-size: 1.1rem; font-family: 'Inter';">Detalle de Aprendices</h3>
-                    <button class="btn-lid" style="background-color: #ef4444; color: white; padding: 6px 15px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer;" onclick="PoblacionUI.exportPDF()">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
+                    <div style="display:flex; gap: 10px;">
+                        <button class="btn-lid" id="btn-add-poblacion" style="background-color: #39A900; color: white; padding: 6px 15px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer; display: none;" onclick="PoblacionUI.abrirModalAgregar()">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                        <button class="btn-lid" style="background-color: #ef4444; color: white; padding: 6px 15px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer;" onclick="PoblacionUI.exportPDF()">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="table-responsive" style="border:none; box-shadow:none;">
@@ -107,8 +112,29 @@
         </main>
     </div>
 
-    <!-- Modales extra si son necesarios (El PDF ahora se dispara directo desde la tabla principal) -->
-
+    <!-- Modales extra si son necesarios -->
+    <div class="modal-overlay" id="modalAddPoblacion" style="display:none; z-index: 2000;">
+        <div class="modal-glass" style="max-width: 450px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="font-family: 'Outfit'; font-size: 1.3rem; color: #1e293b; margin: 0;"><i class="fas fa-user-plus" style="color:#39A900;"></i> Agregar a Población</h2>
+                <button type="button" onclick="document.getElementById('modalAddPoblacion').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+            </div>
+            <form id="formAddPoblacion" onsubmit="event.preventDefault(); PoblacionUI.guardarAprendizPoblacion();">
+                <input type="hidden" id="pob-categoria-actual">
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Seleccione un aprendiz con estado LECTIVA para añadir a la categoría <strong id="pob-categoria-nombre" style="color:#00324D;"></strong>.</p>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: #1e293b; display: block; margin-bottom: 5px;">Buscar Aprendiz</label>
+                    <select id="pob-aprendiz-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none;" required>
+                        <option value="">Cargando aprendices...</option>
+                    </select>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" onclick="document.getElementById('modalAddPoblacion').style.display='none'" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancelar</button>
+                    <button type="submit" id="btn-save-pob" style="padding: 8px 16px; background: #39A900; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;"><i class="fas fa-save"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="js/main.js"></script>
     <script>
         const CATEGORIAS = [
@@ -202,9 +228,69 @@
                 currentCatData = todosAprendices.filter(a => a.tipo_poblacion === cat.label);
                 this.renderTabla(currentCatData);
                 this.currentKey = key;
+                this.currentLabel = cat.label;
+                
+                // Mostrar botón de agregar
+                const btnAdd = document.getElementById('btn-add-poblacion');
+                if (btnAdd) btnAdd.style.display = 'inline-flex';
                 
                 // Scroll to table smoothly
                 document.getElementById('tabla-poblacion-titulo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+
+            abrirModalAgregar() {
+                if (!this.currentKey) return;
+                document.getElementById('pob-categoria-actual').value = this.currentLabel;
+                document.getElementById('pob-categoria-nombre').textContent = this.currentLabel;
+                
+                // Poblar select
+                const select = document.getElementById('pob-aprendiz-select');
+                select.innerHTML = '<option value="">Cargando...</option>';
+                
+                // Solo aprendices en LECTIVA que NO estén en la categoría actual (o que no tengan categoría asignada)
+                const elegibles = todosAprendices.filter(a => a.estado === 'LECTIVA' && a.tipo_poblacion !== this.currentLabel);
+                
+                if (elegibles.length === 0) {
+                    select.innerHTML = '<option value="">No hay aprendices elegibles</option>';
+                } else {
+                    select.innerHTML = '<option value="">Seleccione un aprendiz...</option>' + elegibles.map(a => `<option value="${a.documento}">${a.documento} - ${a.nombre} ${a.apellido}</option>`).join('');
+                }
+                
+                document.getElementById('modalAddPoblacion').style.display = 'flex';
+            },
+
+            async guardarAprendizPoblacion() {
+                const doc = document.getElementById('pob-aprendiz-select').value;
+                const cat = document.getElementById('pob-categoria-actual').value;
+                if (!doc) return;
+                
+                const btn = document.getElementById('btn-save-pob');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                try {
+                    const req = await fetch('api/liderazgo.php?action=addPoblacion', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ documento: doc, tipo_poblacion: cat })
+                    });
+                    const res = await req.json();
+                    
+                    if (res.success) {
+                        alert('Aprendiz añadido correctamente a la población');
+                        document.getElementById('modalAddPoblacion').style.display = 'none';
+                        await this.fetchData(); 
+                        this.renderGrid();
+                        this.abrirDetalle(this.currentKey);
+                    } else {
+                        alert('Error: ' + res.message);
+                    }
+                } catch(e) {
+                    alert('Error en el servidor.');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+                }
             },
 
             renderTabla(lista) {
