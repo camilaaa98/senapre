@@ -151,14 +151,25 @@ const VoceroDashboard = (() => {
             const rows = slice.map((a, i) => {
                 const est = (a.estado || '').toUpperCase();
                 const badge = ({ LECTIVA: 'badge-lectiva', CANCELADO: 'badge-cancelado', RETIRADO: 'badge-retirado', APLAZADO: 'badge-aplazado', TRASLADO: 'badge-aplazado' })[est] || 'badge-default';
+                
+                // Generar iconos de población
+                const pobIcons = [];
+                if (a.mujer == 1) pobIcons.push('<i class="fas fa-venus" title="Mujer" style="color:#ec4899"></i>');
+                if (a.indigena == 1) pobIcons.push('<i class="fas fa-leaf" title="Indígena" style="color:#16a34a"></i>');
+                if (a.narp == 1) pobIcons.push('<i class="fas fa-users" title="NARP" style="color:#92400e"></i>');
+                if (a.campesino == 1) pobIcons.push('<i class="fas fa-tractor" title="Campesino" style="color:#d97706"></i>');
+                if (a.lgbtiq == 1) pobIcons.push('<i class="fas fa-rainbow" title="LGBTIQ+" style="color:#8b5cf6"></i>');
+                if (a.discapacidad == 1) pobIcons.push('<i class="fas fa-wheelchair" title="Discapacidad" style="color:#3b82f6"></i>');
+
                 return `<tr>
                     <td>${inicio + i + 1}</td>
                     <td><strong>${a.documento}</strong></td>
                     <td>${a.nombre} ${a.apellido}</td>
+                    <td><div class="voc-pob-cell">${pobIcons.join(' ') || '<span style="color:#cbd5e1">—</span>'}</div></td>
                     <td><span id="correo-txt-${a.documento}">${a.correo || '—'}</span></td>
                     <td><span id="cel-txt-${a.documento}">${a.celular || '—'}</span></td>
                     <td><span class="badge ${badge}">${est}</span></td>
-                    <td>
+                    <td class="txt-center">
                         <button class="voc-btn-edit-circ" onclick="VoceroDashboard.editarFila('${a.documento}')" title="Editar">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
@@ -167,9 +178,20 @@ const VoceroDashboard = (() => {
             }).join('');
 
             document.getElementById('voc-tabla-body').innerHTML = `
-                <div class="table-responsive">
+                <div class="table-container-fixed">
                     <table class="voc-table">
-                        <thead><tr><th>N°</th><th>Documento</th><th>Nombre</th><th>Correo</th><th>Celular</th><th>Estado</th><th>Acción</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Documento</th>
+                                <th>Aprendiz</th>
+                                <th>Población</th>
+                                <th>Correo</th>
+                                <th>Celular</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
                         <tbody>${rows}</tbody>
                     </table>
                 </div>`;
