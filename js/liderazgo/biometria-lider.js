@@ -195,6 +195,7 @@ const BiometriaLider = {
             console.log("Rostro Analizado. Coincidencia Biometrica 98.4%. ID:", randomId);
             this.onDetected(randomId);
         }
+    },
 
     onDetected(id) {
         // Evento personalizado para ser manejado por la UI
