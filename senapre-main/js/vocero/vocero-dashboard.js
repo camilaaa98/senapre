@@ -306,12 +306,12 @@ const VoceroDash = (() => {
             // ── Cabecera profesional SENA + SenApre ──────────────
             const subtitulo = `Informe de Aprendices | Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`;
 
-            // Usar el módulo compartido si está disponible, o pintar manualmente
-            let startY = 56;
+            // Usar el módulo compartido si está disponible
+            let startY = 66;
             if (typeof SenaPrePDF !== 'undefined') {
                 startY = await SenaPrePDF.crearCabecera(doc, {
-                    titulo:      'REGIONAL CAQUET\u00c1',
-                    subtitulo:   subtitulo,
+                    titulo:      'Informe de Aprendices',
+                    subtitulo:   `Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`,
                     orientacion: 'landscape'
                 });
             } else {

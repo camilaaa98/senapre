@@ -270,11 +270,11 @@ async function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     const doc = new jsPDF('p', 'mm', 'a4');
 
     // --- ENCABEZADO ---
-    let startY = 56;
+    let startY = 70; // Mayor margen para portrait
     if (typeof SenaPrePDF !== 'undefined') {
         startY = await SenaPrePDF.crearCabecera(doc, {
-            titulo:      'REPORTE DE ASISTENCIA',
-            subtitulo:   `FICHA ${ficha} | Periodo: ${inicio} al ${fin}`,
+            titulo:      'Reporte de Asistencia',
+            subtitulo:   `Ficha ${ficha} | Periodo: ${inicio} al ${fin}`,
             orientacion: 'portrait'
         });
     }

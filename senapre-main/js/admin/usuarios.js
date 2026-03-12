@@ -728,10 +728,10 @@ async function exportarUsuariosPDF() {
     });
 
     // --- ENCABEZADO ---
-    let startY = 56;
+    let startY = 70; // Mayor margen para portrait
     if (typeof SenaPrePDF !== 'undefined') {
         startY = await SenaPrePDF.crearCabecera(doc, {
-            titulo:      'REPORTE GENERAL DE USUARIOS',
+            titulo:      'Reporte General de Usuarios',
             subtitulo:   `Generado el ${fecha}`,
             orientacion: 'portrait'
         });

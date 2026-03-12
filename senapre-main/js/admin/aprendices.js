@@ -1052,18 +1052,18 @@ async function exportarAprendicesPDF() {
         ]);
 
         // --- ENCABEZADO ---
-        let startY = 56;
+        let startY = 66;
         if (typeof SenaPrePDF !== 'undefined') {
             let titulo = "REPORTE DE APRENDICES";
-            let subtitulo = "VOCERÍA DE FORMACIÓN";
+            let subtitulo = "VOCER\u00cdA DE FORMACI\u00d3N";
 
             if (user.rol === 'vocero') {
                 if (scope.tipo === 'enfoque') {
-                    titulo = `TIPO DE POBLACIÓN ${scope.poblacion.toUpperCase()}`;
-                    subtitulo = `VOCERO DE ENFOQUE DIFERENCIAL ${scope.poblacion.toUpperCase()}`;
+                    titulo = `Poblaci\u00f3n ${scope.poblacion.toUpperCase()}`;
+                    subtitulo = `Vocero de Enfoque Diferencial`;
                 } else {
-                    titulo = `LISTADO DE APRENDICES - FICHA ${scope.ficha}`;
-                    subtitulo = `VOCERÍA ${scope.tipo.toUpperCase()} - FICHA ${scope.ficha}`;
+                    titulo = `Listado de Aprendices - Ficha ${scope.ficha}`;
+                    subtitulo = `Vocer\u00eda ${scope.tipo.toUpperCase()}`;
                 }
             }
 
