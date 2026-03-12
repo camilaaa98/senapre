@@ -1749,4 +1749,182 @@
         font-size: 0.85rem;
     }
 }
-
+
+
+/* -----------------------------------------------------------
+   BOTÓN VOLVER — Premium
+   ----------------------------------------------------------- */
+.voc-btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #00324D, #004f75);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 3px 10px rgba(0,50,77,0.25);
+    letter-spacing: 0.02em;
+}
+.voc-btn-volver:hover {
+    background: linear-gradient(135deg, #004f75, #006b9e);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,50,77,0.35);
+    color: white;
+}
+.voc-btn-volver i { font-size: 0.9rem; }
+
+/* -----------------------------------------------------------
+   HAMBURGER BUTTON
+   ----------------------------------------------------------- */
+.voc-hamburger {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 999;
+    background: linear-gradient(135deg, #00324D, #004f75);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,50,77,0.4);
+    transition: all 0.2s ease;
+}
+.voc-hamburger:hover { transform: scale(1.07); }
+
+.voc-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    backdrop-filter: blur(2px);
+}
+.voc-overlay.active { display: block; }
+
+/* -----------------------------------------------------------
+   RESPONSIVE — Tablet (= 900px)
+   ----------------------------------------------------------- */
+@media (max-width: 900px) {
+    .voc-hamburger { display: flex; }
+
+    .voc-sidebar {
+        transform: translateX(-260px);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        z-index: 300;
+    }
+    .voc-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 6px 0 28px rgba(0,0,0,0.3);
+    }
+
+    .voc-main {
+        margin-left: 0 !important;
+        padding: 20px 16px;
+        padding-top: 72px;
+    }
+
+    .voc-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .voc-charts-row {
+        flex-direction: column !important;
+    }
+
+    .voc-chart-card {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .voc-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 18px 20px;
+    }
+
+    .voc-header-right { align-self: flex-end; }
+
+    .voc-table-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .voc-filters { width: 100%; }
+    .voc-input { max-width: 100%; width: 100%; }
+}
+
+/* -----------------------------------------------------------
+   RESPONSIVE — Móvil (= 600px)
+   ----------------------------------------------------------- */
+@media (max-width: 600px) {
+    .voc-main {
+        padding: 12px;
+        padding-top: 68px;
+    }
+
+    .voc-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .voc-stat-num { font-size: 1.5rem; }
+    .voc-stat-card { padding: 14px 10px; }
+    .voc-header-left h1 { font-size: 1.3rem; }
+
+    .voc-table-card { overflow-x: auto; }
+
+    .voc-filters {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .voc-select,
+    .voc-btn-pdf {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .voc-stats-mini {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px;
+    }
+
+    .voc-card-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .voc-modal-box {
+        margin: 0;
+        border-radius: 12px 12px 0 0;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+    }
+
+    .voc-checks-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .voc-btn-volver {
+        font-size: 0.8rem;
+        padding: 7px 14px;
+    }
+}

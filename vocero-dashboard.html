@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Hamburger (móvil) -->
+    <button class="voc-hamburger" id="voc-hamburger" aria-label="Abrir menú">
+        <i class="fas fa-bars"></i>
+    </button>
+    <!-- Overlay sidebar -->
+    <div class="voc-overlay" id="voc-overlay"></div>
+
     <div class="voc-container">
 
         <!-- SIDEBAR -->
@@ -163,10 +170,20 @@
             if ((user.rol || '').toLowerCase() !== 'vocero') { window.location.href = 'index.html'; }
         })();
     </script>
-    <script src="js/vocero/vocero-dashboard.js?v=2.2.0"></script>
+    <script src="js/vocero/vocero-dashboard.js?v=2.3.0"></script>
     <script>
         function cerrarSesion(e) { e.preventDefault(); localStorage.removeItem('user'); location.href = 'index.html'; }
-        document.addEventListener('DOMContentLoaded', () => VoceroDash.initDashboard());
+        document.addEventListener('DOMContentLoaded', () => {
+            VoceroDash.initDashboard();
+            // Sidebar móvil
+            const ham = document.getElementById('voc-hamburger');
+            const overlay = document.getElementById('voc-overlay');
+            const sidebar = document.querySelector('.voc-sidebar');
+            function abrirSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); ham.innerHTML = '<i class="fas fa-times"></i>'; }
+            function cerrarSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); ham.innerHTML = '<i class="fas fa-bars"></i>'; }
+            ham.addEventListener('click', () => sidebar.classList.contains('open') ? cerrarSidebar() : abrirSidebar());
+            overlay.addEventListener('click', cerrarSidebar);
+        });
     </script>
 </body>
 </html>

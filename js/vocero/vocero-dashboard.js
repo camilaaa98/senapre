@@ -310,7 +310,7 @@ const VoceroDash = (() => {
             let startY = 56;
             if (typeof SenaPrePDF !== 'undefined') {
                 startY = await SenaPrePDF.crearCabecera(doc, {
-                    titulo:      'REPORTE DE APRENDICES',
+                    titulo:      'REGIONAL CAQUET\u00c1',
                     subtitulo:   subtitulo,
                     responsable: State.vocNombre,
                     orientacion: 'landscape'

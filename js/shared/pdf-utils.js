@@ -84,27 +84,27 @@ const SenaPrePDF = (() => {
         doc.line(logoSenaX + logoSenaW + 4, 12, logoSenapreX - 4, 12);
         doc.line(logoSenaX + logoSenaW + 4, headerH - 10, logoSenapreX - 4, headerH - 10);
 
-        // ── Texto "SENA — SENAPRE" (más grande y visible)
+        // ── Texto "SENA — SENAPRE" (más grande, bajado para no pisar la línea)
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
-        doc.text('SENA \u2014 SENAPRE', pw / 2, isLandscape ? 14 : 15, { align: 'center' });
+        doc.text('SENA \u2014 SENAPRE', pw / 2, isLandscape ? 19 : 20, { align: 'center' });
 
         // ── Título principal
         doc.setFontSize(isLandscape ? 15 : 13);
         doc.setFont('helvetica', 'bold');
-        doc.text(titulo.toUpperCase(), pw / 2, isLandscape ? 25 : 27, { align: 'center' });
+        doc.text(titulo.toUpperCase(), pw / 2, isLandscape ? 29 : 30, { align: 'center' });
 
         // ── Subtítulo
         doc.setFontSize(isLandscape ? 9.5 : 9);
         doc.setFont('helvetica', 'normal');
-        doc.text(subtitulo, pw / 2, isLandscape ? 34 : 36, { align: 'center' });
+        doc.text(subtitulo, pw / 2, isLandscape ? 38 : 40, { align: 'center' });
 
         // ── Responsable (si aplica)
         if (responsable) {
             doc.setFontSize(isLandscape ? 9 : 8);
             doc.setFont('helvetica', 'bold');
-            doc.text(responsable.toUpperCase(), pw / 2, isLandscape ? 42 : 44, { align: 'center' });
+            doc.text(responsable.toUpperCase(), pw / 2, isLandscape ? 46 : 48, { align: 'center' });
         }
 
         // ── Franja de fecha (fondo claro)
@@ -143,7 +143,7 @@ const SenaPrePDF = (() => {
         doc.setLineWidth(0.3);
         doc.line(12, ph - 11, pw - 12, ph - 11);
 
-        doc.text('Generado por SenApre — SENA CTPI', 14, ph - 6);
+        doc.text('Generado por SenApre \u2014 SENA Regional Caquet\u00e1', 14, ph - 6);
         doc.text(
             `Página ${pageNum} de ${totalPags}`,
             pw - 14, ph - 6,
