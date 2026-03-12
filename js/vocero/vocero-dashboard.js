@@ -312,7 +312,6 @@ const VoceroDash = (() => {
                 startY = await SenaPrePDF.crearCabecera(doc, {
                     titulo:      'REGIONAL CAQUET\u00c1',
                     subtitulo:   subtitulo,
-                    responsable: State.vocNombre,
                     orientacion: 'landscape'
                 });
             } else {
