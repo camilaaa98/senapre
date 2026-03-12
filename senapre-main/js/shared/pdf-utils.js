@@ -1,5 +1,5 @@
 /**
- * pdf-utils.js — v2.2.0
+ * pdf-utils.js — v3.0.0
  * SENAPRE — Módulo compartido para generación de PDFs estandarizados
  * 
  * Uso:
