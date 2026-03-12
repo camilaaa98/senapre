@@ -1,5 +1,5 @@
 /**
- * pdf-utils.js — v1.0.0
+ * pdf-utils.js — v2.2.0
  * SENAPRE — Módulo compartido para generación de PDFs estandarizados
  * 
  * Uso:
@@ -71,8 +71,8 @@ const SenaPrePDF = (() => {
         if (imgSenapre) {
             // Clipping circular perfecto sin borde blanco
             doc.saveGraphicsState();
-            doc.circle(logoSenapreX + logoSenapreD / 2, logoSenapreY + logoSenapreD / 2, logoSenapreD / 2, 'F'); // Solo para referencia de área si es necesario
-            doc.clip();
+            doc.circle(logoSenapreX + logoSenapreD / 2, logoSenapreY + logoSenapreD / 2, logoSenapreD / 2); // Definir el path del círculo
+            doc.clip(); // Aplicar el recorte basado en el path definido
             doc.addImage(imgSenapre, 'PNG', logoSenapreX, logoSenapreY, logoSenapreD, logoSenapreD);
             doc.restoreGraphicsState();
         }
