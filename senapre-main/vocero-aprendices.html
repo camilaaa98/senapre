@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de aprendices por vocero — SenApre SENA">
+    <title>Mis Aprendices — Panel Vocería | SenApre</title>
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css?v=2.2.0">
+    <link rel="stylesheet" href="css/vocero.css?v=2.2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="voc-container">
+
+        <!-- SIDEBAR -->
+        <aside class="voc-sidebar">
+            <div class="voc-sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo">
+                <h3 id="voc-nombre-sidebar">Vocero</h3>
+                <div class="voc-badge"><i class="fas fa-star"></i> Vocería</div>
+                <p class="voc-ficha-tag">Ficha: <span id="voc-ficha-sidebar">—</span></p>
+            </div>
+            <nav class="voc-nav">
+                <a href="vocero-dashboard"><i class="fas fa-home"></i> <span>Inicio</span></a>
+                <a href="vocero-aprendices" class="active"><i class="fas fa-user-graduate"></i> <span>Aprendices</span></a>
+                <a href="javascript:void(0)" onclick="VoceroDash.exportarPDF()"><i class="fas fa-file-pdf"></i> <span>Exportar PDF</span></a>
+            </nav>
+            <nav class="voc-nav voc-nav-footer">
+                <a href="index" onclick="cerrarSesion(event)">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+            <div class="voc-sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="voc-main">
+
+            <!-- Encabezado -->
+            <div class="voc-header">
+                <div class="voc-header-left">
+                    <p class="voc-header-tag">Gestión</p>
+                    <h1>Mis Aprendices</h1>
+                    <p id="voc-tipo-label" class="voc-header-sub">Cargando información...</p>
+                </div>
+                <div class="voc-header-right">
+                    <div class="voc-ficha-label">FICHA</div>
+                    <div class="voc-ficha-num" id="voc-ficha-header">—</div>
+                </div>
+            </div>
+
+            <!-- Mini resumen de estados -->
+            <div class="voc-stats-mini">
+                <div class="voc-stat-mini-card">
+                    <span class="voc-stat-mini-num" id="st-total">—</span>
+                    <span class="voc-stat-mini-label">Total</span>
+                </div>
+                <div class="voc-stat-mini-card stat-mini-verde">
+                    <span class="voc-stat-mini-num" id="st-lectiva">—</span>
+                    <span class="voc-stat-mini-label">Lectiva</span>
+                </div>
+                <div class="voc-stat-mini-card stat-mini-rojo">
+                    <span class="voc-stat-mini-num" id="st-cancelado">—</span>
+                    <span class="voc-stat-mini-label">Cancelado</span>
+                </div>
+                <div class="voc-stat-mini-card stat-mini-naranja">
+                    <span class="voc-stat-mini-num" id="st-retirado">—</span>
+                    <span class="voc-stat-mini-label">Retirado</span>
+                </div>
+                <div class="voc-stat-mini-card stat-mini-gris">
+                    <span class="voc-stat-mini-num" id="st-traslado">0</span>
+                    <span class="voc-stat-mini-label">Traslado</span>
+                </div>
+            </div>
+
+            <!-- Listado de Aprendices -->
+            <div class="voc-table-card">
+                <div class="voc-table-header">
+                    <h2><i class="fas fa-users"></i> Ficha <span id="voc-ficha-tabla">—</span></h2>
+                    <div class="voc-filters">
+                        <input type="text" class="voc-input" id="filtro-search"
+                            placeholder="🔍 Buscar nombre o documento..." oninput="filtrarTabla()">
+                        <select class="voc-select" id="filtro-estado" onchange="filtrarTabla()">
+                            <option value="LECTIVA">Lectiva</option>
+                            <option value="CANCELADO">Cancelado</option>
+                            <option value="RETIRADO">Retirado</option>
+                            <option value="APLAZADO">Aplazado</option>
+                            <option value="TRASLADO">Traslado</option>
+                            <option value="TODOS">Ver todos</option>
+                        </select>
+                        <button class="voc-btn-pdf" onclick="VoceroDash.exportarPDF()">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="voc-aviso-filtro" id="aviso-filtro">
+                    <i class="fas fa-info-circle"></i>
+                    Mostrando aprendices en estado <strong>LECTIVA</strong> (activos). Use el filtro para ver otros estados.
+                </div>
+
+                <div id="voc-tabla-body">
+                    <div class="voc-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando aprendices...
+                    </div>
+                </div>
+
+                <div class="voc-pag" id="voc-paginacion"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal de Edición -->
+    <div id="modalEditVocero" class="voc-modal-overlay" style="display:none;">
+        <div class="voc-modal-box">
+            <div class="voc-modal-header">
+                <h2><i class="fas fa-user-edit"></i> Editar Aprendiz</h2>
+                <button class="voc-modal-close" onclick="document.getElementById('modalEditVocero').style.display='none'">&times;</button>
+            </div>
+            <form id="formEditVocero" onsubmit="VoceroDash.guardarEdicion(event)" novalidate>
+                <input type="hidden" id="edit-doc-modal">
+
+                <div class="voc-form-group">
+                    <label class="voc-form-label">Aprendiz</label>
+                    <input type="text" id="edit-nombre-display" class="voc-input" readonly>
+                </div>
+
+                <div class="voc-form-group">
+                    <label class="voc-form-label" for="edit-correo-modal">Correo Electrónico</label>
+                    <input type="text" id="edit-correo-modal" class="voc-input" placeholder="ejemplo@correo.com">
+                    <span class="voc-form-error" id="err-correo"></span>
+                </div>
+
+                <div class="voc-form-group">
+                    <label class="voc-form-label" for="edit-cel-modal">Celular / Teléfono</label>
+                    <input type="text" id="edit-cel-modal" class="voc-input" placeholder="10 dígitos"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" maxlength="10">
+                    <span class="voc-form-error" id="err-celular"></span>
+                </div>
+
+                <div class="voc-form-group">
+                    <label class="voc-form-label">Población Diferencial</label>
+                    <div class="voc-checks-grid">
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-mujer"> <i class="fas fa-venus" style="color:#ec4899"></i> Mujer</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-indigena"> <i class="fas fa-leaf" style="color:#16a34a"></i> Indígena</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-narp"> <i class="fas fa-users" style="color:#92400e"></i> Narp</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-campesino"> <i class="fas fa-tractor" style="color:#d97706"></i> Campesino</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-lgbtiq"> <i class="fas fa-rainbow" style="color:#8b5cf6"></i> Lgbtiq</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-discapacidad"> <i class="fas fa-wheelchair" style="color:#3b82f6"></i> Discapacidad</label>
+                    </div>
+                </div>
+
+                <div class="voc-modal-actions">
+                    <button type="button" class="voc-btn-secundario"
+                        onclick="document.getElementById('modalEditVocero').style.display='none'">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="voc-btn-primario" id="btn-save-modal">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast de notificaciones -->
+    <div id="voc-toast" class="voc-toast"></div>
+
+    <!-- DEPENDENCIAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/main.js?v=1.0.7"></script>
+    <script>
+        (function () {
+            const user = (typeof authSystem !== 'undefined' && authSystem.getCurrentUser)
+                ? authSystem.getCurrentUser()
+                : JSON.parse(localStorage.getItem('user') || 'null');
+            if (!user) { window.location.href = 'index.html'; return; }
+            if ((user.rol || '').toLowerCase() !== 'vocero') { window.location.href = 'index.html'; }
+        })();
+    </script>
+    <script src="js/vocero/vocero-dashboard.js?v=2.2.0"></script>
+    <script>
+        function filtrarTabla() { VoceroDash.renderTabla(); }
+        function cerrarSesion(e) { e.preventDefault(); localStorage.removeItem('user'); location.href = 'index.html'; }
+        document.addEventListener('DOMContentLoaded', () => VoceroDash.initAprendices());
+    </script>
+</body>
+</html>
