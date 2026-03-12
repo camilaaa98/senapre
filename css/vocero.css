@@ -230,17 +230,21 @@
 }
 
 .voc-input {
-    padding: 8px 14px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 9px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 9px;
+    font-size: 0.875rem;
     outline: none;
-    transition: border-color 0.2s;
-    width: 220px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 260px;
+    background: #fafbfc;
 }
 
 .voc-input:focus {
-    border-color: #00324D;
+    border-color: #39A900;
+    box-shadow: 0 0 0 3px rgba(57,169,0,0.12);
+    background: #fff;
 }
 
 .voc-select {
@@ -1390,6 +1394,306 @@
 
     .voc-chart-wrap {
         height: 190px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE — vocero-aprendices.html
+   Breakpoints profesionales: 1024 / 768 / 480
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1024px: tablet landscape ────────────────────────────── */
+@media (max-width: 1024px) {
+
+    .voc-table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px 20px;
+    }
+
+    .voc-filters {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .voc-input {
+        max-width: 100%;
+        flex: 1 1 180px;
+    }
+
+    .voc-select {
+        flex: 1 1 140px;
+    }
+}
+
+/* ── 768px: tablet portrait y móviles grandes ─────────────── */
+@media (max-width: 768px) {
+
+    /* Sidebar colapsa a iconos */
+    .voc-sidebar {
+        width: 58px;
+        overflow: hidden;
+    }
+
+    .voc-sidebar-header h3,
+    .voc-badge,
+    .voc-ficha-tag,
+    .voc-nav a span,
+    .voc-nav-footer span,
+    .voc-sidebar-footer {
+        display: none;
+    }
+
+    .voc-sidebar-header {
+        padding: 16px 8px;
+    }
+
+    .voc-sidebar-header img {
+        width: 38px;
+        height: 38px;
+        margin-bottom: 0;
+    }
+
+    .voc-nav a {
+        justify-content: center;
+        padding: 14px 0;
+        font-size: 1.1rem;
+    }
+
+    /* Main desplazado */
+    .voc-main {
+        margin-left: 58px;
+        padding: 14px;
+    }
+
+    /* Encabezado */
+    .voc-header {
+        padding: 16px 18px;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-radius: 10px;
+    }
+
+    .voc-header-left h1 {
+        font-size: 1.25rem;
+    }
+
+    .voc-header-right {
+        display: none; /* Ocultar número de ficha en móvil para ahorrar espacio */
+    }
+
+    /* Mini-stats: 3 columnas en tablet */
+    .voc-stats-mini {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .voc-stat-mini-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 10px 8px;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .voc-stat-mini-num {
+        font-size: 1.2rem;
+    }
+
+    .voc-stat-mini-label {
+        font-size: 0.65rem;
+    }
+
+    /* Tarjeta de tabla */
+    .voc-table-card {
+        border-radius: 10px;
+    }
+
+    /* Header de tabla */
+    .voc-table-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+
+    .voc-table-header h2 {
+        font-size: 1rem;
+    }
+
+    /* Filtros en columna */
+    .voc-filters {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .voc-input,
+    .voc-select {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .voc-btn-pdf {
+        width: 100%;
+        justify-content: center;
+        padding: 11px 16px;
+    }
+
+    /* Aviso de filtro */
+    .voc-aviso-filtro {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+        margin: 10px 14px 0;
+        border-radius: 8px;
+    }
+
+    /* Tabla — desplazamiento horizontal */
+    .table-container-fixed {
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .voc-table {
+        font-size: 0.8rem;
+        min-width: 620px;
+    }
+
+    .voc-table thead th,
+    .voc-table tbody td {
+        padding: 10px 10px;
+    }
+
+    /* Ocultar columnas menos importantes en móvil */
+    .voc-table th:nth-child(5),
+    .voc-table td:nth-child(5) {
+        display: none; /* Correo */
+    }
+
+    /* Botón de editar más pequeño */
+    .voc-btn-edit {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    /* Paginación */
+    .voc-pag {
+        padding: 12px 16px;
+        gap: 6px;
+    }
+
+    .voc-pag-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        min-width: 32px;
+    }
+
+    /* Modal */
+    .voc-modal-overlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+
+    .voc-modal-box {
+        max-height: 96vh;
+        border-radius: 18px 18px 0 0;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .voc-modal-header {
+        padding: 18px 20px;
+    }
+
+    #formEditVocero {
+        padding: 16px 20px;
+    }
+
+    .voc-modal-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .voc-btn-primario,
+    .voc-btn-secundario {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+}
+
+/* ── 480px: móviles pequeños ─────────────────────────────── */
+@media (max-width: 480px) {
+
+    .voc-main {
+        margin-left: 58px;
+        padding: 10px;
+    }
+
+    /* Header más compacto */
+    .voc-header {
+        padding: 14px;
+        border-radius: 10px;
+        border-left-width: 4px;
+    }
+
+    .voc-header-left h1 {
+        font-size: 1.1rem;
+    }
+
+    .voc-header-tag {
+        font-size: 0.65rem;
+    }
+
+    /* Mini-stats: 2 columnas en móvil pequeño */
+    .voc-stats-mini {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Tabla más compacta */
+    .voc-table {
+        font-size: 0.78rem;
+        min-width: 520px;
+    }
+
+    .voc-table thead th,
+    .voc-table tbody td {
+        padding: 9px 8px;
+    }
+
+    /* Ocultar también la columna de celular en móvil muy pequeño */
+    .voc-table th:nth-child(6),
+    .voc-table td:nth-child(6) {
+        display: none; /* Celular */
+    }
+
+    /* Badges más compactos */
+    .badge {
+        font-size: 0.68rem;
+        padding: 2px 7px;
+    }
+
+    /* Campos del modal en una columna */
+    .voc-checks-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .voc-form-label {
+        font-size: 0.75rem;
+    }
+
+    .voc-input {
+        font-size: 0.85rem;
     }
 }
 
