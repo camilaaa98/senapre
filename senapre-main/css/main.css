@@ -216,28 +216,80 @@ body {
 }
 
 .content-header {
-    text-align: center !important;
-    margin-bottom: 30px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    position: relative !important;
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
+    padding: 0 120px;
+    /* Espacio para que el botón no tape el título en pantallas medianas */
+}
+
+.content-info {
+    width: 100%;
 }
 
 .content-title {
-    font-size: 1.6rem !important;
-    font-weight: 700 !important;
-    color: #00324D !important;
-    margin-bottom: 6px !important;
-    text-align: center !important;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00324D;
+    margin: 0;
+    text-align: center;
 }
 
 .content-description {
-    color: #64748b !important;
-    font-size: 0.95rem !important;
-    text-align: center !important;
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 4px 0 0;
+    text-align: center;
+}
+
+.header-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+/* Header Actions y Botón Volver Profesional */
+/* Botón Volver con Estética Institucional (Azul SENA) */
+.btn-volver,
+.header-actions .btn-primary[style*="background: #00324D"] {
+    background: #00324D !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-volver:hover,
+.header-actions .btn-primary[style*="background: #00324D"]:hover {
+    background: #004a73 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Filtros Horizontales */
+.filters-wrapper {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    padding: 10px 0;
+}
+
+.filters-wrapper .form-group {
+    margin-bottom: 0;
+}
+
+.filters-wrapper label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
 }
 
 @media (max-width: 900px) {
@@ -615,24 +667,157 @@ body {
     color: white;
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
-    .login-container {
-        flex-direction: column;
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE LOGIN — Breakpoints Profesionales
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1024px: Tablet landscape ────────────────────────────── */
+@media (max-width: 1024px) {
+    .login-info {
+        width: 40%;
+        padding: 40px 30px;
     }
 
-    .login-info {
-        display: none;
-        /* Hide info on small screens to focus on login */
+    .info-content h2 {
+        font-size: 2.2rem;
+    }
+
+    .info-content p {
+        font-size: 1rem;
     }
 
     .login-form-section {
+        width: 60%;
+    }
+}
+
+/* ── 768px: Tablet Portrait ─────────────────────────────── */
+@media (max-width: 900px) {
+    .login-page {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .login-container {
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Panel izquierdo: barra compacta superior */
+    .login-info {
         width: 100%;
-        padding: 20px;
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .info-content {
+        max-width: 480px;
+        width: 100%;
+    }
+
+    .info-content h2 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .info-content p {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .feature-list {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .feature-item {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+        background: rgba(255,255,255,0.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+
+    .feature-item i {
+        font-size: 1rem;
+        margin-right: 6px;
+    }
+
+    .info-footer { display: none; }
+
+    /* Formulario: ocupa el resto */
+    .login-form-section {
+        width: 100%;
+        padding: 30px 20px 40px;
+        flex: 1;
     }
 
     .login-card {
         padding: 0;
+        max-width: 440px;
+    }
+
+    .logo-text {
+        font-size: 2rem;
+    }
+
+    .logo-principal {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+/* ── 480px: Móviles pequeños ─────────────────────────────── */
+@media (max-width: 480px) {
+    .login-info {
+        padding: 22px 16px;
+    }
+
+    .info-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .login-form-section {
+        padding: 20px 16px 30px;
+    }
+
+    .login-card {
+        max-width: 100%;
+    }
+
+    .logo-text {
+        font-size: 1.8rem;
+    }
+
+    .logo-principal {
+        width: 54px !important;
+        height: 54px !important;
+    }
+
+    .login-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-control {
+        padding: 12px 12px 12px 40px;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        padding: 14px;
+        font-size: 1rem;
     }
 }
 

@@ -181,7 +181,7 @@ const VoceroDash = (() => {
                     <table class="voc-table">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>N°</th>
                                 <th>Documento</th>
                                 <th>Nombre del Aprendiz</th>
                                 <th>Población</th>
@@ -200,12 +200,37 @@ const VoceroDash = (() => {
 
         renderPaginacion(total) {
             const pg = document.getElementById('voc-paginacion');
-            if (!pg || total <= 1) { if (pg) pg.innerHTML = ''; return; }
-            let h = State.paginaActual > 1 ? `<button class="voc-pag-btn" onclick="VoceroDash.irPagina(${State.paginaActual - 1})">‹ Ant.</button>` : '';
-            for (let p = Math.max(1, State.paginaActual - 2); p <= Math.min(total, State.paginaActual + 2); p++) {
-                h += `<button class="voc-pag-btn ${p === State.paginaActual ? 'active' : ''}" onclick="VoceroDash.irPagina(${p})">${p}</button>`;
+            if (!pg) return;
+            if (total <= 1) { pg.innerHTML = ''; return; }
+
+            const cur = State.paginaActual;
+            let h = '';
+
+            // Boton primera pagina
+            h += `<button class="voc-pag-btn ${cur === 1 ? 'disabled' : ''}" onclick="VoceroDash.irPagina(1)" title="Primera página" ${cur === 1 ? 'disabled' : ''}>&#171;</button>`;
+            // Anterior
+            h += `<button class="voc-pag-btn ${cur === 1 ? 'disabled' : ''}" onclick="VoceroDash.irPagina(${cur - 1})" ${cur === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+            // Rango de paginas
+            const desde = Math.max(1, cur - 2);
+            const hasta = Math.min(total, cur + 2);
+            if (desde > 1) h += `<span class="voc-pag-ellipsis">&hellip;</span>`;
+            for (let p = desde; p <= hasta; p++) {
+                h += `<button class="voc-pag-btn ${p === cur ? 'active' : ''}" onclick="VoceroDash.irPagina(${p})">${p}</button>`;
             }
-            if (State.paginaActual < total) h += `<button class="voc-pag-btn" onclick="VoceroDash.irPagina(${State.paginaActual + 1})">Sig. ›</button>`;
+            if (hasta < total) h += `<span class="voc-pag-ellipsis">&hellip;</span>`;
+
+            // Siguiente
+            h += `<button class="voc-pag-btn ${cur === total ? 'disabled' : ''}" onclick="VoceroDash.irPagina(${cur + 1})" ${cur === total ? 'disabled' : ''}>&#8250;</button>`;
+            // Ultima
+            h += `<button class="voc-pag-btn ${cur === total ? 'disabled' : ''}" onclick="VoceroDash.irPagina(${total})" title="Última página" ${cur === total ? 'disabled' : ''}>&#187;</button>`;
+
+            // Indicador
+            const filtered = State.aprendices.length;
+            const ini = (cur - 1) * State.POR_PAG + 1;
+            const fin = Math.min(cur * State.POR_PAG, filtered);
+            h += `<span class="voc-pag-info">Pág. ${cur}/${total} &mdash; ${ini}-${fin} de ${filtered}</span>`;
+
             pg.innerHTML = h;
         }
     };
@@ -272,24 +297,117 @@ const VoceroDash = (() => {
         async toPDF() {
             if (!State.aprendices.length) return alert('No hay datos para exportar');
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const pw = doc.internal.pageSize.getWidth();
-            doc.setFillColor(0, 50, 77); doc.rect(0, 0, pw, 35, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.setFont('helvetica', 'bold');
-            doc.text('SENA — Centro de Teleinformática y Producción Industrial', pw / 2, 12, { align: 'center' });
-            doc.setFontSize(11); doc.setFont('helvetica', 'normal');
-            doc.text(`Informe Vocería — Ficha ${State.vocFicha}`, pw / 2, 21, { align: 'center' });
+
+            // Horizontal (landscape) A4
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pw = doc.internal.pageSize.getWidth();  // 297mm
+            const ph = doc.internal.pageSize.getHeight(); // 210mm
+
+            // ── Cabecera con fondo verde SENA
+            doc.setFillColor(0, 100, 0);
+            doc.rect(0, 0, pw, 38, 'F');
+
+            // Franja inferior más oscura
+            doc.setFillColor(0, 50, 0);
+            doc.rect(0, 30, pw, 8, 'F');
+
+            // Logo SENA (texto si no hay imagen)
+            try {
+                // Intentar logo SENA como base64 si está disponible
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(22);
+                doc.setFont('helvetica', 'bold');
+                doc.text('SENA', 18, 22);
+            } catch(e) {}
+
+            // Títulos centrados
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SISTEMA NACIONAL DE APRENDIZAJE — SENA', pw / 2, 11, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Centro de Teleinformática y Producción Industrial — CTPI', pw / 2, 18, { align: 'center' });
+
+            doc.setFontSize(9);
+            doc.text(`Informe de Aprendices | Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`, pw / 2, 25, { align: 'center' });
+
+            // Franja de fecha
+            doc.setFillColor(245, 245, 245);
+            doc.rect(0, 38, pw, 10, 'F');
+            doc.setTextColor(80, 80, 80);
             doc.setFontSize(8);
-            doc.text(`Vocero: ${State.vocNombre} | Fecha: ${new Date().toLocaleDateString('es-CO')}`, pw / 2, 28, { align: 'center' });
-            const activos = State.aprendices.filter(a => !State.INACTIVOS.has((a.estado || '').toUpperCase()));
+            doc.setFont('helvetica', 'italic');
+            const fecha = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            doc.text(`Fecha de generación: ${fecha}`, pw / 2, 44, { align: 'center' });
+
+            // ── Tabla de datos
+            const todosAprendices = State.aprendices;
             doc.autoTable({
-                startY: 40,
-                head: [['#', 'Documento', 'Nombre Completo', 'Correo', 'Celular', 'Estado']],
-                body: activos.map((a, i) => [i + 1, a.documento, `${a.nombre} ${a.apellido}`, a.correo || '—', a.celular || '—', a.estado]),
-                theme: 'striped',
-                headStyles: { fillColor: [0, 50, 77], font: 'helvetica' }
+                startY: 52,
+                head: [['N°', 'Documento', 'Nombres', 'Apellidos', 'Correo Electrónico', 'Celular', 'Estado', 'Ficha']],
+                body: todosAprendices.map((a, i) => [
+                    i + 1,
+                    a.documento || '—',
+                    a.nombre || '—',
+                    a.apellido || '—',
+                    a.correo || '—',
+                    a.celular || '—',
+                    (a.estado || '—').toUpperCase(),
+                    State.vocFicha
+                ]),
+                theme: 'grid',
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 8.5,
+                    cellPadding: 4,
+                    halign: 'center',
+                    valign: 'middle',
+                    lineColor: [210, 210, 210],
+                    lineWidth: 0.3
+                },
+                headStyles: {
+                    fillColor: [0, 100, 0],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    fontSize: 9,
+                    halign: 'center',
+                    cellPadding: 5
+                },
+                alternateRowStyles: { fillColor: [245, 252, 240] },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },
+                    1: { cellWidth: 28, halign: 'center' },
+                    2: { cellWidth: 30, halign: 'left' },
+                    3: { cellWidth: 32, halign: 'left' },
+                    4: { cellWidth: 55, halign: 'left' },
+                    5: { cellWidth: 25, halign: 'center' },
+                    6: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
+                    7: { cellWidth: 20, halign: 'center' }
+                },
+                margin: { left: 12, right: 12 },
+                didParseCell(data) {
+                    if (data.section === 'body' && data.column.index === 6) {
+                        const val = (data.cell.raw || '').toUpperCase();
+                        if (val === 'LECTIVA')   { data.cell.styles.textColor = [22, 163, 74]; }
+                        if (val === 'CANCELADO') { data.cell.styles.textColor = [220, 38, 38]; }
+                        if (val === 'RETIRADO')  { data.cell.styles.textColor = [217, 119, 6]; }
+                    }
+                },
+                didDrawPage(data) {
+                    const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
+                    const totalPages = doc.internal.getNumberOfPages();
+                    doc.setFontSize(7);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(`Página ${pageNum} de ${totalPages}`, pw - 15, ph - 6, { align: 'right' });
+                    doc.text('Generado por SenApre — SENA CTPI', 15, ph - 6);
+                    doc.setDrawColor(200, 200, 200);
+                    doc.line(12, ph - 10, pw - 12, ph - 10);
+                }
             });
-            doc.save(`informe-ficha-${State.vocFicha}.pdf`);
+            doc.save(`informe-vocero-ficha-${State.vocFicha}.pdf`);
         }
     };
 
