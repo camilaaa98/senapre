@@ -39,13 +39,17 @@ const SenaPrePDF = (() => {
         const pw = doc.internal.pageSize.getWidth();
         const isLandscape = orientacion === 'landscape';
 
+        // Altura del encabezado (más grande para logos y texto)
+        const headerH = isLandscape ? 54 : 57;
+        const franjaH = isLandscape ? 46 : 49;
+
         // ── Fondo cabecera principal (verde sena)
         doc.setFillColor(0, 100, 0);
-        doc.rect(0, 0, pw, isLandscape ? 42 : 45, 'F');
+        doc.rect(0, 0, pw, headerH, 'F');
 
         // ── Franja inferior más oscura
         doc.setFillColor(0, 60, 0);
-        doc.rect(0, isLandscape ? 34 : 37, pw, 8, 'F');
+        doc.rect(0, franjaH, pw, 8, 'F');
 
         // ── Logos
         const [imgSena, imgSenapre] = await Promise.all([
@@ -53,42 +57,58 @@ const SenaPrePDF = (() => {
             cargarImagen('assets/img/asi.png')
         ]);
 
-        const logoSize = isLandscape ? 26 : 24;
-        const logoY    = isLandscape ? 8 : 10;
+        // Logo SENA izquierda — 30x30mm
+        const logoSenaW = 30;
+        const logoSenaH = 30;
+        const logoSenaX = 14;
+        const logoSenaY = 10;
+        if (imgSena) doc.addImage(imgSena, 'PNG', logoSenaX, logoSenaY, logoSenaW, logoSenaH);
 
-        if (imgSena)    doc.addImage(imgSena,    'PNG', 14,        logoY, logoSize, logoSize);
-        if (imgSenapre) doc.addImage(imgSenapre,  'PNG', pw - 14 - logoSize, logoY, logoSize, logoSize);
+        // Logo SenApre circular — radio aprox 18mm = diámetro 36mm
+        // jsPDF no soporta clipping nativo, dibujamos la imagen cuadrada y luego
+        // superponemos un fondo circular para simular el círculo
+        const logoSenapreD = 36; // diámetro en mm
+        const logoSenapreX = pw - 14 - logoSenapreD;
+        const logoSenapreY = 9;
+        if (imgSenapre) {
+            // Primero dibujar el fondo circular verde oscuro
+            doc.setFillColor(0, 50, 0);
+            doc.circle(pw - 14 - logoSenapreD / 2, logoSenapreY + logoSenapreD / 2, logoSenapreD / 2, 'F');
+            // Luego la imagen encima (recortada visualmente por el círculo de fondo)
+            doc.addImage(imgSenapre, 'PNG', logoSenapreX, logoSenapreY, logoSenapreD, logoSenapreD);
+        }
 
         // ── Línea decorativa entre logos
         doc.setDrawColor(255, 255, 255);
         doc.setLineWidth(0.3);
-        doc.line(14 + logoSize + 4, 10, pw - 14 - logoSize - 4, 10);
+        doc.line(logoSenaX + logoSenaW + 4, 12, logoSenapreX - 4, 12);
+        doc.line(logoSenaX + logoSenaW + 4, headerH - 10, logoSenapreX - 4, headerH - 10);
 
-        // ── Texto "SENA — SENAPRE"
+        // ── Texto "SENA — SENAPRE" (más grande y visible)
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(7);
-        doc.text('SENA — SENAPRE', pw / 2, isLandscape ? 10 : 12, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('SENA \u2014 SENAPRE', pw / 2, isLandscape ? 14 : 15, { align: 'center' });
 
         // ── Título principal
-        doc.setFontSize(isLandscape ? 13 : 12);
+        doc.setFontSize(isLandscape ? 15 : 13);
         doc.setFont('helvetica', 'bold');
-        doc.text(titulo.toUpperCase(), pw / 2, isLandscape ? 19 : 21, { align: 'center' });
+        doc.text(titulo.toUpperCase(), pw / 2, isLandscape ? 25 : 27, { align: 'center' });
 
         // ── Subtítulo
-        doc.setFontSize(isLandscape ? 9 : 8.5);
+        doc.setFontSize(isLandscape ? 9.5 : 9);
         doc.setFont('helvetica', 'normal');
-        doc.text(subtitulo, pw / 2, isLandscape ? 27 : 29, { align: 'center' });
+        doc.text(subtitulo, pw / 2, isLandscape ? 34 : 36, { align: 'center' });
 
         // ── Responsable (si aplica)
         if (responsable) {
-            doc.setFontSize(isLandscape ? 8 : 7.5);
+            doc.setFontSize(isLandscape ? 9 : 8);
             doc.setFont('helvetica', 'bold');
-            doc.text(responsable.toUpperCase(), pw / 2, isLandscape ? 33 : 35, { align: 'center' });
+            doc.text(responsable.toUpperCase(), pw / 2, isLandscape ? 42 : 44, { align: 'center' });
         }
 
         // ── Franja de fecha (fondo claro)
-        const fechaY = isLandscape ? 42 : 45;
+        const fechaY = headerH;
         doc.setFillColor(245, 248, 245);
         doc.rect(0, fechaY, pw, 10, 'F');
 
@@ -99,7 +119,7 @@ const SenaPrePDF = (() => {
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(60, 60, 60);
-        doc.text(`Fecha de generación: ${fechaStr}`, pw / 2, fechaY + 6.5, { align: 'center' });
+        doc.text(`Fecha de generaci\u00f3n: ${fechaStr}`, pw / 2, fechaY + 6.5, { align: 'center' });
 
         // Retornar Y de inicio del contenido
         return fechaY + 14;

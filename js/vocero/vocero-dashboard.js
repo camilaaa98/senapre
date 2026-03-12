@@ -337,28 +337,39 @@ const VoceroDash = (() => {
             }
 
             // ── Tabla centrada ─────────────────────────────────────
-            // Calcular márgenes iguales para centrar la tabla
-            const totalW  = 10 + 28 + 30 + 32 + 52 + 25 + 22 + 20; // 219mm de columnas
-            const margen  = Math.max(12, (pw - totalW) / 2);
+            // Filtrar solo aprendices en estado LECTIVA
+            const soloLectiva = State.aprendices.filter(a =>
+                (a.estado || '').toUpperCase() === 'LECTIVA'
+            );
+
+            if (!soloLectiva.length) {
+                doc.save(`informe-vocero-ficha-${State.vocFicha}.pdf`);
+                return;
+            }
+
+            // Columnas: N°=14, Doc=32, Nombres=40, Apellidos=42, Correo=60, Cel=28, Estado=26, Ficha=22 → total 264
+            const colW = { n: 14, doc: 32, nom: 40, ape: 42, cor: 60, cel: 28, est: 26, fic: 22 };
+            const totalCols = Object.values(colW).reduce((a, b) => a + b, 0); // 264mm
+            const margen = Math.max(8, (pw - totalCols) / 2);
 
             doc.autoTable({
                 startY,
                 head: [['N\u00b0', 'Documento', 'Nombres', 'Apellidos', 'Correo Electr\u00f3nico', 'Celular', 'Estado', 'Ficha']],
-                body: State.aprendices.map((a, i) => [
+                body: soloLectiva.map((a, i) => [
                     i + 1,
                     a.documento || '\u2014',
                     a.nombre    || '\u2014',
                     a.apellido  || '\u2014',
                     a.correo    || '\u2014',
                     a.celular   || '\u2014',
-                    (a.estado   || '\u2014').toUpperCase(),
+                    'LECTIVA',
                     State.vocFicha
                 ]),
                 theme: 'grid',
                 styles: {
                     font: 'helvetica',
-                    fontSize: 8.5,
-                    cellPadding: { top: 4, right: 5, bottom: 4, left: 5 },
+                    fontSize: 8,
+                    cellPadding: { top: 2.5, right: 4, bottom: 2.5, left: 4 },
                     halign: 'center',
                     valign: 'middle',
                     lineColor: [210, 210, 210],
@@ -368,30 +379,22 @@ const VoceroDash = (() => {
                     fillColor: [0, 100, 0],
                     textColor: [255, 255, 255],
                     fontStyle: 'bold',
-                    fontSize: 9,
+                    fontSize: 8.5,
                     halign: 'center',
-                    cellPadding: 5
+                    cellPadding: { top: 3.5, right: 4, bottom: 3.5, left: 4 }
                 },
                 alternateRowStyles: { fillColor: [245, 252, 240] },
                 columnStyles: {
-                    0: { cellWidth: 10,  halign: 'center' },
-                    1: { cellWidth: 28,  halign: 'center' },
-                    2: { cellWidth: 30,  halign: 'center' },
-                    3: { cellWidth: 32,  halign: 'center' },
-                    4: { cellWidth: 52,  halign: 'center' },
-                    5: { cellWidth: 25,  halign: 'center' },
-                    6: { cellWidth: 22,  halign: 'center', fontStyle: 'bold' },
-                    7: { cellWidth: 20,  halign: 'center' }
+                    0: { cellWidth: colW.n,   halign: 'center' },
+                    1: { cellWidth: colW.doc,  halign: 'center' },
+                    2: { cellWidth: colW.nom,  halign: 'center' },
+                    3: { cellWidth: colW.ape,  halign: 'center' },
+                    4: { cellWidth: colW.cor,  halign: 'center' },
+                    5: { cellWidth: colW.cel,  halign: 'center' },
+                    6: { cellWidth: colW.est,  halign: 'center', fontStyle: 'bold', textColor: [22, 163, 74] },
+                    7: { cellWidth: colW.fic,  halign: 'center' }
                 },
                 margin: { left: margen, right: margen },
-                didParseCell(data) {
-                    if (data.section === 'body' && data.column.index === 6) {
-                        const val = (data.cell.raw || '').toUpperCase();
-                        if (val === 'LECTIVA')   data.cell.styles.textColor = [22, 163, 74];
-                        if (val === 'CANCELADO') data.cell.styles.textColor = [220, 38, 38];
-                        if (val === 'RETIRADO')  data.cell.styles.textColor = [217, 119, 6];
-                    }
-                },
                 didDrawPage() {
                     if (typeof SenaPrePDF !== 'undefined') {
                         SenaPrePDF.pieDePagina(doc);
