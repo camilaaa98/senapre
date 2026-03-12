@@ -7,7 +7,7 @@
 require_once __DIR__ . '/../api/config/Database.php';
 
 try {
-    $database = Database::getInstance();
+    $database = new Database();
     $conn = $database->getConnection();
     
     echo "=== MIGRACIÓN: TABLAS DE BIOMETRÍA ===\n\n";

@@ -119,45 +119,48 @@ function mostrarUsuarios(usuarios) {
 
     // Renderizar después de un pequeño delay para que carguen los estados
     setTimeout(() => {
-        tbody.innerHTML = usuarios.map((u, index) => `
-            <tr class="table-row-divider">
-                <td class="td-index">${startIndex + index + 1}</td>
-                <td>${u.nombre || ''} ${u.apellido || ''}</td>
-                <td>${u.correo}</td>
-                <td>${u.telefono || ''}</td>
-                <td><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
-                <td>
-                    <select onchange="cambiarEstadoUsuario('${u.id_usuario}', this.value)" 
-                            class="status-select-user ${esActivo(u.estado) ? 'bg-success-user' : 'bg-error-user'}">
-                        <option value="activo" ${esActivo(u.estado) ? 'selected' : ''}>Activo</option>
-                        <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''}>Inactivo</option>
-                    </select>
-                </td>
-                <td class="text-center">
-                    <div class="flex-center-gap">
-                        <i class="fas fa-${u.tiene_biometria ? 'check-circle' : 'times-circle'} ${u.tiene_biometria ? 'color-success' : 'color-error'}" 
-                           title="${u.tiene_biometria ? 'Biometría registrada' : 'Sin biometría'}"></i>
-                        <button onclick="registrarBiometriaUsuario('${u.id_usuario}')" 
-                                class="btn-icon-custom btn-purple btn-moderate" 
-                                title="Registrar/Actualizar Biometría">
-                            <i class="fas fa-camera"></i>
-                        </button>
-                    </div>
-                </td>
-                <td class="text-center">
-                    <div class="flex-center-gap">
-                        <button onclick="editarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-blue btn-moderate" 
-                                title="Editar Usuario">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="eliminarUsuario('${u.id_usuario}')" class="btn-icon-custom btn-red btn-moderate" 
-                                title="Eliminar Usuario">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = usuarios.map((u, index) => {
+            const biometriaStatus = u.tiene_biometria 
+                ? `<i class="fas fa-check-circle color-success" title="Biometría registrada" style="margin-right: 5px;"></i>` 
+                : `<i class="fas fa-times-circle color-error" title="Sin biometría" style="margin-right: 5px;"></i>`;
+
+            return `
+                <tr class="table-row-divider">
+                    <td class="td-index">${startIndex + index + 1}</td>
+                    <td>${u.nombre || ''} ${u.apellido || ''}</td>
+                    <td>${u.correo}</td>
+                    <td>${u.telefono || ''}</td>
+                    <td><span class="badge ${u.rol === 'director' ? 'badge-primary' : u.rol === 'instructor' ? 'badge-info' : u.rol === 'coordinador' ? 'badge-warning' : 'badge-success'}">${u.rol.toUpperCase()}</span></td>
+                    <td>
+                        <select onchange="cambiarEstadoUsuario('${u.id_usuario}', this.value)" 
+                                class="status-select-user ${esActivo(u.estado) ? 'bg-success-user' : 'bg-error-user'}">
+                            <option value="activo" ${esActivo(u.estado) ? 'selected' : ''}>Activo</option>
+                            <option value="inactivo" ${!esActivo(u.estado) ? 'selected' : ''}>Inactivo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="btn-action-container">
+                            ${biometriaStatus}
+                            <button onclick="registrarBiometriaUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-purple" 
+                                    title="Registrar/Actualizar Biometría">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <button onclick="editarUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-blue" 
+                                    title="Editar Usuario">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="eliminarUsuario('${u.id_usuario}')" 
+                                    class="btn-action btn-action-red" 
+                                    title="Eliminar Usuario">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }, 300);
 }
 
@@ -345,9 +348,9 @@ async function eliminarUsuario(id) {
     }
 }
 
-async function exportarUsuarios() {
+async function exportarUsuariosExcel() {
     try {
-        mostrarNotificacion('Generando reporte...', 'info');
+        mostrarNotificacion('Generando reporte Excel...', 'info');
 
         // Obtener filtros actuales
         const search = document.getElementById('filtroSearch')?.value || '';
@@ -404,9 +407,9 @@ async function exportarUsuarios() {
         link.download = `Usuarios_${new Date().toISOString().split('T')[0]}.xls`;
         link.click();
 
-        mostrarNotificacion('Archivo exportado exitosamente', 'success');
+        mostrarNotificacion('Excel exportado exitosamente', 'success');
     } catch (error) {
-        console.error('Error exportando:', error);
+        console.error('Error exportando Excel:', error);
         mostrarNotificacion('Error al exportar datos', 'error');
     }
 }
@@ -712,7 +715,7 @@ function cerrarModalBiometriaUsuario() {
 /**
  * Exportar Usuarios a PDF con cabecera profesional (Referencia Imagen 3)
  */
-async function exportarUsuarios() {
+async function exportarUsuariosPDF() {
     if (!todosUsuarios || todosUsuarios.length === 0) {
         mostrarNotificacion('No hay datos para exportar', 'warning');
         return;
@@ -720,29 +723,19 @@ async function exportarUsuarios() {
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
     const fecha = new Date().toLocaleDateString('es-CO', {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // ── CABECERA PROFESIONAL ──────────────────
-    // Fondo oscuro para la cabecera
-    doc.setFillColor(0, 50, 77); // #00324D
-    doc.rect(0, 0, pageWidth, 40, 'F');
-
-    // Texto de Cabecera (Blanco)
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('SENA — Centro de Teleinformática y Producción Industrial', pageWidth / 2, 12, { align: 'center' });
-
-    doc.setFontSize(16);
-    doc.text('SENAPRE — SISTEMA DE GESTIÓN ACADÉMICA', pageWidth / 2, 22, { align: 'center' });
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text(`REPORTE GENERAL DE USUARIOS DEL SISTEMA`, pageWidth / 2, 30, { align: 'center' });
-    doc.text(`Fecha de generación: ${fecha}`, pageWidth / 2, 36, { align: 'center' });
+    // --- ENCABEZADO ---
+    let startY = 56;
+    if (typeof SenaPrePDF !== 'undefined') {
+        startY = await SenaPrePDF.crearCabecera(doc, {
+            titulo:      'REPORTE GENERAL DE USUARIOS',
+            subtitulo:   `Generado el ${fecha}`,
+            orientacion: 'portrait'
+        });
+    }
 
     // ── TABLA DE DATOS ──────────────────────
     const head = [['Documento', 'Nombres', 'Apellidos', 'Correo', 'Rol', 'Estado']];
@@ -756,12 +749,12 @@ async function exportarUsuarios() {
     ]);
 
     doc.autoTable({
-        startY: 45,
+        startY: startY,
         head: head,
         body: body,
         theme: 'grid',
         headStyles: {
-            fillColor: [57, 169, 0], // #39A900 (Verde SENA)
+            fillColor: [57, 169, 0], // Verde SENA
             textColor: 255,
             fontStyle: 'bold',
             halign: 'center'
@@ -778,18 +771,12 @@ async function exportarUsuarios() {
             3: { cellWidth: 50 },
             4: { cellWidth: 25 },
             5: { cellWidth: 20 }
+        },
+        didDrawPage: () => {
+            if (typeof SenaPrePDF !== 'undefined') SenaPrePDF.pieDePagina(doc);
         }
     });
 
-    // Pie de página
-    const totalPages = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(`Página ${i} de ${totalPages} — SenApre CTPI`, pageWidth / 2, 285, { align: 'center' });
-    }
-
     doc.save(`Reporte_Usuarios_${new Date().getTime()}.pdf`);
-    mostrarNotificacion('Reporte generado exitosamente', 'success');
+    mostrarNotificacion('Reporte PDF generado exitosamente', 'success');
 }

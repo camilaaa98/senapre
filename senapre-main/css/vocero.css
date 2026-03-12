@@ -1,4 +1,4 @@
-﻿/* Estructura general */
+/* Estructura general */
 .voc-container {
     display: flex;
     min-height: 100vh;
@@ -1691,57 +1691,7 @@
     }
 
     /* Header mÃ¡s compacto */
-    .voc-header {
-        padding: 14px;
-        border-radius: 10px;
-        border-left-width: 4px;
-    }
-
-    .voc-header-left h1 {
-        font-size: 1.1rem;
-    }
-
-    .voc-header-tag {
-        font-size: 0.65rem;
-    }
-
-    /* Mini-stats: 2 columnas en mÃ³vil pequeÃ±o */
-    .voc-stats-mini {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-
-    /* Tabla mÃ¡s compacta */
-    .voc-table {
-        font-size: 0.78rem;
-        min-width: 520px;
-    }
-
-    .voc-table thead th,
-    .voc-table tbody td {
-        padding: 9px 8px;
-    }
-
-    /* Ocultar tambiÃ©n la columna de celular en mÃ³vil muy pequeÃ±o */
-    .voc-table th:nth-child(6),
-    .voc-table td:nth-child(6) {
-        display: none; /* Celular */
-    }
-
-    /* Badges mÃ¡s compactos */
-    .badge {
-        font-size: 0.68rem;
-        padding: 2px 7px;
-    }
-
-    /* Campos del modal en una columna */
-    .voc-checks-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .voc-form-label {
+    .vlabel {
         font-size: 0.75rem;
     }
 
@@ -1920,4 +1870,81 @@
     }
     .voc-checks-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .voc-btn-volver { font-size: 0.8rem; padding: 7px 14px; }
+}
+
+/* ============================================================
+   FIX SIDEBAR MOVIL — Ancho completo y texto visible
+   ============================================================ */
+@media (max-width: 900px) {
+    .voc-sidebar {
+        width: 260px !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        overflow: visible !important;
+        transform: translateX(-260px);
+    }
+    .voc-sidebar.open {
+        transform: translateX(0);
+        width: 260px !important;
+    }
+    /* Asegurar que los textos del nav sean visibles */
+    .voc-nav a span {
+        display: inline !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        white-space: nowrap;
+    }
+    /* Nombre del vocero no se desborde */
+    .voc-sidebar-header h3 {
+        font-size: 0.9rem !important;
+        word-break: break-word;
+        max-width: 180px;
+        text-align: center;
+    }
+    /* Ajuste del botón hamburger */
+    .voc-hamburger {
+        z-index: 999 !important;
+    }
+    /* Foto en el sidebar */
+    .voc-sidebar-header img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+        min-width: 260px !important;
+        max-width: 260px !important;
+        overflow: visible !important;
+    }
+    .voc-sidebar.open {
+        width: 260px !important;
+    }
+    /* Asegurar que los textos del nav sean visibles */
+    .voc-nav a span {
+        display: inline !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        white-space: nowrap;
+    }
+    /* Nombre del vocero no se desborde */
+    .voc-sidebar-header h3 {
+        font-size: 0.9rem !important;
+        word-break: break-word;
+        max-width: 180px;
+        text-align: center;
+    }
+    /* Ocultar hamburger cuando el sidebar esta abierto
+       (el boton X queda adentro del sidebar) */
+    .voc-sidebar.open ~ * .voc-hamburger,
+    .voc-sidebar.open + .voc-hamburger {
+        left: 274px !important;
+    }
+    /* Boton hamburger/cerrar correctamente alineado */
+    .voc-hamburger {
+        z-index: 999 !important;
+    }
+    /* Foto en el sidebar */
+    .voc-sidebar-header img {
+        width: 60px !important;
+        height: 60px !important;
+    }
 }

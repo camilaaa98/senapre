@@ -44,19 +44,9 @@ async function cargarAsignaciones() {
 
         if (result.success) {
             mostrarAsignaciones(result.data);
-        } else {
-            console.error('Error del servidor:', result.message);
-            const tbody = document.getElementById('tablaAsignaciones');
-            if (tbody) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px; color: red;">Error: ${result.message || 'No se pudieron cargar las asignaciones'}</td></tr>`;
-            }
         }
     } catch (error) {
-        console.error('Error de red:', error);
-        const tbody = document.getElementById('tablaAsignaciones');
-        if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 30px; color: red;">Error de conexión con el servidor</td></tr>`;
-        }
+        console.error('Error:', error);
     }
 }
 
@@ -87,11 +77,11 @@ function mostrarAsignaciones(datos) {
             <td>${a.nombre_instructor || 'N/A'}</td>
             <td><span class="badge badge-info">${a.fechas.length} fecha(s)</span></td>
             <td><span class="td-mono">${a.hora_inicio} - ${a.hora_fin}</span></td>
-            <td class="flex-center-gap">
-                <button onclick="verDetalles('${a.id_usuario}', '${a.numero_ficha}')" class="btn-icon btn-blue" title="Ver detalles">
+            <td class="btn-action-container">
+                <button onclick="verDetalles('${a.id_usuario}', '${a.numero_ficha}')" class="btn-action btn-action-blue" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button onclick="eliminarAsignaciones('${a.id_usuario}', '${a.numero_ficha}')" class="btn-icon btn-red" title="Eliminar">
+                <button onclick="eliminarAsignaciones('${a.id_usuario}', '${a.numero_ficha}')" class="btn-action btn-action-red" title="Eliminar">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>

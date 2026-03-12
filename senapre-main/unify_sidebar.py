@@ -16,12 +16,13 @@ target_files = [
     "admin-bienestar-dashboard.html",
     "admin-bienestar-asignacion.html",
     "admin-poblacion-detalle.html",
-    "jefe-bienestar-dashboard.html"
+    "jefe-bienestar-dashboard.html",
+    "liderazgo.html"
 ]
 
 def get_sidebar_html(active_file):
     is_dash = "active" if active_file == "admin-dashboard.html" else ""
-    is_bien = "active" if active_file in ["admin-bienestar-dashboard.html", "admin-bienestar-asignacion.html", "jefe-bienestar-dashboard.html"] else ""
+    is_bien = "active" if active_file in ["admin-bienestar-dashboard.html", "admin-bienestar-asignacion.html", "jefe-bienestar-dashboard.html", "liderazgo.html"] else ""
     is_user = "active" if active_file == "admin-usuarios.html" else ""
     is_prog = "active" if active_file == "admin-programas.html" else ""
     is_fich = "active" if active_file == "admin-fichas.html" else ""
@@ -36,11 +37,9 @@ def get_sidebar_html(active_file):
     
     sidebar = f"""        <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="assets/img/asi.png" alt="ASI Logo"
-                    style="width: 100px; height: 100px; object-fit: cover; margin-bottom: 10px; border-radius: 50px;">
+                <img src="assets/img/asi.png" alt="ASI Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display"
-                    style="text-align: center; color: rgba(255,255,255,0.7); font-size: 0.8rem;">Director</div>
+                <div class="sidebar-subtitle" id="user-role-display"></div>
             </div>
 
             <nav class="sidebar-menu">
@@ -56,7 +55,7 @@ def get_sidebar_html(active_file):
                         <span>Bienestar del Aprendiz</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" id="menu-usuarios">
                     <a href="admin-usuarios.html" class="menu-link {is_user}">
                         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
                         <span>Gestionar Usuarios</span>
@@ -77,7 +76,7 @@ def get_sidebar_html(active_file):
                         <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" id="menu-programas">
                     <a href="admin-programas.html" class="menu-link {is_prog}">
                         <div class="menu-icon"><i class="fas fa-book"></i></div>
                         <span>Gestionar Programas</span>
@@ -89,7 +88,7 @@ def get_sidebar_html(active_file):
                         <span>Gestionar Fichas</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item" id="menu-asignaciones">
                     <a href="admin-asignaciones.html" class="menu-link {is_asig}">
                         <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                         <span>Asignar Instructores</span>
@@ -114,9 +113,8 @@ def get_sidebar_html(active_file):
                     </a>
                 </li>
             </nav>
-            <div class="sidebar-footer"
-                style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
-                <img src="assets/img/logosena.png" alt="SENA Logo" style="height: 60px; width: auto; opacity: 0.9;">
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
             </div>
         </aside>"""
     return sidebar

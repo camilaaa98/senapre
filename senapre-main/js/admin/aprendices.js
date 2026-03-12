@@ -449,28 +449,30 @@ function mostrarAprendices(aprendices) {
                 <td>${a.celular || a.telefono || ''}</td>
                 ${!esVocero ? `<td><span class="badge badge-ficha">${a.numero_ficha || a.ficha_id || 'N/A'}</span></td>` : ''}
                 <td>${estadoSelect}</td>
-                <td class="text-center action-buttons-wrapper">
+                <td class="btn-action-container">
                     <!-- Botón Biometría (oculto para inactivos) -->
                     ${esInactivo ?
                 `<span class="badge badge-secondary" style="font-size: 0.75rem; padding: 4px 8px;" title="Biometría deshabilitada">
-                            <i class="fas fa-ban"></i> Inactivo
+                            <i class="fas fa-ban"></i>
                         </span>` :
                 (a.tiene_biometria ?
                     `<button onclick="registrarBiometriaAprendiz('${a.documento}')" 
-                                    class="btn-icon-custom btn-green" 
+                                    class="btn-action btn-action-green" 
                                     title="Biometría Registrada - Click para actualizar">
                                 <i class="fas fa-user-check"></i>
                             </button>` :
                     `<button onclick="registrarBiometriaAprendiz('${a.documento}')" 
-                                    class="btn-icon-custom btn-orange" 
+                                    class="btn-action btn-action-purple" 
                                     title="Registrar Biometría">
                                 <i class="fas fa-camera"></i>
                             </button>`)
             }
 
-                    ${btnEditar}
-
-                    <!-- Botón Eliminar REMOVIDO por solicitud -->
+                    <button onclick="editarAprendiz('${a.documento}')" 
+                            class="btn-action btn-action-blue" 
+                            title="Editar Datos">
+                        <i class="fas fa-edit"></i>
+                    </button>
                 </td>
             </tr>
         `;
@@ -1049,54 +1051,31 @@ async function exportarAprendicesPDF() {
             (a.estado || '').toUpperCase()
         ]);
 
-        // LOGOS Y CABECERA
-        const drawHeader = async () => {
-            const logoSena = new Image();
-            logoSena.src = 'assets/img/logosena.png';
-            const logoSenApre = new Image();
-            logoSenApre.src = 'assets/img/asi.png';
-
-            await Promise.all([
-                new Promise(r => logoSena.onload = r),
-                new Promise(r => logoSenApre.onload = r)
-            ]);
-
-            doc.addImage(logoSena, 'PNG', 15, 10, 22, 22);
-            doc.addImage(logoSenApre, 'PNG', 260, 10, 22, 22);
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(18);
-            doc.setTextColor(57, 169, 0);
-
-            let tituloPrincipal = "REPORTE DE APRENDICES";
-            let subTitulo = "VOCERÍA DE FORMACIÓN";
+        // --- ENCABEZADO ---
+        let startY = 56;
+        if (typeof SenaPrePDF !== 'undefined') {
+            let titulo = "REPORTE DE APRENDICES";
+            let subtitulo = "VOCERÍA DE FORMACIÓN";
 
             if (user.rol === 'vocero') {
                 if (scope.tipo === 'enfoque') {
-                    tituloPrincipal = `TIPO DE POBLACIÓN ${scope.poblacion.toUpperCase()}`;
-                    subTitulo = `VOCERO DE ENFOQUE DIFERENCIAL ${scope.poblacion.toUpperCase()}`;
+                    titulo = `TIPO DE POBLACIÓN ${scope.poblacion.toUpperCase()}`;
+                    subtitulo = `VOCERO DE ENFOQUE DIFERENCIAL ${scope.poblacion.toUpperCase()}`;
                 } else {
-                    tituloPrincipal = `LISTADO DE APRENDICES - FICHA ${scope.ficha}`;
-                    subTitulo = `VOCERÍA ${scope.tipo.toUpperCase()} - FICHA ${scope.ficha}`;
+                    titulo = `LISTADO DE APRENDICES - FICHA ${scope.ficha}`;
+                    subtitulo = `VOCERÍA ${scope.tipo.toUpperCase()} - FICHA ${scope.ficha}`;
                 }
             }
 
-            doc.text(tituloPrincipal, 148, 20, { align: 'center' });
-            doc.setFontSize(14);
-            doc.text(subTitulo, 148, 28, { align: 'center' });
-            doc.setFontSize(16);
-            doc.setTextColor(0, 50, 77); // Azul Oscuro
-            doc.text(`${user.nombre.toUpperCase()} ${user.apellido.toUpperCase()}`, 148, 38, { align: 'center' });
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text(`Fecha de reporte: ${fecha}`, 148, 45, { align: 'center' });
-        };
-
-        await drawHeader();
+            startY = await SenaPrePDF.crearCabecera(doc, {
+                titulo:      titulo,
+                subtitulo:   subtitulo,
+                orientacion: 'landscape'
+            });
+        }
 
         doc.autoTable({
-            startY: 55,
+            startY: startY,
             head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
             body: rows,
             theme: 'grid',
@@ -1112,7 +1091,10 @@ async function exportarAprendicesPDF() {
                 7: { halign: 'center', cellWidth: 30 }
             },
             styles: { fontSize: 8, cellPadding: 2 },
-            margin: { left: 15, right: 15 }
+            margin: { left: 15, right: 15 },
+            didDrawPage: () => {
+                if (typeof SenaPrePDF !== 'undefined') SenaPrePDF.pieDePagina(doc);
+            }
         });
 
         doc.save(`Reporte_Aprendices_${user.rol}_F${scope.ficha || 'NA'}_${fecha}.pdf`);
@@ -1387,42 +1369,15 @@ window.descargarPDFPoblacion = async function () {
         return;
     }
 
-    // --- ENCABEZADO ESTILO IMAGEN ---
-    try {
-        // Logo SENA (Izquierda)
-        const imgSena = new Image();
-        imgSena.src = 'assets/img/logosena.png';
-        await new Promise(r => imgSena.onload = r);
-        doc.addImage(imgSena, 'PNG', 15, 10, 25, 25);
-
-        // Logo SENAPRE (Derecha, circular si es posible o normal)
-        const imgSenapre = new Image();
-        imgSenapre.src = 'assets/img/asi.png';
-        await new Promise(r => imgSenapre.onload = r);
-        doc.addImage(imgSenapre, 'PNG', 170, 10, 25, 25);
-    } catch (e) { console.warn('No se pudieron cargar los logos', e); }
-
-    // Títulos
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(22);
-    doc.setTextColor(57, 169, 0); // Verde SENA
-    doc.text(title, 105, 25, { align: 'center' });
-
-    doc.setFontSize(14);
-    doc.text(`VOCERO DE ENFOQUE DIFERENCIAL ${categoria.toUpperCase()}`, 105, 35, { align: 'center' });
-
-    // Nombre del Vocero (si es vocero, usar su nombre. Si es admin, poner el del responsable si lo tenemos)
-    let nombreVocero = `${user.nombre} ${user.apellido}`;
-    if (user.rol !== 'vocero') {
-        // Aquí podrías buscar el responsable de la tabla voceros_enfoque si quisieras ser más preciso
+    // --- ENCABEZADO ---
+    let startY = 56;
+    if (typeof SenaPrePDF !== 'undefined') {
+        startY = await SenaPrePDF.crearCabecera(doc, {
+            titulo:      title,
+            subtitulo:   `VOCERO DE ENFOQUE DIFERENCIAL ${categoria.toUpperCase()}`,
+            orientacion: 'portrait'
+        });
     }
-    doc.setFontSize(18);
-    doc.text(nombreVocero.toUpperCase(), 105, 45, { align: 'center' });
-
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(10);
-    doc.setTextColor(50);
-    doc.text(`Fecha de reporte: ${fecha}`, 105, 55, { align: 'center' });
 
     // Tabla de Datos
     const rows = filtrados.map(a => [
@@ -1435,7 +1390,7 @@ window.descargarPDFPoblacion = async function () {
     ]);
 
     doc.autoTable({
-        startY: 65,
+        startY: startY,
         head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'FICHA', 'PROGRAMA', 'ESTADO']],
         body: rows,
         theme: 'grid',
@@ -1444,6 +1399,9 @@ window.descargarPDFPoblacion = async function () {
             textColor: [255, 255, 255],
             fontSize: 10,
             halign: 'center'
+        },
+        didDrawPage: () => {
+            if (typeof SenaPrePDF !== 'undefined') SenaPrePDF.pieDePagina(doc);
         },
         styles: {
             fontSize: 9,

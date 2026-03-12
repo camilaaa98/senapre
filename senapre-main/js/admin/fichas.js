@@ -13,16 +13,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listeners para filtros
     document.getElementById('filtroSearch')?.addEventListener('input', debounce(aplicarFiltros, 500));
+    document.getElementById('filtroMunicipio')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtroPrograma')?.addEventListener('change', aplicarFiltros);
     document.getElementById('filtroEstado')?.addEventListener('change', aplicarFiltros);
 });
 
+let programasData = []; // Cache para datos de programas
+
 async function cargarProgramas() {
     try {
-        const response = await fetch('api/programas.php');
+        const response = await fetch('api/programas.php?limit=-1');
         const result = await response.json();
 
         if (result.success) {
+            programasData = result.data;
             const select = document.getElementById('programa');
             const filtroSelect = document.getElementById('filtroPrograma');
 
@@ -40,11 +44,80 @@ async function cargarProgramas() {
                     filtroSelect.appendChild(filterOption);
                 }
             });
+
+            // Listener para autocompletar campos cuando cambia el programa
+            select.addEventListener('change', (e) => {
+                const programaNombre = e.target.value;
+                const programa = programasData.find(p => p.nombre_programa === programaNombre);
+                if (programa) {
+                    autocompletarFichaDesdePrograma(programa);
+                }
+            });
         }
     } catch (error) {
         console.error('Error cargando programas:', error);
     }
 }
+
+function autocompletarFichaDesdePrograma(p) {
+    const nivelBaseSelect = document.getElementById('tipoFormacionBase');
+    const modalidadSelect = document.getElementById('modalidadOferta');
+    const jornadaSelect = document.getElementById('jornada');
+
+    // 1. Nivel de Formación base (Pluralizado)
+    if (nivelBaseSelect) {
+        const nivelNormalizado = (p.nivel_formacion || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        // Mapeo simple de singular a plural para el autocompletado si es necesario
+        const mapeoPlural = {
+            'tecnico': 'Técnicos',
+            'tecnologo': 'Tecnólogos',
+            'virtual': 'Virtuales',
+            'curso': 'Cursos',
+            'auxiliar': 'Auxiliares',
+            'operario': 'Operarios',
+            'especializacion': 'Especializaciones'
+        };
+
+        const targetPlural = mapeoPlural[nivelNormalizado] || mapeoPlural[nivelNormalizado.replace(/s$/, '')] || null;
+
+        if (targetPlural) {
+            nivelBaseSelect.value = targetPlural;
+        } else {
+            const options = Array.from(nivelBaseSelect.options);
+            const match = options.find(o => {
+                const optVal = o.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                return optVal === nivelNormalizado || optVal.includes(nivelNormalizado) || nivelNormalizado.includes(optVal);
+            });
+            if (match) nivelBaseSelect.value = match.value;
+        }
+    }
+
+    // 2. Modalidad (Oferta)
+    if (modalidadSelect) {
+        modalidadSelect.value = (p.tipo_oferta === 'Cerrada') ? 'Cerrada' : 'Abierta';
+    }
+
+    // 3. Determinar Jornada basándose en horarios del programa
+    if (jornadaSelect && p.hora_entrada) {
+        const h = parseInt(p.hora_entrada.split(':')[0]);
+        let jornadaAsumida = '';
+        if (h >= 5 && h < 12) jornadaAsumida = 'Diurna';
+        else if (h >= 12 && h < 18) jornadaAsumida = 'Tarde';
+        else if (h >= 18) jornadaAsumida = 'Noche';
+
+        if (jornadaAsumida) {
+            // Si es oferta cerrada, intentar buscar la opción "- Cerrado"
+            const sufijo = (p.tipo_oferta === 'Cerrada') ? ' - Cerrado' : '';
+            const buscado = jornadaAsumida + sufijo;
+
+            const options = Array.from(jornadaSelect.options);
+            const match = options.find(o => o.value === buscado) || options.find(o => o.value.startsWith(jornadaAsumida));
+            if (match) jornadaSelect.value = match.value;
+        }
+    }
+}
+
 
 let todosInstructores = []; // Variable global para almacenar instructores
 let todosTiposFormacion = []; // Variable global para almacenar tipos de formación
@@ -126,9 +199,14 @@ async function cargarInstructores() {
 async function cargarFichas(pagina = 1) {
     try {
         const search = document.getElementById('filtroSearch')?.value || '';
+        const municipio = document.getElementById('filtroMunicipio')?.value || '';
         const programa = document.getElementById('filtroPrograma')?.value || '';
         const estado = document.getElementById('filtroEstado')?.value || '';
-        const response = await fetch('api/fichas.php?limit=-1');
+
+        let url = 'api/fichas.php?limit=-1';
+        if (municipio) url += `&municipio=${encodeURIComponent(municipio)}`;
+
+        const response = await fetch(url);
         const result = await response.json();
 
         if (result.success) {
@@ -233,7 +311,19 @@ function mostrarFichas(fichas) {
         <tr class="table-row-divider">
             <td class="td-mono">${f.numero_ficha}</td>
             <td>${f.nombre_programa || 'N/A'}</td>
-            <td class="td-mono">${f.tipo_formacion_nombre || f.tipoFormacion || 'N/A'}</td>
+            <td class="td-mono">
+                <select onchange="cambiarTipoFormacion('${f.numero_ficha}', this.value)" 
+                        class="form-select-custom">
+                    <option value="">Seleccione...</option>
+                    ${todosTiposFormacion.map(t => `
+                        <option value="${t.nombre}" ${f.tipoFormacion === t.nombre ? 'selected' : ''}>
+                            ${t.nombre}
+                        </option>
+                    `).join('')}
+                    ${(f.tipoFormacion && !todosTiposFormacion.some(t => t.nombre === f.tipoFormacion)) ?
+                `<option value="${f.tipoFormacion}" selected>${f.tipoFormacion}</option>` : ''}
+                </select>
+            </td>
             <td>${f.jornada || 'N/A'}</td>
             <td>
                 <select onchange="cambiarInstructorLider('${f.numero_ficha}', this.value)" 
@@ -268,9 +358,9 @@ function mostrarFichas(fichas) {
                 <select onchange="cambiarEstadoFicha('${f.numero_ficha}', this)" 
                         class="form-control status-select ${claseEstado}">
                     ${todosEstados.map(e => {
-            const claseOpcion = `status-${e.nombre.toLowerCase().replace(/ /g, '-')}`;
-            return `<option value="${e.nombre}" class="${claseOpcion}" ${f.estado === e.nombre ? 'selected' : ''}>${e.nombre}</option>`;
-        }).join('')}
+                    const claseOpcion = `status-${e.nombre.toLowerCase().replace(/ /g, '-')}`;
+                    return `<option value="${e.nombre}" class="${claseOpcion}" ${f.estado === e.nombre ? 'selected' : ''}>${e.nombre}</option>`;
+                }).join('')}
                 </select>
             </td>
         </tr>
@@ -438,13 +528,22 @@ function cerrarModal() {
 async function guardarFicha(event) {
     event.preventDefault();
 
+    // Combinar Nivel + Modalidad para el campo tipoFormacion de la BD
+    const nivel = document.getElementById('tipoFormacionBase').value;
+    const modalidad = document.getElementById('modalidadOferta').value;
+    let tipoFinal = nivel;
+    if (modalidad === 'Cerrada') {
+        tipoFinal += ' - Cerrado';
+    }
+
     const formData = {
         numero_ficha: document.getElementById('numeroFicha').value,
         nombre_programa: document.getElementById('programa').value,
         jornada: document.getElementById('jornada').value,
         estado: document.getElementById('estadoFicha').value,
         instructor_lider: document.getElementById('instructorLider').value,
-        tipoFormacion: document.getElementById('tipoFormacionSelect').value
+        tipoFormacion: tipoFinal,
+        municipio: document.getElementById('municipioFicha').value
     };
 
     try {

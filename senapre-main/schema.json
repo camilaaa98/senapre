@@ -1,0 +1,37 @@
+{
+    "aprendices": [
+        "documento",
+        "tipo_identificacion",
+        "nombre",
+        "apellido",
+        "correo",
+        "celular",
+        "numero_ficha",
+        "estado",
+        "tipo_poblacion"
+    ],
+    "fichas": [
+        "numero_ficha",
+        "nombre_programa",
+        "jornada",
+        "estado",
+        "instructor_lider",
+        "vocero_principal",
+        "vocero_suplente"
+    ],
+    "usuarios": [
+        "id_usuario",
+        "nombre",
+        "apellido",
+        "correo",
+        "password_hash",
+        "rol",
+        "estado",
+        "creado_en"
+    ],
+    "area_responsables": [
+        "id",
+        "id_usuario",
+        "area"
+    ]
+}

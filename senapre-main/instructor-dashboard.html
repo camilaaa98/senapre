@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - SenApre</title>
-    <link rel="stylesheet" href="css/main.css?v=2.0.2">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="css/instructor-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -18,6 +19,7 @@
                 <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
                 <h3>SenApre</h3>
                 <div class="sidebar-subtitle">Instructor</div>
+                <div id="userInfo" class="sidebar-user-info"></div>
             </div>
 
             <nav class="sidebar-menu">
@@ -25,6 +27,12 @@
                     <a href="instructor-dashboard" class="menu-link active">
                         <div class="menu-icon"><i class="fas fa-home"></i></div>
                         <span>Panel Principal</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-fichas" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span>Mis Fichas</span>
                     </a>
                 </li>
                 <li class="menu-item">
@@ -66,62 +74,53 @@
             </div>
 
             <!-- Métricas Principales -->
-            <div class="stats-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="stats-grid">
+                <div class="card-stat">
+                    <div class="card-header-flex">
                         <h3 class="card-title">Fichas Asignadas</h3>
-                        <i class="fas fa-chalkboard fa-2x" style="color: var(--sena-green)"></i>
+                        <i class="fas fa-chalkboard fa-2x color-sena"></i>
                     </div>
-                    <div class="stat-value" id="fichasCount"
-                        style="font-size: 3rem; font-weight: bold; color: var(--sena-green); margin: 20px 0;">-</div>
-                    <p class="text-muted">Total de fichas activas</p>
+                    <div class="stat-value color-sena" id="fichasCount">-</div>
+                    <p class="stat-label">Total de fichas activas</p>
                 </div>
 
-                <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-stat">
+                    <div class="card-header-flex">
                         <h3 class="card-title">Aprendices</h3>
-                        <i class="fas fa-user-graduate fa-2x" style="color: #3b82f6"></i>
+                        <i class="fas fa-user-graduate fa-2x color-accent"></i>
                     </div>
-                    <div class="stat-value" id="aprendicesCount"
-                        style="font-size: 3rem; font-weight: bold; color: #3b82f6; margin: 20px 0;">-</div>
-                    <p class="text-muted">En formación activa</p>
+                    <div class="stat-value color-accent" id="aprendicesCount">-</div>
+                    <p class="stat-label">En formación activa</p>
                 </div>
 
-                <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-stat">
+                    <div class="card-header-flex">
                         <h3 class="card-title">Promedio Asistencia</h3>
-                        <i class="fas fa-chart-line fa-2x" style="color: #8b5cf6"></i>
+                        <i class="fas fa-chart-line fa-2x color-purple"></i>
                     </div>
-                    <div class="stat-value" id="promedioAsistencia"
-                        style="font-size: 3rem; font-weight: bold; color: #8b5cf6; margin: 20px 0;">-</div>
-                    <p class="text-muted">General del instructor</p>
+                    <div class="stat-value color-purple" id="promedioAsistencia">-</div>
+                    <p class="stat-label">General del instructor</p>
                 </div>
 
-                <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-stat">
+                    <div class="card-header-flex">
                         <h3 class="card-title">Alertas</h3>
-                        <i class="fas fa-exclamation-triangle fa-2x" style="color: #ef4444"></i>
+                        <i class="fas fa-exclamation-triangle fa-2x color-danger"></i>
                     </div>
-                    <div class="stat-value" id="alertasCount"
-                        style="font-size: 3rem; font-weight: bold; color: #ef4444; margin: 20px 0;">-</div>
-                    <p class="text-muted">Aprendices con baja asistencia</p>
+                    <div class="stat-value color-danger" id="alertasCount">-</div>
+                    <p class="stat-label">Aprendices con baja asistencia</p>
                 </div>
             </div>
 
             <!-- Alertas y Calendario -->
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+            <div class="content-grid-2-1">
                 <!-- Alertas -->
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-exclamation-circle"></i> Aprendices en Riesgo</h3>
                     </div>
-                    <div id="alertasContainer" style="max-height: 400px; overflow-y: auto;">
-                        <p style="text-align: center; color: #666; padding: 20px;">Cargando...</p>
+                    <div id="alertasContainer" class="scroll-container-sm">
+                        <p class="text-center-muted p-20">Cargando...</p>
                     </div>
                 </div>
 
@@ -130,7 +129,7 @@
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Mi Programación</h3>
                     </div>
-                    <div id="calendar" style="padding: 20px;"></div>
+                    <div id="calendar" class="p-20"></div>
                 </div>
             </div>
         </main>
@@ -143,7 +142,16 @@
 
     <script src="js/main.js?v=1.0.6"></script>
     <script src="js/instructor/dashboard.js"></script>
-    
+
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'index';
+        } else {
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) userInfo.textContent = `${user.nombre} ${user.apellido}`;
+        }
+    </script>
 </body>
 
 </html>

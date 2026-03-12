@@ -14,28 +14,28 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+                                <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <img src="assets/img/asi.png" alt="ASI Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display">Director</div>
+                <div class="sidebar-subtitle" id="user-role-display"></div>
             </div>
 
             <nav class="sidebar-menu">
                 <li class="menu-item">
-                    <a href="admin-dashboard" class="menu-link ">
+                    <a href="admin-dashboard.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-home"></i></div>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-bienestar-dashboard" class="menu-link ">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-handshake"></i></div>
                         <span>Bienestar del Aprendiz</span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-usuarios" class="menu-link ">
+                <li class="menu-item" id="menu-usuarios">
+                    <a href="admin-usuarios.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
                         <span>Gestionar Usuarios</span>
                     </a>
@@ -47,46 +47,40 @@
                         <i class="fas fa-chevron-down submenu-arrow"></i>
                     </a>
                     <ul class="submenu show" id="submenu-aprendices">
-                        <li><a href="#lista" onclick="mostrarSeccion(event, 'lista')"><i class="fas fa-list"></i> Lista
-                                de Aprendices</a></li>
-                        <li><a href="#poblacion" onclick="mostrarSeccion(event, 'poblacion')"><i
-                                    class="fas fa-users"></i> Tipo de Población</a></li>
-                        <li><a href="#excusas" onclick="mostrarSeccion(event, 'excusas')"><i
-                                    class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="#planes" onclick="mostrarSeccion(event, 'planes')"><i
-                                    class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
-                        <li><a href="#inasistencias" onclick="mostrarSeccion(event, 'inasistencias')"><i
-                                    class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
-                        <li><a href="#retardos" onclick="mostrarSeccion(event, 'retardos')"><i class="fas fa-clock"></i>
-                                Retardos</a></li>
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-programas" class="menu-link ">
+                <li class="menu-item" id="menu-programas">
+                    <a href="admin-programas.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-book"></i></div>
                         <span>Gestionar Programas</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-fichas" class="menu-link ">
+                    <a href="admin-fichas.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
                         <span>Gestionar Fichas</span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-asignaciones" class="menu-link ">
+                <li class="menu-item" id="menu-asignaciones">
+                    <a href="admin-asignaciones.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                         <span>Asignar Instructores</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-asistencias" class="menu-link ">
+                    <a href="admin-asistencias.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
                         <span>Consultar Asistencias</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-reportes" class="menu-link ">
+                    <a href="admin-reportes.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
                         <span>Generar Reportes</span>
                     </a>
@@ -109,9 +103,17 @@
             <!-- SECCIÓN: LISTA DE APRENDICES -->
             <div id="seccion-lista" class="content-section active">
                 <div class="content-header">
-                    <h1 class="content-title" id="titulo-gestion-aprendices">Gestión de Aprendices</h1>
-                    <p class="content-description" id="desc-gestion-aprendices">Administración completa de aprendices
-                        matriculados</p>
+                    <div class="content-info">
+                        <h1 class="content-title" id="titulo-gestion-aprendices">Gestión de Aprendices</h1>
+                        <p class="content-description" id="desc-gestion-aprendices">Administración completa de
+                            aprendices matriculados</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="window.location.href='admin-dashboard'" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </button>
+                    </div>
                 </div>
                 <!-- Filtros de Búsqueda -->
                 <div class="card card-filtros">
@@ -156,7 +158,7 @@
                                 style="background: #ef4444;">
                                 <i class="fas fa-file-pdf"></i> Exportar PDF
                             </button>
-                            <button onclick="exportarAprendices()" class="btn-primary btn-moderate"
+                            <button onclick="exportarAprendicesExcel()" class="btn-primary btn-moderate"
                                 style="background: #16a34a;">
                                 <i class="fas fa-file-excel"></i> Exportar Excel
                             </button>
@@ -192,8 +194,16 @@
             <!-- SECCIÓN: TIPO DE POBLACIÓN (Estadísticas y Filtros) -->
             <div id="seccion-poblacion" class="content-section">
                 <div class="content-header">
-                    <h1 class="content-title">Distribución de Población</h1>
-                    <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
+                    <div class="content-info">
+                        <h1 class="content-title">Distribución de Población</h1>
+                        <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="mostrarSeccion(event, 'lista')" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver a Lista
+                        </button>
+                    </div>
                 </div>
                 <div class="chart-section-grid">
                     <!-- Tarjetas de Estadística -->
@@ -331,9 +341,17 @@
             <!-- SECCIÓN: GESTIÓN DE TIPOS DE POBLACIÓN (Vista AGREGAR) -->
             <div id="seccion-gestion-poblacion" class="content-section">
                 <div class="content-header">
-                    <h1 class="content-title">Tipo de Población</h1>
-                    <p class="content-description">Mujer, Indígena, Afro, Víctima, Campesina, N.A.P, LGBTI, Discapacidad
-                    </p>
+                    <div class="content-info">
+                        <h1 class="content-title">Tipo de Población</h1>
+                        <p class="content-description">Mujer, Indígena, Afro, Víctima, Campesina, N.A.P, LGBTI,
+                            Discapacidad</p>
+                    </div>
+                    <div class="header-actions">
+                        <button onclick="mostrarSeccion(event, 'poblacion')" class="btn-primary"
+                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                            <i class="fas fa-arrow-left"></i> Volver a Estadísticas
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Filtros de Búsqueda (Copia de la lista principal) -->
@@ -677,6 +695,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
+    <script src="js/shared/pdf-utils.js"></script>
     <script src="js/main.js?v=1.0.6"></script>
     <script src="js/human-config.js"></script>
     <script src="js/facial-recognition.js"></script>

@@ -16,82 +16,73 @@
     <div class="dashboard-container">
 
         <!-- SIDEBAR -->
-        <aside class="sidebar">
+                                <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <img src="assets/img/asi.png" alt="ASI Logo" class="logo-principal">
                 <h3>SenApre</h3>
-                <div class="sidebar-subtitle" id="user-role-display">Director</div>
+                <div class="sidebar-subtitle" id="user-role-display"></div>
             </div>
 
             <nav class="sidebar-menu">
                 <li class="menu-item">
-                    <a href="admin-dashboard" class="menu-link active">
+                    <a href="admin-dashboard.html" class="menu-link active">
                         <div class="menu-icon"><i class="fas fa-home"></i></div>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a href="#" class="menu-link" onclick="toggleSubmenu(event, 'submenu-bienestar')">
+                <li class="menu-item">
+                    <a href="admin-bienestar-dashboard.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-handshake"></i></div>
                         <span>Bienestar del Aprendiz</span>
-                        <i class="fas fa-chevron-down submenu-arrow"></i>
                     </a>
-                    <ul class="submenu" id="submenu-bienestar">
-                        <li><a href="liderazgo.html"><i class="fas fa-users"></i> Liderazgo Estudiantil</a></li>
-                        <li><a href="admin-bienestar-dashboard.html"><i class="fas fa-chart-pie"></i> Estadísticas
-                                Bienestar</a></li>
-                    </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-usuarios" class="menu-link">
+                <li class="menu-item" id="menu-usuarios">
+                    <a href="admin-usuarios.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
                         <span>Gestionar Usuarios</span>
                     </a>
                 </li>
-                <li class="menu-item has-submenu">
-                    <a href="admin-aprendices" class="menu-link" onclick="toggleSubmenu(event, 'submenu-aprendices')">
+                <li class="menu-item has-submenu ">
+                    <a href="#" class="menu-link " onclick="toggleSubmenu(event, 'submenu-aprendices')">
                         <div class="menu-icon"><i class="fas fa-user-graduate"></i></div>
                         <span>Gestionar Aprendices</span>
                         <i class="fas fa-chevron-down submenu-arrow"></i>
                     </a>
-                    <ul class="submenu" id="submenu-aprendices">
-                        <li><a href="admin-aprendices"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
-                        <li><a href="admin-aprendices#poblacion"><i class="fas fa-users"></i> Tipo de Población</a>
-                        </li>
-                        <li><a href="admin-aprendices#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
-                        <li><a href="admin-aprendices#planes"><i class="fas fa-clipboard-list"></i> Planes de
-                                Mejoramiento</a></li>
-                        <li><a href="admin-aprendices#inasistencias"><i class="fas fa-exclamation-triangle"></i>
-                                Inasistencias</a></li>
-                        <li><a href="admin-aprendices#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
+                    <ul class="submenu " id="submenu-aprendices">
+                        <li><a href="admin-aprendices.html"><i class="fas fa-list"></i> Lista de Aprendices</a></li>
+                        <li><a href="admin-aprendices.html#poblacion"><i class="fas fa-users"></i> Tipo de Población</a></li>
+                        <li><a href="admin-aprendices.html#excusas"><i class="fas fa-file-alt"></i> Excusas</a></li>
+                        <li><a href="admin-aprendices.html#planes"><i class="fas fa-clipboard-list"></i> Planes de Mejoramiento</a></li>
+                        <li><a href="admin-aprendices.html#inasistencias"><i class="fas fa-exclamation-triangle"></i> Inasistencias</a></li>
+                        <li><a href="admin-aprendices.html#retardos"><i class="fas fa-clock"></i> Retardos</a></li>
                     </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-programas" class="menu-link">
+                <li class="menu-item" id="menu-programas">
+                    <a href="admin-programas.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-book"></i></div>
                         <span>Gestionar Programas</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-fichas" class="menu-link">
+                    <a href="admin-fichas.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-chalkboard"></i></div>
                         <span>Gestionar Fichas</span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a href="admin-asignaciones" class="menu-link">
+                <li class="menu-item" id="menu-asignaciones">
+                    <a href="admin-asignaciones.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                         <span>Asignar Instructores</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-asistencias" class="menu-link">
+                    <a href="admin-asistencias.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-check-circle"></i></div>
                         <span>Consultar Asistencias</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="admin-reportes" class="menu-link">
+                    <a href="admin-reportes.html" class="menu-link ">
                         <div class="menu-icon"><i class="fas fa-chart-bar"></i></div>
                         <span>Generar Reportes</span>
                     </a>
@@ -103,7 +94,6 @@
                     </a>
                 </li>
             </nav>
-
             <div class="sidebar-footer">
                 <img src="assets/img/logosena.png" alt="SENA Logo">
             </div>
@@ -252,16 +242,20 @@
                     <h3 class="card-title">Accesos Rápidos</h3>
                 </div>
                 <div class="accesos-grid">
-                    <button onclick="window.location.href = 'liderazgo-historico.html'"
+                    <button onclick="window.location.href = 'liderazgo.html'"
                         class="btn-premium premium-gradient-verde">
-                        <i class="fas fa-users"></i> Asistencia Reuniones Voceros
+                        <i class="fas fa-users"></i>
+                        <span>Asistencia Reuniones Voceros</span>
                     </button>
-                    <button onclick="window.location.href = 'admin-asistencias'"
+                    <button onclick="window.location.href = 'admin-asistencias.html'"
                         class="btn-premium premium-gradient-verde2">
-                        <i class="fas fa-clipboard-check"></i> Consultar Asistencias de Fichas
+                        <i class="fas fa-check-double"></i>
+                        <span>Consultar Asistencias de Fichas</span>
                     </button>
-                    <button onclick="window.location.href = 'admin-reportes'" class="btn-premium premium-gradient-azul">
-                        <i class="fas fa-chart-line"></i> Centro de Reportes y Estadísticas
+                    <button onclick="window.location.href = 'admin-reportes.html'"
+                        class="btn-premium premium-gradient-azul">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Centro de Reportes y Estadísticas</span>
                     </button>
                 </div>
             </div>

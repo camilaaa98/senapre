@@ -159,25 +159,47 @@
     transform: translateY(-2px);
 }
 
+.btn-premium {
+    padding: 20px !important;
+    border-radius: 12px !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-height: 120px !important;
+    width: 100% !important;
+}
+
+.btn-premium i {
+    font-size: 1.8rem !important;
+}
+
 .btn-premium.premium-gradient-verde {
-    background: linear-gradient(135deg, #39A900 0%, #2d8600 100%);
-    box-shadow: 0 4px 15px rgba(57, 169, 0, 0.3);
+    background: linear-gradient(135deg, #39A900 0%, #2d8600 100%) !important;
+    box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2) !important;
 }
 
 .btn-premium.premium-gradient-verde2 {
-    background: linear-gradient(135deg, #2d8600 0%, #1e5c00 100%);
-    box-shadow: 0 4px 15px rgba(45, 134, 0, 0.3);
+    background: linear-gradient(135deg, #2d8600 0%, #1e5c00 100%) !important;
+    box-shadow: 0 10px 20px rgba(45, 134, 0, 0.2) !important;
 }
 
 .btn-premium.premium-gradient-azul {
-    background: linear-gradient(135deg, #00324D 0%, #001f2f 100%);
-    box-shadow: 0 4px 15px rgba(0, 50, 77, 0.3);
+    background: linear-gradient(135deg, #00324D 0%, #001f2f 100%) !important;
+    box-shadow: 0 10px 20px rgba(0, 50, 77, 0.2) !important;
 }
 
 .btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    filter: brightness(1.1);
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2) !important;
+    filter: brightness(1.1) !important;
 }
 
 .btn-acceso.verde {
@@ -192,23 +214,36 @@
     background: #00324D;
 }
 
-/* ── Botón volver ─────────────────────────────────────────── */
-.btn-volver {
-    display: none;
-    margin-bottom: 20px;
+/* ── Botón volver (Estandarizado) ─────────────────────────── */
+.btn-back-container {
+    margin-bottom: 25px;
 }
 
-.btn-volver button {
+.btn-back {
     background: #64748b;
-    color: white;
+    color: white !important;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    transition: all 0.2s;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    background: #475569;
+    transform: translateX(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back i {
+    font-size: 0.8rem;
 }
 
 /* ── Panel estadísticas de población ──────────────────────── */
@@ -255,11 +290,11 @@
 }
 
 /* ── Utilidades para limpieza de HTML (SOLID) ─────────────── */
-.filters-wrapper {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    align-items: flex-end;
+.accesos-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 25px !important;
+    padding: 10px !important;
 }
 
 .sticky-thead th {
@@ -310,6 +345,127 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* ── Clases Auxiliares para Refactorización (SOLID) ──────── */
+.filter-label-small {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.f-width-180 {
+    width: 180px;
+}
+
+.f-width-220 {
+    width: 220px;
+}
+
+.f-width-auto {
+    width: auto;
+}
+
+.p-20 {
+    padding: 20px;
+}
+
+.p-15 {
+    padding: 8px 15px;
+}
+
+.pb-eee {
+    border-bottom: 1px solid #eee;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.mt-2rem {
+    margin-top: 2rem;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.d-grid {
+    display: grid;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-15 {
+    gap: 15px;
+}
+
+.gap-20 {
+    gap: 20px;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.grid-1-2 {
+    grid-template-columns: 1fr 2fr;
+}
+
+.bg-excel {
+    background: #2d8600 !important;
+}
+
+.overflow-x {
+    overflow-x: auto;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.min-w-200 {
+    min-width: 200px;
+}
+
+.f-width-200 {
+    width: 200px;
+}
+
+.f-width-250 {
+    width: 250px;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.btn-none {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #64748b !important;
 }
 
 /* ── Clases para Voceros (Separación de Estilos) ─────────── */
@@ -650,17 +806,68 @@
     font-size: 1.1rem;
 }
 
-/* ── Botones de Acción (Vibrantes) ─────────────────────── */
-.btn-blue {
-    background: #3b82f6 !important;
+/* ── Botones de Acción Premium (Vibrantes) ───────────────── */
+.btn-action-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-red {
-    background: #ef4444 !important;
+.btn-action {
+    width: 42px;
+    height: 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white !important;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn-purple {
-    background: #8b5cf6 !important;
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+}
+
+.btn-action:active {
+    transform: translateY(0);
+}
+
+.btn-action i {
+    pointer-events: none;
+}
+
+.btn-action-purple {
+    background: #8b5cf6 !important; /* Púrpura vibrante */
+}
+
+.btn-action-blue {
+    background: #3b82f6 !important; /* Azul vibrante */
+}
+
+.btn-action-red {
+    background: #ef4444 !important; /* Rojo vibrante */
+}
+
+.btn-action-green {
+    background: #10b981 !important; /* Verde vibrante */
+}
+
+.btn-action-orange {
+    background: #f59e0b !important; /* Naranja vibrante */
+}
+
+.btn-action:disabled {
+    background: #cbd5e1 !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .document-change-note {

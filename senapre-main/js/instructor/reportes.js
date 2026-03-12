@@ -259,7 +259,7 @@ function exportarCSVFicha(ficha, inicio, fin, datos) {
 
 // ... (Logos loading remains same) ...
 
-function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
+async function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     if (!detalles || detalles.length === 0) return mostrarNotificacion('No hay datos', 'error');
 
     if (!window.jspdf || !window.jspdf.jsPDF) {
@@ -267,33 +267,17 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     }
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF('p', 'mm', 'a4');
 
-    // Logos - Robust check to avoid crash if images are missing
-    try {
-        if (typeof logoBase64 !== 'undefined' && logoBase64) {
-            doc.addImage(logoBase64, 'PNG', 15, 10, 35, 15);
-        }
-        if (typeof logoSenaBase64 !== 'undefined' && logoSenaBase64) {
-            doc.addImage(logoSenaBase64, 'PNG', 170, 8, 25, 25);
-        }
-    } catch (e) {
-        console.warn('Logos not available or blocked by CORS for PDF');
+    // --- ENCABEZADO ---
+    let startY = 56;
+    if (typeof SenaPrePDF !== 'undefined') {
+        startY = await SenaPrePDF.crearCabecera(doc, {
+            titulo:      'REPORTE DE ASISTENCIA',
+            subtitulo:   `FICHA ${ficha} | Periodo: ${inicio} al ${fin}`,
+            orientacion: 'portrait'
+        });
     }
-
-    // Título Centrado
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(57, 169, 0); // SENA Green
-    doc.text('SISTEMA SENAPRE', 105, 20, { align: "center" });
-
-    doc.setFontSize(14);
-    doc.setTextColor(0, 50, 77); // SENA Blue
-    doc.text(`REPORTE DE ASISTENCIA - FICHA ${ficha}`, 105, 28, { align: "center" });
-
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Periodo: ${inicio} al ${fin}`, 105, 33, { align: "center" });
 
     // Tabla Resumen
     const colResumen = ["Documento", "Aprendiz", "Total", "Pres.", "Ret.", "Aus.", "Exc.", "%"];
@@ -311,7 +295,7 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
     doc.autoTable({
         head: [colResumen],
         body: rowResumen,
-        startY: 40,
+        startY: startY,
         theme: 'grid',
         headStyles: { fillColor: [57, 169, 0], textColor: 255 },
         styles: { fontSize: 8 },
@@ -324,6 +308,9 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
             5: { cellWidth: 12 },
             6: { cellWidth: 12 },
             7: { cellWidth: 15 }
+        },
+        didDrawPage: () => {
+            if (typeof SenaPrePDF !== 'undefined') SenaPrePDF.pieDePagina(doc);
         }
     });
 
@@ -361,6 +348,9 @@ function exportarPDFFicha(ficha, inicio, fin, datos, detalles) {
                 }
                 data.cell.styles.fontStyle = 'bold';
             }
+        },
+        didDrawPage: () => {
+            if (typeof SenaPrePDF !== 'undefined') SenaPrePDF.pieDePagina(doc);
         }
     });
 
