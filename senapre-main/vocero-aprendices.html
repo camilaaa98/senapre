@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,14 @@
     <title>Mis Aprendices — Panel Vocería | SenApre</title>
     <link rel="icon" href="assets/img/logosena.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/main.css?v=2.2.0">
     <link rel="stylesheet" href="css/vocero.css?v=2.2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <div class="voc-container">
 
@@ -25,8 +29,10 @@
             </div>
             <nav class="voc-nav">
                 <a href="vocero-dashboard"><i class="fas fa-home"></i> <span>Inicio</span></a>
-                <a href="vocero-aprendices" class="active"><i class="fas fa-user-graduate"></i> <span>Aprendices</span></a>
-                <a href="javascript:void(0)" onclick="VoceroDash.exportarPDF()"><i class="fas fa-file-pdf"></i> <span>Exportar PDF</span></a>
+                <a href="vocero-aprendices" class="active"><i class="fas fa-user-graduate"></i>
+                    <span>Aprendices</span></a>
+                <a href="javascript:void(0)" onclick="VoceroDash.exportarPDF()"><i class="fas fa-file-pdf"></i>
+                    <span>Exportar PDF</span></a>
             </nav>
             <nav class="voc-nav voc-nav-footer">
                 <a href="index" onclick="cerrarSesion(event)">
@@ -101,7 +107,8 @@
 
                 <div class="voc-aviso-filtro" id="aviso-filtro">
                     <i class="fas fa-info-circle"></i>
-                    Mostrando aprendices en estado <strong>LECTIVA</strong> (activos). Use el filtro para ver otros estados.
+                    Mostrando aprendices en estado <strong>LECTIVA</strong> (activos). Use el filtro para ver otros
+                    estados.
                 </div>
 
                 <div id="voc-tabla-body">
@@ -121,7 +128,8 @@
         <div class="voc-modal-box">
             <div class="voc-modal-header">
                 <h2><i class="fas fa-user-edit"></i> Editar Aprendiz</h2>
-                <button class="voc-modal-close" onclick="document.getElementById('modalEditVocero').style.display='none'">&times;</button>
+                <button class="voc-modal-close"
+                    onclick="document.getElementById('modalEditVocero').style.display='none'">&times;</button>
             </div>
             <form id="formEditVocero" onsubmit="VoceroDash.guardarEdicion(event)" novalidate>
                 <input type="hidden" id="edit-doc-modal">
@@ -147,12 +155,18 @@
                 <div class="voc-form-group">
                     <label class="voc-form-label">Población Diferencial</label>
                     <div class="voc-checks-grid">
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-mujer"> <i class="fas fa-venus" style="color:#ec4899"></i> Mujer</label>
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-indigena"> <i class="fas fa-leaf" style="color:#16a34a"></i> Indígena</label>
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-narp"> <i class="fas fa-users" style="color:#92400e"></i> Narp</label>
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-campesino"> <i class="fas fa-tractor" style="color:#d97706"></i> Campesino</label>
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-lgbtiq"> <i class="fas fa-rainbow" style="color:#8b5cf6"></i> Lgbtiq</label>
-                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-discapacidad"> <i class="fas fa-wheelchair" style="color:#3b82f6"></i> Discapacidad</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-mujer"> <i
+                                class="fas fa-venus" style="color:#ec4899"></i> Mujer</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-indigena"> <i
+                                class="fas fa-leaf" style="color:#16a34a"></i> Indígena</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-narp"> <i class="fas fa-users"
+                                style="color:#92400e"></i> Narp</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-campesino"> <i
+                                class="fas fa-tractor" style="color:#d97706"></i> Campesino</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-lgbtiq"> <i
+                                class="fas fa-rainbow" style="color:#8b5cf6"></i> LGBTIQ+</label>
+                        <label class="voc-check-item"><input type="checkbox" id="edit-pob-discapacidad"> <i
+                                class="fas fa-wheelchair" style="color:#3b82f6"></i> Discapacidad</label>
                     </div>
                 </div>
 
@@ -175,6 +189,7 @@
     <!-- DEPENDENCIAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/shared/pdf-utils.js?v=1.0.0"></script>
     <script src="js/main.js?v=1.0.7"></script>
     <script>
         (function () {
@@ -192,4 +207,5 @@
         document.addEventListener('DOMContentLoaded', () => VoceroDash.initAprendices());
     </script>
 </body>
+
 </html>

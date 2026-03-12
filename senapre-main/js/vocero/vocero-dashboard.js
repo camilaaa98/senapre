@@ -298,70 +298,67 @@ const VoceroDash = (() => {
             if (!State.aprendices.length) return alert('No hay datos para exportar');
             const { jsPDF } = window.jspdf;
 
-            // Horizontal (landscape) A4
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            const pw = doc.internal.pageSize.getWidth();  // 297mm
-            const ph = doc.internal.pageSize.getHeight(); // 210mm
+            // A4 Horizontal (landscape)
+            const doc  = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pw   = doc.internal.pageSize.getWidth();    // 297mm
+            const ph   = doc.internal.pageSize.getHeight();   // 210mm
 
-            // ── Cabecera con fondo verde SENA
-            doc.setFillColor(0, 100, 0);
-            doc.rect(0, 0, pw, 38, 'F');
+            // ── Cabecera profesional SENA + SenApre ──────────────
+            const subtitulo = `Informe de Aprendices | Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`;
 
-            // Franja inferior más oscura
-            doc.setFillColor(0, 50, 0);
-            doc.rect(0, 30, pw, 8, 'F');
-
-            // Logo SENA (texto si no hay imagen)
-            try {
-                // Intentar logo SENA como base64 si está disponible
+            // Usar el módulo compartido si está disponible, o pintar manualmente
+            let startY = 56;
+            if (typeof SenaPrePDF !== 'undefined') {
+                startY = await SenaPrePDF.crearCabecera(doc, {
+                    titulo:      'REPORTE DE APRENDICES',
+                    subtitulo:   subtitulo,
+                    responsable: State.vocNombre,
+                    orientacion: 'landscape'
+                });
+            } else {
+                // Fallback manual si el script no se cargó
+                doc.setFillColor(0, 100, 0);
+                doc.rect(0, 0, pw, 42, 'F');
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(22);
                 doc.setFont('helvetica', 'bold');
-                doc.text('SENA', 18, 22);
-            } catch(e) {}
+                doc.setFontSize(13);
+                doc.text('REPORTE DE APRENDICES', pw / 2, 19, { align: 'center' });
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(subtitulo, pw / 2, 27, { align: 'center' });
+                doc.setFillColor(245, 248, 245);
+                doc.rect(0, 42, pw, 10, 'F');
+                const fechaStr = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(60, 60, 60);
+                doc.text(`Fecha de generación: ${fechaStr}`, pw / 2, 48.5, { align: 'center' });
+                startY = 56;
+            }
 
-            // Títulos centrados
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('SISTEMA NACIONAL DE APRENDIZAJE — SENA', pw / 2, 11, { align: 'center' });
+            // ── Tabla centrada ─────────────────────────────────────
+            // Calcular márgenes iguales para centrar la tabla
+            const totalW  = 10 + 28 + 30 + 32 + 52 + 25 + 22 + 20; // 219mm de columnas
+            const margen  = Math.max(12, (pw - totalW) / 2);
 
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Centro de Teleinformática y Producción Industrial — CTPI', pw / 2, 18, { align: 'center' });
-
-            doc.setFontSize(9);
-            doc.text(`Informe de Aprendices | Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`, pw / 2, 25, { align: 'center' });
-
-            // Franja de fecha
-            doc.setFillColor(245, 245, 245);
-            doc.rect(0, 38, pw, 10, 'F');
-            doc.setTextColor(80, 80, 80);
-            doc.setFontSize(8);
-            doc.setFont('helvetica', 'italic');
-            const fecha = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            doc.text(`Fecha de generación: ${fecha}`, pw / 2, 44, { align: 'center' });
-
-            // ── Tabla de datos
-            const todosAprendices = State.aprendices;
             doc.autoTable({
-                startY: 52,
-                head: [['N°', 'Documento', 'Nombres', 'Apellidos', 'Correo Electrónico', 'Celular', 'Estado', 'Ficha']],
-                body: todosAprendices.map((a, i) => [
+                startY,
+                head: [['N\u00b0', 'Documento', 'Nombres', 'Apellidos', 'Correo Electr\u00f3nico', 'Celular', 'Estado', 'Ficha']],
+                body: State.aprendices.map((a, i) => [
                     i + 1,
-                    a.documento || '—',
-                    a.nombre || '—',
-                    a.apellido || '—',
-                    a.correo || '—',
-                    a.celular || '—',
-                    (a.estado || '—').toUpperCase(),
+                    a.documento || '\u2014',
+                    a.nombre    || '\u2014',
+                    a.apellido  || '\u2014',
+                    a.correo    || '\u2014',
+                    a.celular   || '\u2014',
+                    (a.estado   || '\u2014').toUpperCase(),
                     State.vocFicha
                 ]),
                 theme: 'grid',
                 styles: {
                     font: 'helvetica',
                     fontSize: 8.5,
-                    cellPadding: 4,
+                    cellPadding: { top: 4, right: 5, bottom: 4, left: 5 },
                     halign: 'center',
                     valign: 'middle',
                     lineColor: [210, 210, 210],
@@ -377,36 +374,41 @@ const VoceroDash = (() => {
                 },
                 alternateRowStyles: { fillColor: [245, 252, 240] },
                 columnStyles: {
-                    0: { cellWidth: 10, halign: 'center' },
-                    1: { cellWidth: 28, halign: 'center' },
-                    2: { cellWidth: 30, halign: 'left' },
-                    3: { cellWidth: 32, halign: 'left' },
-                    4: { cellWidth: 55, halign: 'left' },
-                    5: { cellWidth: 25, halign: 'center' },
-                    6: { cellWidth: 22, halign: 'center', fontStyle: 'bold' },
-                    7: { cellWidth: 20, halign: 'center' }
+                    0: { cellWidth: 10,  halign: 'center' },
+                    1: { cellWidth: 28,  halign: 'center' },
+                    2: { cellWidth: 30,  halign: 'center' },
+                    3: { cellWidth: 32,  halign: 'center' },
+                    4: { cellWidth: 52,  halign: 'center' },
+                    5: { cellWidth: 25,  halign: 'center' },
+                    6: { cellWidth: 22,  halign: 'center', fontStyle: 'bold' },
+                    7: { cellWidth: 20,  halign: 'center' }
                 },
-                margin: { left: 12, right: 12 },
+                margin: { left: margen, right: margen },
                 didParseCell(data) {
                     if (data.section === 'body' && data.column.index === 6) {
                         const val = (data.cell.raw || '').toUpperCase();
-                        if (val === 'LECTIVA')   { data.cell.styles.textColor = [22, 163, 74]; }
-                        if (val === 'CANCELADO') { data.cell.styles.textColor = [220, 38, 38]; }
-                        if (val === 'RETIRADO')  { data.cell.styles.textColor = [217, 119, 6]; }
+                        if (val === 'LECTIVA')   data.cell.styles.textColor = [22, 163, 74];
+                        if (val === 'CANCELADO') data.cell.styles.textColor = [220, 38, 38];
+                        if (val === 'RETIRADO')  data.cell.styles.textColor = [217, 119, 6];
                     }
                 },
-                didDrawPage(data) {
-                    const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
-                    const totalPages = doc.internal.getNumberOfPages();
-                    doc.setFontSize(7);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(150, 150, 150);
-                    doc.text(`Página ${pageNum} de ${totalPages}`, pw - 15, ph - 6, { align: 'right' });
-                    doc.text('Generado por SenApre — SENA CTPI', 15, ph - 6);
-                    doc.setDrawColor(200, 200, 200);
-                    doc.line(12, ph - 10, pw - 12, ph - 10);
+                didDrawPage() {
+                    if (typeof SenaPrePDF !== 'undefined') {
+                        SenaPrePDF.pieDePagina(doc);
+                    } else {
+                        const pn = doc.internal.getCurrentPageInfo().pageNumber;
+                        const pt = doc.internal.getNumberOfPages();
+                        doc.setFontSize(7);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setTextColor(140, 140, 140);
+                        doc.setDrawColor(200, 200, 200);
+                        doc.line(12, ph - 11, pw - 12, ph - 11);
+                        doc.text('Generado por SenApre \u2014 SENA CTPI', 14, ph - 6);
+                        doc.text(`P\u00e1gina ${pn} de ${pt}`, pw - 14, ph - 6, { align: 'right' });
+                    }
                 }
             });
+
             doc.save(`informe-vocero-ficha-${State.vocFicha}.pdf`);
         }
     };
