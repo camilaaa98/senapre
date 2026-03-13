@@ -335,7 +335,7 @@ try {
                 if(empty($data['categoria'])) throw new Exception('Categoría requerida');
                 $cat = $data['categoria'];
                 // Check if exists
-                $chk = $conn->prepare("SELECT id FROM voceros_enfoque WHERE tipo_poblacion = :c");
+                $chk = $conn->prepare("SELECT documento FROM voceros_enfoque WHERE tipo_poblacion = :c");
                 $chk->execute([':c' => $cat]);
                 if($chk->fetch()) {
                     $conn->prepare("UPDATE voceros_enfoque SET documento = :d WHERE tipo_poblacion = :c")->execute([':d'=>$doc, ':c'=>$cat]);
@@ -350,7 +350,7 @@ try {
                 if(empty($data['jornada'])) throw new Exception('Jornada requerida');
                 $jor = $data['jornada'];
                 // Check if exists
-                $chk = $conn->prepare("SELECT id FROM representantes_jornada WHERE jornada = :j");
+                $chk = $conn->prepare("SELECT documento FROM representantes_jornada WHERE jornada = :j");
                 $chk->execute([':j' => $jor]);
                 if($chk->fetch()) {
                     $conn->prepare("UPDATE representantes_jornada SET documento = :d WHERE jornada = :j")->execute([':d'=>$doc, ':j'=>$jor]);
