@@ -107,6 +107,10 @@ const LiderazgoUI = {
         const btn = document.getElementById('tab-btn-' + tab);
         if (panel) panel.style.display = 'block';
         if (btn) btn.classList.add('active');
+        
+        // Limpiar buscador al cambiar pestaña
+        const searchInput = document.getElementById('lid-search');
+        if (searchInput) searchInput.value = '';
 
         // Logic for specific tab loads
         if (tab === 'reuniones') {
@@ -116,6 +120,27 @@ const LiderazgoUI = {
             const fab = document.getElementById('fab-reunion');
             if (fab) fab.style.display = 'none';
         }
+    },
+
+    filterTable(query) {
+        const q = query.toLowerCase();
+        const tab = this.currentTab || 'voceros';
+        const fullData = LiderazgoData.cache[tab] || [];
+        
+        const filtered = fullData.filter(l => {
+            const nombre = `${l.nombre} ${l.apellido}`.toLowerCase();
+            const doc = String(l.documento).toLowerCase();
+            const ficha = String(l.numero_ficha || '').toLowerCase();
+            const det = String(l.detalle || '').toLowerCase();
+            const tip = String(l.tipo || '').toLowerCase();
+            return nombre.includes(q) || doc.includes(q) || ficha.includes(q) || det.includes(q) || tip.includes(q);
+        });
+
+        let containerId = `container-${tab}`;
+        if (tab === 'suplentes') containerId = 'container-voceros-suplentes';
+        if (tab === 'voceros') containerId = 'container-voceros';
+        
+        this.renderLideres(filtered, containerId, 1, tab);
     },
 
     renderLideres(lideres, containerId, page = 1, tipoFiltro) {
@@ -135,6 +160,7 @@ const LiderazgoUI = {
                 <thead>
                     <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">FICHA</th>
+                        <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">ROL / CATEGORÍA</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">DOCUMENTO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">NOMBRE COMPLETO</th>
                         <th style="padding: 1rem; color: #64748b; font-weight: 600; font-size: 0.8rem;">CORREO</th>
@@ -155,6 +181,10 @@ const LiderazgoUI = {
             html += `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
                     <td style="padding: 1rem; color: #64748b; font-weight: 700;">${l.numero_ficha || '—'}</td>
+                    <td style="padding: 1rem; color: #0f172a; font-weight: 700;">
+                        <div style="font-size: 0.85rem; color: #1e293b;">${l.tipo}</div>
+                        ${l.detalle ? `<div style="font-size: 0.75rem; color: #39A900; background: rgba(57, 169, 0, 0.1); display: inline-block; padding: 2px 8px; border-radius: 4px; margin-top: 4px;">${l.detalle}</div>` : ''}
+                    </td>
                     <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${l.documento}</td>
                     <td style="padding: 1rem; color: #475569;">${l.nombre} ${l.apellido}</td>
                     <td style="padding: 1rem; color: #64748b;">${l.correo || 'No disponible'}</td>
@@ -162,9 +192,12 @@ const LiderazgoUI = {
                     <td style="padding: 1rem; text-align:center;">
                         <span style="background:${pillBg}; color:${pillColor}; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; display: inline-block;">${l.estado}</span>
                     </td>
-                    <td style="padding: 1rem; text-align:center;">
+                    <td style="padding: 1rem; text-align:center; display: flex; justify-content: center; gap: 8px;">
                         <button style="background: #e0f2fe; color: #0284c7; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#bae6fd'" onmouseout="this.style.background='#e0f2fe'" onclick="LiderazgoUI.editLider('${l.documento}')" title="Editar">
                             <i class="fas fa-pen" style="font-size: 0.85rem;"></i>
+                        </button>
+                        <button style="background: #fee2e2; color: #dc2626; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'" onclick="LiderazgoUI.eliminarRol('${l.documento}', '${l.tipo}')" title="Eliminar Rol">
+                            <i class="fas fa-trash-alt" style="font-size: 0.85rem;"></i>
                         </button>
                     </td>
                 </tr>
@@ -217,13 +250,36 @@ const LiderazgoUI = {
             return;
         }
 
-        document.getElementById('edit-doc').value = lider.documento;
-        document.getElementById('edit-doc-display').value = lider.documento;
+        document.getElementById('edit-doc').value = documento;
+        document.getElementById('edit-doc-display').value = documento;
         document.getElementById('edit-nombre-display').value = `${lider.nombre} ${lider.apellido}`;
         document.getElementById('edit-correo').value = lider.correo || '';
         document.getElementById('edit-tel').value = lider.telefono || '';
-        
         document.getElementById('modalEditLider').style.display = 'flex';
+    },
+
+    async eliminarRol(doc, tipo) {
+        if (!confirm(`¿Está seguro de eliminar el rol de "${tipo}" para este aprendiz?`)) return;
+
+        try {
+            const res = await fetch('api/liderazgo.php?action=eliminarRol', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ documento: doc, tipo: tipo })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('Rol eliminado correctamente');
+                // Forzar recarga de datos
+                delete LiderazgoData.cache[this.currentTab]; 
+                if (typeof cargarLiderazgo === 'function') cargarLiderazgo();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error al procesar la solicitud');
+        }
     },
 
     abrirModalReunion() {
@@ -291,15 +347,16 @@ const LiderazgoUI = {
     },
 
     async cambioTipoRolAsignacion(tipo) {
-        document.getElementById('grp-ficha').style.display = (tipo === 'principal' || tipo === 'suplente') ? 'block' : 'none';
+        document.getElementById('grp-ficha').style.display = (tipo === 'principal' || tipo === 'suplente' || tipo === 'representante') ? 'block' : 'none';
         document.getElementById('grp-enfoque').style.display = (tipo === 'enfoque') ? 'block' : 'none';
-        document.getElementById('grp-jornada').style.display = (tipo === 'representante') ? 'block' : 'none';
+        document.getElementById('grp-jornada').style.display = 'none'; // Ya no se usa jornada directa, se saca de la ficha
         document.getElementById('grp-aprendiz').style.display = 'none';
 
-        if (tipo === 'enfoque' || tipo === 'representante') {
+        if (tipo === 'enfoque') {
             await this.cargarAprendicesParaRol();
         } else {
             document.getElementById('asig-ficha').value = '';
+            document.getElementById('grp-aprendiz').style.display = 'none';
         }
     },
 

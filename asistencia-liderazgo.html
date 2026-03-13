@@ -13,11 +13,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
+    <script src="js/human-config.js"></script>
+    <script src="js/facial-recognition.js"></script>
+    <script src="js/facial-landmarks-draw.js"></script>
 </head>
 
 <body class="bg-light">
     <div class="attendance-header" style="background:var(--lid-secondary); color:white; padding:1.5rem; display:flex; justify-content:space-between; align-items:center;">
-        <a href="liderazgo.html" class="btn-lid btn-lid-secondary" style="color:white; border-color:white;"><i class="fas fa-arrow-left"></i> Volver</a>
+        <a href="liderazgo.html" class="btn-lid btn-lid-secondary" style="color:#00324d; border-color:white;"><i class="fas fa-arrow-left"></i> Volver</a>
         <div class="text-center">
             <h1 id="meet-title" style="font-size:1.5rem; margin:0;">Reunión Liderazgo</h1>
             <p id="meet-date" style="opacity:0.8; font-size:0.9rem; margin-top:5px;"></p>
@@ -52,7 +56,7 @@
                 <div class="biometric-scanner-container" style="height:350px; position:relative; overflow:hidden; border-radius: 15px; background: #000;">
                     <video id="webcam" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; transform: scaleX(-1);"></video>
                     <div class="biometric-overlay"></div>
-                    <div id="bio-points" class="biometric-points"></div>
+                    <div id="bio-points" class="biometric-points" style="transform: scaleX(-1);"></div>
                     <div id="scan-feedback" style="position:absolute; bottom:20px; left:0; width:100%; text-align:center; font-weight:700; color:var(--lid-accent); text-shadow:0 0 10px rgba(0,0,0,0.5); z-index: 10;">
                         BUSCANDO LÍDER...
                     </div>
@@ -123,7 +127,7 @@
                 let list = resL.data;
                 // REGLA: En la reunión ID=2 (o según lo pida el usuario), solo lideres principales y representantes
                 if (meetingId == "2") {
-                    list = list.filter(l => l.tipo === 'Vocero Principal' || l.tipo === 'Representante de Jornada');
+                    list = list.filter(l => l.tipo === 'Vocero Principal' || l.tipo === 'Representante');
                 }
                 
                 leaders = list;

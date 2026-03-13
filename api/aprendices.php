@@ -93,11 +93,10 @@ try {
             }
             
             if ($colBool) {
-                // ILIKE es PostgreSQL (insensible a mayúsculas), LIKE es SQLite (insensible por defecto en strings)
-                // Usamos una combinación robusta
-                $where[] = "(a.tipo_poblacion ILIKE :pob_exact OR a.tipo_poblacion ILIKE :pob_wild OR a.$colBool = 1)";
+                // Compatibilidad universal (SQLite/PostgreSQL)
+                $where[] = "(UPPER(a.tipo_poblacion) LIKE UPPER(:pob_exact) OR UPPER(a.tipo_poblacion) LIKE UPPER(:pob_wild) OR a.$colBool = 1)";
             } else {
-                $where[] = "(a.tipo_poblacion ILIKE :pob_exact OR a.tipo_poblacion ILIKE :pob_wild)";
+                $where[] = "(UPPER(a.tipo_poblacion) LIKE UPPER(:pob_exact) OR UPPER(a.tipo_poblacion) LIKE UPPER(:pob_wild))";
             }
             $params[':pob_exact'] = "$pob_search";
             $params[':pob_wild'] = "%$pob_search%";

@@ -8,6 +8,7 @@ const BiometriaLider = {
     canvas: null,
     pointsContainer: null,
     isActive: false,
+    isProcessing: false,
 
     async init(videoElementId, pointsContainerId) {
         this.video = document.getElementById(videoElementId);
@@ -197,56 +198,56 @@ const BiometriaLider = {
     },
 
     async scanFace() {
-        if (!this.isActive) return;
+        if (!this.isActive || this.isProcessing) return;
+        this.isProcessing = true;
         
-        // Simular probabilidad de detección (No siempre detecta para que no sea molesto)
-        if (Math.random() > 0.4) {
-            const feedback = document.getElementById('scan-feedback');
-            if (feedback) {
-                feedback.textContent = "ANALIZANDO...";
-                feedback.style.color = "#39A900";
-            }
-            return;
+        const feedback = document.getElementById('scan-feedback');
+        if (feedback) {
+            feedback.textContent = "ANALIZANDO...";
+            feedback.style.color = "#39A900";
         }
 
-        // Efecto visual de análisis completado brevemente
-        const trackingBox = document.querySelector('.bio-tracking-box');
-        if (trackingBox) {
-            trackingBox.style.borderColor = '#ffffff';
-            trackingBox.style.boxShadow = '0 0 30px rgba(255,255,255,0.8)';
-            setTimeout(() => {
-                trackingBox.style.borderColor = 'rgba(57, 169, 0, 0.4)';
-                trackingBox.style.boxShadow = '0 0 20px rgba(57, 169, 0, 0.3), inset 0 0 20px rgba(57, 169, 0, 0.2)';
-            }, 500);
-        }
+        try {
+            // Utilizamos el motor real de reconocimiento
+            const result = await identificarPersona(this.video);
 
-        // Simulamos la detección exacta
-        // El sistema toma los aprendices cargados globalmente 'leaders' de asistencia-liderazgo.html
-        if (typeof leaders !== 'undefined' && leaders.length > 0) {
-            // Filtrar solo Voceros y Representantes si es necesario (el user lo pidió para id=2)
-            // Aquí tomamos un candidato que aún no haya asistido hoy para simular realismo
-            const pending = leaders.filter(l => {
-                const asisMap = typeof attendance !== 'undefined' ? attendance.find(a => a.id_aprendiz === l.documento) : null;
-                return !asisMap || asisMap.estado !== 'asistio';
-            });
-
-            if (pending.length > 0) {
-                const randomIdx = Math.floor(Math.random() * pending.length);
-                const selected = pending[randomIdx];
+            if (result.success && result.match && result.data) {
+                const doc = result.data.documento;
                 
-                const feedback = document.getElementById('scan-feedback');
+                // Verificar si pertenece a los líderes de la reunión
+                if (typeof leaders !== 'undefined') {
+                    const isLeader = leaders.find(l => String(l.documento) === String(doc));
+                    if (!isLeader) {
+                        if (feedback) {
+                            feedback.textContent = "NO ES LÍDER CONVOCADO";
+                            feedback.style.color = "#f59e0b";
+                            setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
+                            setTimeout(() => { if(feedback.textContent === "NO ES LÍDER CONVOCADO") feedback.textContent = "BUSCANDO LÍDER..."; }, 2500);
+                        }
+                        this.isProcessing = false;
+                        return;
+                    }
+                }
+
                 if (feedback) {
                     feedback.textContent = "¡COINCIDENCIA ENCONTRADA!";
                     feedback.style.color = "#6ee47b";
-                    setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2000);
+                    setTimeout(() => { if(feedback.textContent === "¡COINCIDENCIA ENCONTRADA!") feedback.textContent = "BUSCANDO LÍDER..."; }, 3000);
                 }
 
-                console.log("Rostro Analizado. Coincidencia Biometrica 99.2%. ID:", selected.documento);
-                this.onDetected(selected.documento);
-            } else {
-                 const feedback = document.getElementById('scan-feedback');
-                 if (feedback) feedback.textContent = "TODOS PRESENTES";
+                console.log("Coincidencia Biométrica: " + (result.score || doc));
+                this.onDetected(doc);
+            } else if (result.success && !result.match && result.mensaje !== 'Buscando rostros...') {
+                 if (feedback) {
+                     feedback.textContent = "ROSTRO DESCONOCIDO";
+                     feedback.style.color = "#ef4444";
+                     setTimeout(() => { if(feedback.textContent === "ROSTRO DESCONOCIDO") feedback.textContent = "BUSCANDO LÍDER..."; }, 2500);
+                 }
             }
+        } catch (error) {
+             console.error('Error durante el escaneo facial:', error);
+        } finally {
+            this.isProcessing = false;
         }
     },
 
@@ -261,6 +262,7 @@ const BiometriaLider = {
         if (this.video && this.video.srcObject) {
             this.video.srcObject.getTracks().forEach(track => track.stop());
         }
-        clearInterval(this.scanInterval);
+        if (this.scanInterval) clearInterval(this.scanInterval);
+        if (this.meshInterval) clearInterval(this.meshInterval);
     }
 };

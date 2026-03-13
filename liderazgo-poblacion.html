@@ -146,7 +146,7 @@
             { key: 'discapacidad', label: 'Discapacidad', icon: 'fas fa-wheelchair', bg: 'linear-gradient(135deg, #42a5f5, #1e88e5)', col: '#ffffff' }
         ];
 
-        let todosAprendices = [];
+        let statsPoblacion = {};
         let currentCatData = [];
         let vocerosEnfoqueMap = {};
 
@@ -172,30 +172,20 @@
             },
 
             async fetchData() {
-                const [resA, resV] = await Promise.all([
-                    fetch('api/aprendices.php?limit=-1').then(r => r.json()),
-                    fetch('api/liderazgo.php?action=getLideres&filtro=enfoque').then(r => r.json())
-                ]);
-                
-                todosAprendices = resA.success ? resA.data : [];
-                if (resV.success) {
-                    resV.data.forEach(v => {
-                        const cat = v.tipo.replace('Vocero Enfoque ', '').toLowerCase();
-                        vocerosEnfoqueMap[cat] = `${v.nombre} ${v.apellido}`;
-                    });
+                try {
+                    const res = await fetch('api/liderazgo.php?action=getPoblacionStats').then(r => r.json());
+                    if (res.success) {
+                        statsPoblacion = res.counts || {};
+                        vocerosEnfoqueMap = res.voceros || {};
+                    }
+                } catch(e) {
+                    console.error("Error al cargar estadísticas:", e);
                 }
             },
 
             renderGrid() {
-                 let html = CATEGORIAS.map(c => {
-                    const count = todosAprendices.filter(a => {
-                        const tp = (a.tipo_poblacion || '').toLowerCase();
-                        const key = c.key.toLowerCase();
-                        // Búsqueda flexible: coincide por campo boolean O por coincidencia de texto (campesino, lgbt, etc)
-                        const matchText = tp.includes(key) || (key === 'lgbtiq' && (tp.includes('lgbt') || tp.includes('plus')));
-                        const matchBool = a[c.key] == 1;
-                        return matchText || matchBool;
-                    }).length;
+                let html = CATEGORIAS.map(c => {
+                    const count = statsPoblacion[c.key] || 0;
                     return `
                     <div style="background:${c.bg}; color:${c.col}; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="PoblacionUI.abrirDetalle('${c.key}')" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
                         <i class="${c.icon}" style="font-size:1.4rem; margin-bottom:8px;"></i>
@@ -226,20 +216,25 @@
                 document.getElementById('pob-grid-categorias').innerHTML = html;
             },
 
-            abrirDetalle(key) {
+            async abrirDetalle(key) {
                 const cat = CATEGORIAS.find(c => c.key === key);
                 const vocero = vocerosEnfoqueMap[key] || 'No asignado';
                 
                 document.getElementById('tabla-poblacion-titulo').innerHTML = `Detalle de Aprendices: <strong>${cat.label}</strong> <span style="font-size:0.8rem; color:#64748b; margin-left:1rem; font-weight:normal;">(Vocero: ${vocero})</span>`;
                 
-                currentCatData = todosAprendices.filter(a => {
-                    const tp = (a.tipo_poblacion || '').toLowerCase();
-                    const key = cat.key.toLowerCase();
-                    const matchText = tp.includes(key) || (key === 'lgbtiq' && (tp.includes('lgbt') || tp.includes('plus')));
-                    const matchBool = a[cat.key] == 1;
-                    return matchText || matchBool;
-                });
-                this.renderTabla(currentCatData);
+                // Mostrar cargando
+                const tbody = document.getElementById('pob-tabla-body');
+                tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Cargando aprendices de la categoría...</td></tr>';
+
+                try {
+                    // Fetch solo para esta categoría (limitado a 200 por rendimiento)
+                    const res = await fetch(`api/aprendices.php?poblacion=${cat.label}&limit=200`).then(r => r.json());
+                    currentCatData = res.success ? res.data : [];
+                    this.renderTabla(currentCatData);
+                } catch(e) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#ef4444;">Error al cargar datos detalle.</td></tr>';
+                }
+
                 this.currentKey = key;
                 this.currentLabel = cat.label;
                 
@@ -260,8 +255,9 @@
                 const select = document.getElementById('pob-aprendiz-select');
                 select.innerHTML = '<option value="">Cargando...</option>';
                 
-                // Solo aprendices en LECTIVA que NO estén en la categoría actual (o que no tengan categoría asignada)
-                const elegibles = todosAprendices.filter(a => a.estado === 'LECTIVA' && a.tipo_poblacion !== this.currentLabel);
+                // Solo aprendices en LECTIVA (con límite de búsqueda)
+                const res = await fetch('api/aprendices.php?estado=LECTIVA&limit=50').then(r => r.json());
+                const elegibles = res.success ? res.data : [];
                 
                 if (elegibles.length === 0) {
                     select.innerHTML = '<option value="">No hay aprendices elegibles</option>';
@@ -347,7 +343,7 @@
                     data: {
                         labels: CATEGORIAS.map(c => c.label),
                         datasets: [{
-                            data: CATEGORIAS.map(c => todosAprendices.filter(a => a.tipo_poblacion === c.label || a[c.key] == 1).length),
+                            data: CATEGORIAS.map(c => statsPoblacion[c.key] || 0),
                             backgroundColor: chartColors,
                             borderWidth: 2,
                             borderColor: '#ffffff'

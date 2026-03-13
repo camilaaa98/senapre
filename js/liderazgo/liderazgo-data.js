@@ -67,8 +67,9 @@ const LiderazgoData = {
         // Determinar contenedor según tipo
         let containerId = 'container-voceros';
         if (key === 'representantes') containerId = 'container-representantes';
-        if (key === 'reuniones') containerId = 'container-reuniones';
+        if (key === 'enfoque') containerId = 'container-enfoque';
         if (key === 'suplentes') containerId = 'container-voceros-suplentes';
+        if (key === 'reuniones') containerId = 'container-reuniones';
         
         LiderazgoUI.renderLideres(this.cache[key] || [], containerId, newPage, tipo);
         

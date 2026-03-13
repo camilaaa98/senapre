@@ -172,7 +172,7 @@ try {
             
             $similitud = calcularSimilitudCoseno($embeddingInput, $embeddingStored);
             
-            if ($similitud >= 0.75) {
+            if ($similitud >= 0.85) {
                 echo json_encode([
                     'success' => true,
                     'match' => true,
