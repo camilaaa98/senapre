@@ -49,12 +49,12 @@
             <!-- BIOMETRIA -->
             <div class="glass-card">
                 <h3 style="margin-bottom:15px;"><i class="fas fa-video"></i> Reconocimiento Facial</h3>
-                <div class="biometric-scanner-container" style="height:350px;">
-                    <video id="webcam" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+                <div class="biometric-scanner-container" style="height:350px; position:relative; overflow:hidden; border-radius: 15px; background: #000;">
+                    <video id="webcam" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; transform: scaleX(-1);"></video>
                     <div class="biometric-overlay"></div>
                     <div id="bio-points" class="biometric-points"></div>
-                    <div id="scan-feedback" style="position:absolute; bottom:20px; left:0; width:100%; text-align:center; font-weight:700; color:var(--lid-accent); text-shadow:0 0 10px rgba(0,0,0,0.5);">
-                        ESCANEANDO...
+                    <div id="scan-feedback" style="position:absolute; bottom:20px; left:0; width:100%; text-align:center; font-weight:700; color:var(--lid-accent); text-shadow:0 0 10px rgba(0,0,0,0.5); z-index: 10;">
+                        BUSCANDO LÍDER...
                     </div>
                 </div>
                 
@@ -120,7 +120,13 @@
             }
 
             if (resL.success) {
-                leaders = resL.data;
+                let list = resL.data;
+                // REGLA: En la reunión ID=2 (o según lo pida el usuario), solo lideres principales y representantes
+                if (meetingId == "2") {
+                    list = list.filter(l => l.tipo === 'Vocero Principal' || l.tipo === 'Representante de Jornada');
+                }
+                
+                leaders = list;
                 attendance = resA.success ? resA.data : [];
                 renderLista();
                 updateCounter();

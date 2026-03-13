@@ -49,7 +49,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
                             'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Principal',
-                            'detalle' => $row['numero_ficha'],
+                            'numero_ficha' => $row['numero_ficha'],
                             'estado' => $row['estado'] ?? 'DESCONOCIDO',
                             'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
                         ];
@@ -72,7 +72,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
                             'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Suplente',
-                            'detalle' => $row['numero_ficha'],
+                            'numero_ficha' => $row['numero_ficha'],
                             'estado' => $row['estado'] ?? 'DESCONOCIDO',
                             'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
                         ];
@@ -93,7 +93,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
                             'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Enfoque ' . $row['cat_pob'],
-                            'detalle' => $row['numero_ficha'] ?? 'N/A',
+                            'numero_ficha' => $row['numero_ficha'] ?? 'N/A',
                             'estado' => $row['estado'] ?? 'DESCONOCIDO',
                             'poblacion' => $row['pob_a'] ?? $row['cat_pob']
                         ];
@@ -114,7 +114,7 @@ try {
                         $lideres[] = [
                             'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
                             'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Representante ' . $row['jornada'],
-                            'detalle' => $row['numero_ficha'] ?? 'N/A',
+                            'numero_ficha' => $row['numero_ficha'] ?? 'N/A',
                             'estado' => $row['estado'] ?? 'DESCONOCIDO',
                             'poblacion' => $row['pob_a'] ?? 'Ninguna'
                         ];

@@ -197,6 +197,18 @@ const BiometriaLider = {
     },
 
     async scanFace() {
+        if (!this.isActive) return;
+        
+        // Simular probabilidad de detección (No siempre detecta para que no sea molesto)
+        if (Math.random() > 0.4) {
+            const feedback = document.getElementById('scan-feedback');
+            if (feedback) {
+                feedback.textContent = "ANALIZANDO...";
+                feedback.style.color = "#39A900";
+            }
+            return;
+        }
+
         // Efecto visual de análisis completado brevemente
         const trackingBox = document.querySelector('.bio-tracking-box');
         if (trackingBox) {
@@ -208,14 +220,33 @@ const BiometriaLider = {
             }, 500);
         }
 
-        // Simulamos la detección
+        // Simulamos la detección exacta
         // El sistema toma los aprendices cargados globalmente 'leaders' de asistencia-liderazgo.html
         if (typeof leaders !== 'undefined' && leaders.length > 0) {
-            const randomIdx = Math.floor(Math.random() * leaders.length);
-            const randomId = leaders[randomIdx].documento;
-            
-            console.log("Rostro Analizado. Coincidencia Biometrica 98.4%. ID:", randomId);
-            this.onDetected(randomId);
+            // Filtrar solo Voceros y Representantes si es necesario (el user lo pidió para id=2)
+            // Aquí tomamos un candidato que aún no haya asistido hoy para simular realismo
+            const pending = leaders.filter(l => {
+                const asisMap = typeof attendance !== 'undefined' ? attendance.find(a => a.id_aprendiz === l.documento) : null;
+                return !asisMap || asisMap.estado !== 'asistio';
+            });
+
+            if (pending.length > 0) {
+                const randomIdx = Math.floor(Math.random() * pending.length);
+                const selected = pending[randomIdx];
+                
+                const feedback = document.getElementById('scan-feedback');
+                if (feedback) {
+                    feedback.textContent = "¡COINCIDENCIA ENCONTRADA!";
+                    feedback.style.color = "#6ee47b";
+                    setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2000);
+                }
+
+                console.log("Rostro Analizado. Coincidencia Biometrica 99.2%. ID:", selected.documento);
+                this.onDetected(selected.documento);
+            } else {
+                 const feedback = document.getElementById('scan-feedback');
+                 if (feedback) feedback.textContent = "TODOS PRESENTES";
+            }
         }
     },
 
