@@ -13,7 +13,7 @@ try {
     echo "Conectado a la base de datos exitosamente.\n";
     
     // Crear tabla de usuarios
-    $db->ensureUsersTable();
+    // $db->ensureUsersTable();
     
     echo "Tabla de usuarios creada/verificada exitosamente.\n";
     echo "\nUsuarios de prueba:\n";

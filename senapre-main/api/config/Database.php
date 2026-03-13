@@ -77,7 +77,7 @@ class Database {
         return $this->getConnection()->prepare($sql);
     }
 
-    public function exec(string $sql): int|false {
+    public function exec(string $sql): int|bool {
         return $this->getConnection()->exec($sql);
     }
 }

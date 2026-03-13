@@ -41,17 +41,21 @@ try {
                 $sqlPrincipales = "SELECT f.numero_ficha, COALESCE(a.documento, f.vocero_principal) as documento, a.nombre, a.apellido, a.correo, a.celular, a.tipo_poblacion, a.estado
                                  FROM fichas f
                                  LEFT JOIN aprendices a ON f.vocero_principal = a.documento
-                                 WHERE f.vocero_principal IS NOT NULL AND trim(f.vocero_principal) != ''";
-                $stmt = $conn->query($sqlPrincipales);
-                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($res as $row) {
-                    $lideres[] = [
-                        'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
-                        'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Principal',
-                        'detalle' => $row['numero_ficha'],
-                        'estado' => $row['estado'] ?? 'DESCONOCIDO',
-                        'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
-                    ];
+                                 WHERE f.vocero_principal IS NOT NULL AND f.vocero_principal != ''";
+                try {
+                    $stmt = $conn->query($sqlPrincipales);
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($res as $row) {
+                        $lideres[] = [
+                            'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
+                            'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Principal',
+                            'detalle' => $row['numero_ficha'],
+                            'estado' => $row['estado'] ?? 'DESCONOCIDO',
+                            'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
+                        ];
+                    }
+                } catch(Exception $e) {
+                    // Ignorar si la columna aún no existe
                 }
             }
 
@@ -60,18 +64,20 @@ try {
                 $sqlSuplentes = "SELECT f.numero_ficha, COALESCE(a.documento, f.vocero_suplente) as documento, a.nombre, a.apellido, a.correo, a.celular, a.tipo_poblacion, a.estado
                                  FROM fichas f
                                  LEFT JOIN aprendices a ON f.vocero_suplente = a.documento
-                                 WHERE f.vocero_suplente IS NOT NULL AND trim(f.vocero_suplente) != ''";
-                $stmt = $conn->query($sqlSuplentes);
-                $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($res as $row) {
-                    $lideres[] = [
-                        'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
-                        'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Suplente',
-                        'detalle' => $row['numero_ficha'],
-                        'estado' => $row['estado'] ?? 'DESCONOCIDO',
-                        'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
-                    ];
-                }
+                                 WHERE f.vocero_suplente IS NOT NULL AND f.vocero_suplente != ''";
+                try {
+                    $stmt = $conn->query($sqlSuplentes);
+                    $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($res as $row) {
+                        $lideres[] = [
+                            'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
+                            'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Suplente',
+                            'detalle' => $row['numero_ficha'],
+                            'estado' => $row['estado'] ?? 'DESCONOCIDO',
+                            'poblacion' => $row['tipo_poblacion'] ?? 'Ninguna'
+                        ];
+                    }
+                } catch (Exception $e) {}
             }
 
             // 2. Voceros de Enfoque Diferencial
@@ -79,18 +85,20 @@ try {
                 $sqlEnfoque = "SELECT v.tipo_poblacion as cat_pob, COALESCE(a.documento, v.documento) as documento, a.nombre, a.apellido, a.correo, a.celular, a.numero_ficha, a.tipo_poblacion as pob_a, a.estado
                                FROM voceros_enfoque v
                                LEFT JOIN aprendices a ON v.documento = a.documento
-                               WHERE v.documento IS NOT NULL AND trim(v.documento) != ''";
-                $stmt = $conn->query($sqlEnfoque);
-                $resEnfoque = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($resEnfoque as $row) {
-                    $lideres[] = [
-                        'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
-                        'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Enfoque ' . $row['cat_pob'],
-                        'detalle' => $row['numero_ficha'] ?? 'N/A',
-                        'estado' => $row['estado'] ?? 'DESCONOCIDO',
-                        'poblacion' => $row['pob_a'] ?? $row['cat_pob']
-                    ];
-                }
+                               WHERE v.documento IS NOT NULL AND v.documento != ''";
+                try {
+                    $stmt = $conn->query($sqlEnfoque);
+                    $resEnfoque = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($resEnfoque as $row) {
+                        $lideres[] = [
+                            'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
+                            'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Vocero Enfoque ' . $row['cat_pob'],
+                            'detalle' => $row['numero_ficha'] ?? 'N/A',
+                            'estado' => $row['estado'] ?? 'DESCONOCIDO',
+                            'poblacion' => $row['pob_a'] ?? $row['cat_pob']
+                        ];
+                    }
+                } catch (Exception $e) {}
             }
 
             // 3. Representantes de Jornada
@@ -98,18 +106,20 @@ try {
                 $sqlRep = "SELECT r.jornada, COALESCE(a.documento, r.documento) as documento, a.nombre, a.apellido, a.correo, a.celular, a.numero_ficha, a.tipo_poblacion as pob_a, a.estado
                            FROM representantes_jornada r
                            LEFT JOIN aprendices a ON r.documento = a.documento
-                           WHERE r.documento IS NOT NULL AND trim(r.documento) != ''";
-                $stmt = $conn->query($sqlRep);
-                $resRep = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                foreach ($resRep as $row) {
-                    $lideres[] = [
-                        'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
-                        'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Representante ' . $row['jornada'],
-                        'detalle' => $row['numero_ficha'] ?? 'N/A',
-                        'estado' => $row['estado'] ?? 'DESCONOCIDO',
-                        'poblacion' => $row['pob_a'] ?? 'Ninguna'
-                    ];
-                }
+                           WHERE r.documento IS NOT NULL AND r.documento != ''";
+                try {
+                    $stmt = $conn->query($sqlRep);
+                    $resRep = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($resRep as $row) {
+                        $lideres[] = [
+                            'documento' => $row['documento'], 'nombre' => $row['nombre'] ?? 'Sin Registro', 'apellido' => $row['apellido'] ?? '',
+                            'correo' => $row['correo'] ?? 'No disponible', 'telefono' => $row['celular'] ?? 'N/A', 'tipo' => 'Representante ' . $row['jornada'],
+                            'detalle' => $row['numero_ficha'] ?? 'N/A',
+                            'estado' => $row['estado'] ?? 'DESCONOCIDO',
+                            'poblacion' => $row['pob_a'] ?? 'Ninguna'
+                        ];
+                    }
+                } catch (Exception $e) {}
             }
 
             echo json_encode(['success' => true, 'data' => $lideres]);
@@ -164,7 +174,7 @@ try {
             $camposPob = "documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad";
             if ($ficha) {
                 // Solo de una ficha específica
-                $sql = "SELECT $camposPob, jornada FROM aprendices WHERE numero_ficha = :ficha AND estado = 'LECTIVA' ORDER BY nombre ASC";
+                $sql = "SELECT $camposPob FROM aprendices WHERE numero_ficha = :ficha AND estado = 'LECTIVA' ORDER BY nombre ASC";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([':ficha' => $ficha]);
             } else {

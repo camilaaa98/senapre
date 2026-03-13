@@ -130,7 +130,7 @@ const LiderazgoUI = {
         const paginatedItems = lideres.slice(start, end);
 
         let html = `
-        <div class="table-responsive" style="border: 1px solid #f1f5f9; border-radius: 8px; overflow-x: auto; margin-top: 1rem;">
+        <div class="table-responsive" style="grid-column: 1 / -1; width: 100%; border: 1px solid #f1f5f9; border-radius: 8px; overflow-x: auto; margin-top: 1rem; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <table class="lid-table" style="width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif;">
                 <thead>
                     <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
@@ -306,17 +306,19 @@ const LiderazgoUI = {
     async cargarAprendicesParaRol(ficha = null) {
         document.getElementById('grp-aprendiz').style.display = 'block';
         const asigAprendiz = document.getElementById('asig-aprendiz');
-        asigAprendiz.innerHTML = '<option value="">Cargando aprendices...</option>';
+        const datalist = document.getElementById('datalist-aprendices');
+        
+        asigAprendiz.value = '';
+        if (datalist) datalist.innerHTML = '';
         
         try {
             const url = ficha ? `api/liderazgo.php?action=getAprendicesLectiva&ficha=${ficha}` : `api/liderazgo.php?action=getAprendicesLectiva`;
             const res = await fetch(url).then(r => r.json());
-            if (res.success) {
-                asigAprendiz.innerHTML = '<option value="">Seleccione Aprendiz...</option>' + 
-                    res.data.map(a => `<option value="${a.documento}">${a.nombre} ${a.apellido} (${a.documento})</option>`).join('');
+            if (res.success && datalist) {
+                datalist.innerHTML = res.data.map(a => `<option value="${a.documento}">${a.nombre} ${a.apellido}</option>`).join('');
             }
         } catch (e) {
-            asigAprendiz.innerHTML = '<option value="">Error al cargar.</option>';
+            console.error('Error al cargar aprendices', e);
         }
     },
 

@@ -306,33 +306,28 @@ const VoceroDash = (() => {
             // ── Cabecera profesional SENA + SenApre ──────────────
             const subtitulo = `Informe de Aprendices | Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`;
 
-            // Usar el módulo compartido si está disponible, o pintar manualmente
-            let startY = 56;
+            // Usar el módulo compartido si está disponible
+            let startY = 66;
             if (typeof SenaPrePDF !== 'undefined') {
                 startY = await SenaPrePDF.crearCabecera(doc, {
-                    titulo:      'REGIONAL CAQUET\u00c1',
-                    subtitulo:   subtitulo,
+                    titulo:      'Informe de Aprendices',
+                    subtitulo:   `Ficha: ${State.vocFicha} | Vocero/a: ${State.vocNombre}`,
                     orientacion: 'landscape'
                 });
             } else {
-                // Fallback manual si el script no se cargó
-                doc.setFillColor(0, 100, 0);
-                doc.rect(0, 0, pw, 42, 'F');
+                // FALLBACK TOTAL — Si pdf-utils.js falla (v3.0.0 fallback)
+                doc.setFillColor(0, 100, 0); // Verde SENA
+                doc.rect(0, 0, pw, 50, 'F');
                 doc.setTextColor(255, 255, 255);
                 doc.setFont('helvetica', 'bold');
-                doc.setFontSize(13);
-                doc.text('REPORTE DE APRENDICES', pw / 2, 19, { align: 'center' });
-                doc.setFontSize(9);
+                doc.setFontSize(22);
+                doc.text('SENAPRE', pw / 2, 18, { align: 'center' });
+                doc.setFontSize(14);
+                doc.text('REGIONAL CAQUET\u00c1', pw / 2, 28, { align: 'center' });
                 doc.setFont('helvetica', 'normal');
-                doc.text(subtitulo, pw / 2, 27, { align: 'center' });
-                doc.setFillColor(245, 248, 245);
-                doc.rect(0, 42, pw, 10, 'F');
-                const fechaStr = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                doc.setFontSize(7.5);
-                doc.setFont('helvetica', 'italic');
-                doc.setTextColor(60, 60, 60);
-                doc.text(`Fecha de generación: ${fechaStr}`, pw / 2, 48.5, { align: 'center' });
-                startY = 56;
+                doc.setFontSize(10);
+                doc.text(subtitulo, pw / 2, 40, { align: 'center' });
+                startY = 60;
             }
 
             // ── Tabla centrada ─────────────────────────────────────
@@ -405,7 +400,7 @@ const VoceroDash = (() => {
                         doc.setTextColor(140, 140, 140);
                         doc.setDrawColor(200, 200, 200);
                         doc.line(12, ph - 11, pw - 12, ph - 11);
-                        doc.text('Generado por SenApre \u2014 SENA CTPI', 14, ph - 6);
+                        doc.text('Generado por SenApre \u2014 SENA Regional Caquet\u00e1', 14, ph - 6);
                         doc.text(`P\u00e1gina ${pn} de ${pt}`, pw - 14, ph - 6, { align: 'right' });
                     }
                 }

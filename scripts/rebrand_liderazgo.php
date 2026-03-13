@@ -5,7 +5,6 @@ $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 $replacements = [
     'liderazgo' => 'liderazgo',
     'admin-liderazgo' => 'liderazgo',
-    'liderazgo' => 'liderazgo',
     'Panel de Liderazgo' => 'Panel de Liderazgo',
     'Liderazgo Estudiantil' => 'Liderazgo Estudiantil',
     'liderazgo.php' => 'liderazgo.php' // I also rename the API for consistency
