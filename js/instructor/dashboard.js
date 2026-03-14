@@ -1,6 +1,7 @@
 /**
  * Instructor Dashboard Logic
  * Handles metrics fetching and calendar rendering
+ * Optimizado con utilidades compartidas y principios SOLID
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,33 +16,29 @@ async function inicializarDashboard() {
         return;
     }
 
-    // Mostrar nombre y fecha
+    // Mostrar nombre y fecha usando utilidades
     document.getElementById('userName').textContent = `Bienvenido, ${user.nombre} ${user.apellido}`;
-
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-ES', options);
+    document.getElementById('currentDate').textContent = DateUtils.formatearFecha(new Date());
 
     try {
-        const response = await fetch(`api/instructor-dashboard.php?id_usuario=${user.id_usuario}`);
-        const result = await response.json();
-
+        const result = await APIUtils.fetchWithErrorHandling(`api/instructor-dashboard.php?id_usuario=${user.id_usuario}`);
+        
         if (result.success) {
             actualizarMetricas(result.data.metrics);
             inicializarCalendario(result.data.calendar);
-            mostrarAlertas(result.data.metrics.alertas); // Por ahora pasamos el conteo, idealmente sería una lista
-        } else {
-            console.error('Error fetching dashboard data:', result.message);
+            mostrarAlertas(result.data.metrics.alertas);
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error en dashboard:', error);
+        UIUtils.mostrarNotificacion('Error al cargar datos del dashboard', 'error');
     }
 }
 
 function actualizarMetricas(metrics) {
-    document.getElementById('fichasCount').textContent = metrics.fichas || 0;
-    document.getElementById('aprendicesCount').textContent = metrics.aprendices || 0;
+    document.getElementById('fichasCount').textContent = UIUtils.formatearNumero(metrics.fichas || 0);
+    document.getElementById('aprendicesCount').textContent = UIUtils.formatearNumero(metrics.aprendices || 0);
     document.getElementById('promedioAsistencia').textContent = metrics.asistencia || '0%';
-    document.getElementById('alertasCount').textContent = metrics.alertas || 0;
+    document.getElementById('alertasCount').textContent = UIUtils.formatearNumero(metrics.alertas || 0);
 }
 
 function mostrarAlertas(alertasCount) {
@@ -50,8 +47,8 @@ function mostrarAlertas(alertasCount) {
     if (alertasCount > 0) {
         container.innerHTML = `
             <div class="text-center p-4">
-                <i class="fas fa-exclamation-triangle fa-3x color-error alert-icon"></i>
-                <p>Tiene <strong>${alertasCount}</strong> aprendices con baja asistencia.</p>
+                <i class="fas fa-exclamation-triangle fa-3x color-danger alert-icon"></i>
+                <p>Tiene <strong>${UIUtils.formatearNumero(alertasCount)}</strong> aprendices con baja asistencia.</p>
                 <a href="instructor-reportes.html" class="btn-primary inline-block mt-2">Ver Reporte Detallado</a>
             </div>
         `;
@@ -88,7 +85,7 @@ function inicializarCalendario(eventos) {
             day: 'Día'
         },
         events: eventos,
-        eventColor: '#39A900', // Verde SENA vibrante
+        eventColor: '#39A900',
         eventBackgroundColor: '#39A900',
         eventBorderColor: '#2d8600',
         eventTextColor: '#ffffff',

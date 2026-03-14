@@ -479,6 +479,21 @@
 }
 
 /* === Responsive Sidebar fixes === */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .card-stat {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
 @media (max-width: 768px) {
     .dashboard-container {
         flex-direction: column;
@@ -492,5 +507,75 @@
 
     .main-content {
         padding: 1rem;
+    }
+    
+    .content-title {
+        font-size: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .card-stat {
+        padding: 1.25rem;
+    }
+    
+    .actions-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-action-large {
+        max-width: none;
+        min-width: auto;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .table-container-scroll {
+        font-size: 0.875rem;
+    }
+    
+    .modal-bio-content {
+        margin: 1rem;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 0.75rem;
+    }
+    
+    .content-title {
+        font-size: 1.25rem;
+    }
+    
+    .card-stat {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .table-instructor th,
+    .table-instructor td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .btn-primary {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.875rem !important;
     }
 }
