@@ -209,35 +209,34 @@ try {
             exit;
         }
 
-        // Obtener aprendices en LECTIVA con filtros de población optimizados
+        // Obtener aprendices en LECTIVA con filtros de población (compatible con producción)
         if ($action === 'getAprendicesLectiva') {
             $categoria = $_GET['categoria'] ?? '';
             
-            // SQL base con LECTIVA
-            $sql = "SELECT documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad 
+            // SQL base compatible con producción
+            $sql = "SELECT documento, nombre, apellido, numero_ficha, tipo_poblacion, correo, celular 
                      FROM aprendices a 
-                     LEFT JOIN fichas f ON a.numero_ficha = f.numero_ficha 
                      WHERE UPPER(a.estado) = 'LECTIVA'";
             
-            // Aplicar filtros específicos por categoría (más eficiente)
+            // Aplicar filtros usando tipo_poblacion (compatible con producción)
             switch ($categoria) {
                 case 'mujer':
-                    $sql .= " AND a.mujer = 1";
+                    $sql .= " AND (LOWER(a.tipo_poblacion) LIKE '%mujer%' OR LOWER(a.tipo_poblacion) LIKE '%mujeres%')";
                     break;
                 case 'indigena':
-                    $sql .= " AND a.indigena = 1";
+                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%indigena%'";
                     break;
                 case 'narp':
-                    $sql .= " AND a.narp = 1";
+                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%narp%'";
                     break;
                 case 'campesino':
-                    $sql .= " AND a.campesino = 1";
+                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%campesino%'";
                     break;
                 case 'lgbtiq':
-                    $sql .= " AND a.lgbtiq = 1";
+                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%lgbtiq%' OR LOWER(a.tipo_poblacion) LIKE '%lgbt%'";
                     break;
                 case 'discapacidad':
-                    $sql .= " AND a.discapacidad = 1";
+                    $sql .= " AND (LOWER(a.tipo_poblacion) LIKE '%discapacidad%' OR LOWER(a.tipo_poblacion) LIKE '%discapacitad%')";
                     break;
             }
             
