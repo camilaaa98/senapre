@@ -151,16 +151,31 @@ try {
             exit;
         }
         
-        // Estadísticas de Población (Optimizado)
+        // Estadísticas de Población (Mejorado con patrones completos)
         if ($action === 'getPoblacionStats') {
             $stats = [];
-            $categorias = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
             
-            foreach ($categorias as $cat) {
-                // Coincidencia por columna boolean o por texto en tipo_poblacion
-                $sql = "SELECT COUNT(*) as total FROM aprendices WHERE $cat = 1 OR tipo_poblacion LIKE :p";
+            // Patrones mejorados para cada categoría
+            $categorias = [
+                'mujer' => ['%mujer%', '%mujeres%', '%femenino%', '%femenina%', '%F%', '%muj%'],
+                'indigena' => ['%indigena%', '%indígena%', '%etnia%', '%pueblos%', '%indígenas%', '%etnico%'],
+                'narp' => ['%narp%', '%negro%', '%afro%', '%afrodescendiente%', '%raizal%', '%palenquero%', '%afro%'],
+                'campesino' => ['%campesino%', '%campesina%', '%rural%', '%campo%', '%camp%'],
+                'lgbtiq' => ['%lgbti%', '%lgbt%', '%trans%', '%gay%', '%lesbiana%', '%bisexual%', '%queer%', '%homosexual%', '+'],
+                'discapacidad' => ['%discapacidad%', '%discapacitado%', '%discapacitada%', '%capacidad%', '%disc%']
+            ];
+            
+            foreach ($categorias as $cat => $patterns) {
+                // Construir consulta con múltiples patrones LIKE
+                $sql = "SELECT COUNT(*) as total FROM aprendices WHERE UPPER(estado) = 'LECTIVA' AND (";
+                $likeConditions = [];
+                foreach ($patterns as $pattern) {
+                    $likeConditions[] = "UPPER(tipo_poblacion) LIKE UPPER('" . $pattern . "')";
+                }
+                $sql .= implode(" OR ", $likeConditions) . ")";
+                
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([':p' => "%$cat%"]); 
+                $stmt->execute();
                 $stats[$cat] = $stmt->fetch()['total'];
             }
             
@@ -209,7 +224,7 @@ try {
             exit;
         }
 
-        // Obtener aprendices en LECTIVA con filtros de población (compatible con producción)
+        // Obtener aprendices en LECTIVA con filtros de población (patrones mejorados)
         if ($action === 'getAprendicesLectiva') {
             $categoria = $_GET['categoria'] ?? '';
             
@@ -218,26 +233,25 @@ try {
                      FROM aprendices a 
                      WHERE UPPER(a.estado) = 'LECTIVA'";
             
-            // Aplicar filtros usando tipo_poblacion (compatible con producción)
-            switch ($categoria) {
-                case 'mujer':
-                    $sql .= " AND (LOWER(a.tipo_poblacion) LIKE '%mujer%' OR LOWER(a.tipo_poblacion) LIKE '%mujeres%')";
-                    break;
-                case 'indigena':
-                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%indigena%'";
-                    break;
-                case 'narp':
-                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%narp%'";
-                    break;
-                case 'campesino':
-                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%campesino%'";
-                    break;
-                case 'lgbtiq':
-                    $sql .= " AND LOWER(a.tipo_poblacion) LIKE '%lgbtiq%' OR LOWER(a.tipo_poblacion) LIKE '%lgbt%'";
-                    break;
-                case 'discapacidad':
-                    $sql .= " AND (LOWER(a.tipo_poblacion) LIKE '%discapacidad%' OR LOWER(a.tipo_poblacion) LIKE '%discapacitad%')";
-                    break;
+            // Patrones mejorados para cada categoría
+            $patrones = [
+                'mujer' => ['%mujer%', '%mujeres%', '%femenino%', '%femenina%', '%F%', '%muj%'],
+                'indigena' => ['%indigena%', '%indígena%', '%etnia%', '%pueblos%', '%indígenas%', '%etnico%'],
+                'narp' => ['%narp%', '%negro%', '%afro%', '%afrodescendiente%', '%raizal%', '%palenquero%', '%afro%'],
+                'campesino' => ['%campesino%', '%campesina%', '%rural%', '%campo%', '%camp%'],
+                'lgbtiq' => ['%lgbti%', '%lgbt%', '%trans%', '%gay%', '%lesbiana%', '%bisexual%', '%queer%', '%homosexual%', '+'],
+                'discapacidad' => ['%discapacidad%', '%discapacitado%', '%discapacitada%', '%capacidad%', '%disc%']
+            ];
+            
+            // Aplicar filtros usando patrones mejorados
+            if (isset($patrones[$categoria])) {
+                $patterns = $patrones[$categoria];
+                $sql .= " AND (";
+                $likeConditions = [];
+                foreach ($patterns as $pattern) {
+                    $likeConditions[] = "UPPER(a.tipo_poblacion) LIKE UPPER('" . $pattern . "')";
+                }
+                $sql .= implode(" OR ", $likeConditions) . ")";
             }
             
             // Ordenar y limitar para mejor rendimiento
