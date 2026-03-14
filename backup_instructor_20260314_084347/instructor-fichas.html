@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Fichas - SenApre</title>
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="css/instructor-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <h3>AsistNet</h3>
+                <div class="sidebar-subtitle">Instructor</div>
+                <div id="userInfo" class="sidebar-user-info"></div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="instructor-dashboard" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Panel Principal</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-fichas" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span>Mis Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-asistencia" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <span>Registrar Asistencia</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-consultar" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-reportes" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1 class="content-title">Mis Fichas Asignadas</h1>
+                <p class="content-description">Gestión de grupos y aprendices</p>
+                <div class="date-display" id="currentDate"></div>
+            </header>
+
+            <div class="card">
+                <div class="table-container-scroll">
+                    <table class="table-instructor">
+                        <thead>
+                            <tr>
+                                <th>Ficha</th>
+                                <th>Programa de Formación</th>
+                                <th>Jornada</th>
+                                <th class="text-center">Aprendices</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fichasTableBody">
+                            <tr>
+                                <td colspan="5" class="empty-state-row">Cargando fichas...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/instructor/fichas.js"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'index';
+        } else {
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) userInfo.textContent = `${user.nombre} ${user.apellido}`;
+        }
+    </script>
+</body>
+
+</html>

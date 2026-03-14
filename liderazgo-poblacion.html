@@ -136,6 +136,8 @@
         </div>
     </div>
     <script src="js/main.js"></script>
+    <script src="js/liderazgo/liderazgo-ui.js"></script>
+    <script src="js/liderazgo/liderazgo-data.js"></script>
     <script>
         const CATEGORIAS = [
             { key: 'mujer', label: 'Mujer', icon: 'fas fa-female', bg: 'linear-gradient(135deg, #d868eb, #b34fd2)', col: '#ffffff' },
@@ -302,13 +304,6 @@
                 }
             },
 
-            renderTabla(lista) {
-                const tbody = document.getElementById('pob-tabla-body');
-                if(!lista || lista.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#64748b;">No hay aprendices registrados en esta categoría.</td></tr>';
-                    return;
-                }
-                
                 tbody.innerHTML = lista.map(a => `
                     <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
                         <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${a.documento}</td>
