@@ -68,11 +68,13 @@ class AuthSystem {
                 // Normalize data structure if needed
                 this.currentUser = {
                     id: result.data.id_usuario,
+                    id_usuario: result.data.id_usuario,
                     nombre: result.data.nombre,
                     apellido: result.data.apellido,
                     correo: result.data.correo,
                     rol: result.data.rol,
-                    instructor_data: result.data.instructor_data
+                    instructor_data: result.data.instructor_data,
+                    bienestar_data: result.data.bienestar_data || []
                 };
 
                 localStorage.setItem(this.storageKey, JSON.stringify(this.currentUser));
@@ -108,12 +110,29 @@ class AuthSystem {
 
     redirectToDashboard() {
         if (!this.currentUser) return;
-
+        
         const rol = this.currentUser.rol.toLowerCase();
-        if (rol === 'admin' || rol === 'administrador') {
-            window.location.href = 'admin-dashboard.html';
+        const areas = this.currentUser.bienestar_data || [];
+
+        // PRIORIDAD ALTA: Si tiene área de Liderazgo (Jancy), redirigir directo sin importar el rol
+        const esLiderazgo = areas.includes('voceros_y_representantes') || areas.includes('liderazgo') || areas.includes('vocero');
+        if (esLiderazgo) {
+            if (!window.location.pathname.includes('liderazgo.html')) {
+                window.location.href = 'liderazgo.html';
+                return;
+            }
+        }
+
+        if (rol === 'vocero') {
+            window.location.href = 'vocero-dashboard.html';
+        } else if (areas.includes('jefe_bienestar')) {
+            window.location.href = 'admin-bienestar-dashboard.html';
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard.html';
+        } else if (rol === 'admin' || rol === 'administrador' || rol === 'administrativo') {
+            window.location.href = 'admin-dashboard.html';
+        } else {
+            window.location.href = 'admin-dashboard.html';
         }
     }
 }
