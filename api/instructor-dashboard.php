@@ -42,7 +42,7 @@ try {
                           FROM asignacion_instructores 
                           WHERE id_usuario = :id
                       )
-                      AND a.estado = 'LECTIVA'";
+                      AND (a.estado = 'LECTIVA' OR a.estado = 'EN FORMACION')";
     $stmtAprendices = $conn->prepare($sqlAprendices);
     $stmtAprendices->execute([':id' => $idUsuario]);
     $totalAprendices = $stmtAprendices->fetch(PDO::FETCH_ASSOC)['total'];

@@ -36,7 +36,7 @@ try {
     // Obtener TODAS las fichas asignadas al instructor (sin filtrar por día)
     // Se incluye el horario si existe para HOY, pero se muestran todas las fichas
     $sql = "SELECT DISTINCT f.*, 
-            (SELECT COUNT(*) FROM aprendices WHERE numero_ficha = f.numero_ficha AND estado = 'LECTIVA') as total_aprendices,
+            (SELECT COUNT(*) FROM aprendices WHERE numero_ficha = f.numero_ficha AND (estado = 'LECTIVA' OR estado = 'EN FORMACION')) as total_aprendices,
             h.hora_inicio, h.hora_fin, h.jornada,
             COALESCE(
                 CASE WHEN h.dia_semana = :dia_semana THEN 1 ELSE 0 END,
