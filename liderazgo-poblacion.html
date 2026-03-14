@@ -222,21 +222,30 @@
                 const cat = CATEGORIAS.find(c => c.key === key);
                 const vocero = vocerosEnfoqueMap[key] || 'No asignado';
                 
-                document.getElementById('tabla-poblacion-titulo').innerHTML = `Detalle de Aprendices: <strong>${cat.label}</strong> <span style="font-size:0.8rem; color:#64748b; margin-left:1rem; font-weight:normal;">(Vocero: ${vocero})</span>`;
+                document.getElementById('modalTitle').textContent = `Gestión - ${cat.label}`;
+                document.getElementById('modalDetalle').style.display = 'flex';
                 
-                // Mostrar cargando
-                const tbody = document.getElementById('pob-tabla-body');
-                tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Cargando aprendices de la categoría...</td></tr>';
-
+                // Cargar datos de la categoría usando el API optimizado
                 try {
-                    // Fetch solo para esta categoría (limitado a 200 por rendimiento)
-                    const res = await fetch(`api/aprendices.php?poblacion=${cat.label}&limit=200`).then(r => r.json());
-                    currentCatData = res.success ? res.data : [];
-                    this.renderTabla(currentCatData);
-                } catch(e) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#ef4444;">Error al cargar datos detalle.</td></tr>';
+                    const res = await fetch(`api/liderazgo.php?action=getAprendicesLectiva&categoria=${key}`);
+                    const data = await res.json();
+                    if (data.success) {
+                        currentCatData = data.data || [];
+                        this.renderTable();
+                        this.renderChart();
+                    } else {
+                        console.error('Error cargando datos:', data.message);
+                        currentCatData = [];
+                        this.renderTable();
+                        this.renderChart();
+                    }
+                } catch (error) {
+                    console.error('Error en la petición:', error);
+                    currentCatData = [];
+                    this.renderTable();
+                    this.renderChart();
                 }
-
+                
                 this.currentKey = key;
                 this.currentLabel = cat.label;
                 
@@ -244,11 +253,11 @@
                 const btnAdd = document.getElementById('btn-add-poblacion');
                 if (btnAdd) btnAdd.style.display = 'inline-flex';
                 
-                // Scroll to table smoothly
-                document.getElementById('tabla-poblacion-titulo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Scroll to modal smoothly
+                document.getElementById('modalDetalle').scrollIntoView({ behavior: 'smooth', block: 'start' });
             },
 
-            abrirModalAgregar() {
+            async abrirModalAgregar() {
                 if (!this.currentKey) return;
                 document.getElementById('pob-categoria-actual').value = this.currentLabel;
                 document.getElementById('pob-categoria-nombre').textContent = this.currentLabel;
@@ -304,7 +313,11 @@
                 }
             },
 
-                tbody.innerHTML = lista.map(a => `
+            renderTable() {
+                const tbody = document.getElementById('pob-tabla-body');
+                if (!tbody) return;
+                
+                tbody.innerHTML = currentCatData.map(a => `
                     <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
                         <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${a.documento}</td>
                         <td style="padding: 1rem; color: #475569;">${a.nombre}</td>
