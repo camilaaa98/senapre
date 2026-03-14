@@ -209,21 +209,46 @@ try {
             exit;
         }
 
-        // Obtener aprendices en LECTIVA
+        // Obtener aprendices en LECTIVA con filtros de población optimizados
         if ($action === 'getAprendicesLectiva') {
-            $ficha = $_GET['ficha'] ?? null;
-            $camposPob = "documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad";
-            if ($ficha) {
-                // Solo de una ficha específica
-                $sql = "SELECT $camposPob FROM aprendices WHERE numero_ficha = :ficha AND UPPER(estado) = 'LECTIVA' ORDER BY nombre ASC";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([':ficha' => $ficha]);
-            } else {
-                // Todos los lectiva (para enfoque y rpte)
-                $sql = "SELECT $camposPob FROM aprendices WHERE UPPER(estado) = 'LECTIVA' ORDER BY nombre ASC";
-                $stmt = $conn->query($sql);
+            $categoria = $_GET['categoria'] ?? '';
+            
+            // SQL base con LECTIVA
+            $sql = "SELECT documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad 
+                     FROM aprendices a 
+                     LEFT JOIN fichas f ON a.numero_ficha = f.numero_ficha 
+                     WHERE UPPER(a.estado) = 'LECTIVA'";
+            
+            // Aplicar filtros específicos por categoría (más eficiente)
+            switch ($categoria) {
+                case 'mujer':
+                    $sql .= " AND a.mujer = 1";
+                    break;
+                case 'indigena':
+                    $sql .= " AND a.indigena = 1";
+                    break;
+                case 'narp':
+                    $sql .= " AND a.narp = 1";
+                    break;
+                case 'campesino':
+                    $sql .= " AND a.campesino = 1";
+                    break;
+                case 'lgbtiq':
+                    $sql .= " AND a.lgbtiq = 1";
+                    break;
+                case 'discapacidad':
+                    $sql .= " AND a.discapacidad = 1";
+                    break;
             }
-            echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            
+            // Ordenar y limitar para mejor rendimiento
+            $sql .= " ORDER BY a.nombre, a.apellido LIMIT 50";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $aprendices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $aprendices]);
             exit;
         }
     }
