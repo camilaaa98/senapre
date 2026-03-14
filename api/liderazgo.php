@@ -282,6 +282,140 @@ try {
             exit;
         }
 
+        // Obtener representantes
+        if ($action === 'getRepresentantes') {
+            $sql = "SELECT r.tipo_jornada, a.documento, a.nombre, a.apellido 
+                     FROM representantes r
+                     JOIN aprendices a ON r.documento = a.documento
+                     ORDER BY r.tipo_jornada";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $representantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $representantes]);
+            exit;
+        }
+
+        // Guardar vocero de enfoque diferencial
+        if ($action === 'saveVoceroEnfoque') {
+            $categoria = $data['categoria'] ?? '';
+            $documento = $data['documento'] ?? '';
+            
+            if (empty($categoria) || empty($documento)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Verificar si ya existe un vocero para esa categoría
+            $sqlCheck = "SELECT id FROM voceros_enfoque WHERE tipo_poblacion = :cat";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->execute([':cat' => $categoria]);
+            $existing = $stmtCheck->fetch();
+            
+            if ($existing) {
+                // Actualizar existente
+                $sql = "UPDATE voceros_enfoque SET documento = :doc WHERE tipo_poblacion = :cat";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':cat' => $categoria]);
+            } else {
+                // Insertar nuevo
+                $sql = "INSERT INTO voceros_enfoque (tipo_poblacion, documento) VALUES (:cat, :doc)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':cat' => $categoria, ':doc' => $documento]);
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Vocero de enfoque asignado correctamente']);
+            exit;
+        }
+
+        // Guardar representante (diurna/mixta)
+        if ($action === 'saveRepresentante') {
+            $tipo = $data['tipo'] ?? ''; // 'diurna' o 'mixta'
+            $documento = $data['documento'] ?? '';
+            
+            if (empty($tipo) || empty($documento)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Verificar si ya existe un representante para ese tipo
+            $sqlCheck = "SELECT id FROM representantes WHERE tipo_jornada = :tipo";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->execute([':tipo' => $tipo]);
+            $existing = $stmtCheck->fetch();
+            
+            if ($existing) {
+                // Actualizar existente
+                $sql = "UPDATE representantes SET documento = :doc, fecha_asignacion = CURRENT_DATE WHERE tipo_jornada = :tipo";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo]);
+            } else {
+                // Insertar nuevo
+                $sql = "INSERT INTO representantes (documento, tipo_jornada, fecha_asignacion) VALUES (:doc, :tipo, CURRENT_DATE)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo]);
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Representante asignado correctamente']);
+            exit;
+        }
+
+        // Eliminar de población
+        if ($action === 'eliminarDePoblacion') {
+            $documento = $data['documento'] ?? '';
+            $categoria = $data['categoria'] ?? '';
+            
+            if (empty($documento) || empty($categoria)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Obtener el tipo_poblacion actual
+            $sqlGet = "SELECT tipo_poblacion FROM aprendices WHERE documento = :doc";
+            $stmtGet = $conn->prepare($sqlGet);
+            $stmtGet->execute([':doc' => $documento]);
+            $aprendiz = $stmtGet->fetch();
+            
+            if ($aprendiz && $aprendiz['tipo_poblacion']) {
+                // Eliminar la categoría específica del tipo_poblacion
+                $tipoPoblacion = $aprendiz['tipo_poblacion'];
+                $patron = '';
+                
+                switch ($categoria) {
+                    case 'mujer':
+                        $patron = 'mujer|mujeres|femenino|femenina|F|muj';
+                        break;
+                    case 'indigena':
+                        $patron = 'indigena|indígena|etnia|pueblos|indígenas|etnico';
+                        break;
+                    case 'narp':
+                        $patron = 'narp|negro|afro|afrodescendiente|raizal|palenquero';
+                        break;
+                    case 'campesino':
+                        $patron = 'campesino|campesina|rural|campo|camp';
+                        break;
+                    case 'lgbtiq':
+                        $patron = 'lgbti|lgbt|trans|gay|lesbiana|bisexual|queer|homosexual|\\+';
+                        break;
+                    case 'discapacidad':
+                        $patron = 'discapacidad|discapacitado|discapacitada|capacidad|disc';
+                        break;
+                }
+                
+                if ($patron) {
+                    // Eliminar patrones específicos
+                    $nuevoTipo = preg_replace("/\b($patron)\b/i", '', $tipoPoblacion);
+                    $nuevoTipo = preg_replace('/,\s*,/', ',', $nuevoTipo); // Eliminar comas dobles
+                    $nuevoTipo = trim($nuevoTipo, ', ');
+                    
+                    $sql = "UPDATE aprendices SET tipo_poblacion = :nuevoTipo WHERE documento = :doc";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([':nuevoTipo' => $nuevoTipo, ':doc' => $documento]);
+                }
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Eliminado de la categoría correctamente']);
+            exit;
+        }
+
         // Guardar nueva reunión y procesar notificaciones
         if ($action === 'saveReunion') {
             if (empty($data['titulo']) || empty($data['fecha'])) throw new Exception('Datos incompletos');

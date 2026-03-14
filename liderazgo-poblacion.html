@@ -216,25 +216,6 @@
                     </div>`;
                 }).join('');
 
-                // Custom Extra Buttons
-                html += `
-                    <div style="background:#4caf50; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-plus-circle" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.85rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">AGREGAR</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">Gestionar Tipos</span>
-                    </div>
-                    <div style="background:#2962ff; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-user" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.8rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">VOCERO</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">ENFOQUE<br>DIFERENCIAL</span>
-                    </div>
-                    <div style="background:#f57c00; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-users" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.75rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">REPRESENTANTES</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">DIURNA / MIXTA</span>
-                    </div>
-                `;
-
                 document.getElementById('pob-grid-categorias').innerHTML = html;
             },
 
@@ -398,7 +379,50 @@
 
             // Funciones de gestión
             gestionarTipos() {
-                alert('Gestión de Tipos de Población\n\nEsta función permitirá:\n• Editar categorías de población\n• Configurar patrones de búsqueda\n• Gestionar reglas de asignación automática\n\nFuncionalidad en desarrollo...');
+                const modalHtml = `
+                    <div class="modal-overlay" id="modalGestionTipos" style="display:flex;">
+                        <div class="modal-glass" style="max-width: 600px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2 style="font-family: 'Outfit'; font-size: 1.3rem; color: #1e293b; margin: 0;">
+                                    <i class="fas fa-users-cog" style="color: #39A900; margin-right: 10px;"></i>
+                                    Gestión de Tipos de Población
+                                </h2>
+                                <button type="button" onclick="document.getElementById('modalGestionTipos').remove()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="color: #475569; font-size: 1rem; margin-bottom: 1rem;">Patrones de Búsqueda Actuales</h3>
+                                <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: #64748b;">
+                                    <div><strong>Mujer:</strong> mujer, mujeres, femenino, femenina, F, muj</div>
+                                    <div><strong>Indígena:</strong> indigena, indígena, etnia, pueblos, indígenas, etnico</div>
+                                    <div><strong>NARP:</strong> narp, negro, afro, afrodescendiente, raizal, palenquero</div>
+                                    <div><strong>Campesino:</strong> campesino, campesina, rural, campo, camp</div>
+                                    <div><strong>LGBTIQ:</strong> lgbti, lgbt, trans, gay, lesbiana, bisexual, queer, homosexual, +</div>
+                                    <div><strong>Discapacidad:</strong> discapacidad, discapacitado, discapacitada, capacidad, disc</div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <p style="margin: 0; color: #0369a1; font-size: 0.9rem;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Los patrones de búsqueda se usan para identificar automáticamente a los aprendices 
+                                    en cada categoría de población según su información registrada.
+                                </p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" onclick="document.getElementById('modalGestionTipos').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cerrar</button>
+                                <button type="button" onclick="PoblacionUI.actualizarPatrones()" style="padding: 8px 16px; background: #39A900; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Actualizar Patrones</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            },
+
+            actualizarPatrones() {
+                alert('Actualización de Patrones\n\nEsta función permitirá:\n• Modificar patrones de búsqueda\n• Agregar nuevas categorías\n• Configurar reglas avanzadas\n• Exportar/importar configuración\n\nFuncionalidad en desarrollo...');
+                document.getElementById('modalGestionTipos').remove();
             },
 
             gestionarVoceroEnfoque() {
@@ -488,28 +512,176 @@
                                 </p>
                             </div>
                             
+                            <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 1rem;">
+                                <button type="button" onclick="PoblacionUI.asignarRepresentante('diurna')" style="padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-user-plus"></i> Asignar Diurno
+                                </button>
+                                <button type="button" onclick="PoblacionUI.asignarRepresentante('mixta')" style="padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-user-plus"></i> Asignar Mixto
+                                </button>
+                            </div>
+                            
                             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                                 <button type="button" onclick="document.getElementById('modalRepresentantes').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cerrar</button>
-                                <button type="button" onclick="PoblacionUI.asignarRepresentante()" style="padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Asignar Representante</button>
                             </div>
                         </div>
                     </div>
                 `;
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Cargar representantes actuales
+                this.cargarRepresentantes();
+            },
+
+            async cargarRepresentantes() {
+                try {
+                    const res = await fetch('api/liderazgo.php?action=getRepresentantes');
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        data.data.forEach(rep => {
+                            const elem = document.getElementById(`rep-${rep.tipo_jornada}`);
+                            if (elem) {
+                                elem.innerHTML = `
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>${rep.nombre} ${rep.apellido}</span>
+                                        <button onclick="PoblacionUI.editarRepresentante('${rep.tipo_jornada}')" style="background: #3b82f6; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error al cargar representantes:', error);
+                }
+            },
+
+            async asignarRepresentante(tipo) {
+                const modalHtml = `
+                    <div class="modal-overlay" id="modalAsignarRep" style="display:flex;">
+                        <div class="modal-glass" style="max-width: 450px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h3 style="font-family: 'Outfit'; font-size: 1.1rem; color: #1e293b; margin: 0;">
+                                    Asignar Representante ${tipo === 'diurna' ? 'Diurno' : 'Mixto'}
+                                </h3>
+                                <button type="button" onclick="document.getElementById('modalAsignarRep').remove()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Buscar Aprendiz</label>
+                                <input type="text" id="rep-aprendiz-buscar" placeholder="Escriba documento o nombre..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                <div id="rep-aprendiz-resultados" style="margin-top: 10px; max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" onclick="document.getElementById('modalAsignarRep').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancelar</button>
+                                <button type="button" onclick="PoblacionUI.guardarRepresentante('${tipo}')" style="padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Configurar búsqueda
+                document.getElementById('rep-aprendiz-buscar').addEventListener('input', (e) => {
+                    this.buscarAprendicesRepresentante(e.target.value);
+                });
+            },
+
+            async buscarAprendicesRepresentante(query) {
+                if (query.length < 3) {
+                    document.getElementById('rep-aprendiz-resultados').innerHTML = '';
+                    return;
+                }
+                
+                try {
+                    const res = await fetch(`api/aprendices.php?search=${encodeURIComponent(query)}&estado=LECTIVA&limit=10`);
+                    const data = await res.json();
+                    
+                    const container = document.getElementById('rep-aprendiz-resultados');
+                    if (data.success && data.data.length > 0) {
+                        container.innerHTML = data.data.map(a => `
+                            <div style="padding: 8px; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 5px; cursor: pointer; background: white;" onclick="PoblacionUI.seleccionarAprendizRepresentante('${a.documento}', '${a.nombre} ${a.apellido}')">
+                                <div style="font-weight: 600;">${a.documento}</div>
+                                <div style="font-size: 0.85rem; color: #64748b;">${a.nombre} ${a.apellido}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        container.innerHTML = '<div style="padding: 10px; text-align: center; color: #64748b;">No se encontraron aprendices</div>';
+                    }
+                } catch (error) {
+                    console.error('Error al buscar aprendices:', error);
+                }
+            },
+
+            seleccionarAprendizRepresentante(documento, nombre) {
+                document.getElementById('rep-aprendiz-buscar').value = `${documento} - ${nombre}`;
+                document.getElementById('rep-aprendiz-buscar').dataset.documento = documento;
+                document.getElementById('rep-aprendiz-resultados').innerHTML = '';
+            },
+
+            async guardarRepresentante(tipo) {
+                const documento = document.getElementById('rep-aprendiz-buscar').dataset.documento;
+                
+                if (!documento) {
+                    alert('Seleccione un aprendiz');
+                    return;
+                }
+                
+                try {
+                    const res = await fetch('api/liderazgo.php?action=saveRepresentante', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tipo: tipo, documento: documento })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        alert('Representante asignado correctamente');
+                        document.getElementById('modalAsignarRep').remove();
+                        document.getElementById('modalRepresentantes').remove();
+                        this.gestionarRepresentantes(); // Recargar modal
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error al guardar representante:', error);
+                    alert('Error al guardar representante');
+                }
             },
 
             async guardarVoceroEnfoque() {
                 const categoria = document.getElementById('enfoque-categoria').value;
-                const nuevoVocero = document.getElementById('nuevo-vocero').value;
+                const documento = document.getElementById('nuevo-vocero').value;
                 
                 if (!categoria) {
                     alert('Seleccione una categoría');
                     return;
                 }
                 
-                // Aquí iría la lógica para guardar en la base de datos
-                alert(`Vocero de enfoque para ${categoria}:\n${nuevoVocero || 'Sin cambios'}\n\nFuncionalidad en desarrollo...`);
-                document.getElementById('modalVoceroEnfoque').remove();
+                try {
+                    const res = await fetch('api/liderazgo.php?action=saveVoceroEnfoque', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ categoria: categoria, documento: documento })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        alert('Vocero de enfoque asignado correctamente');
+                        document.getElementById('modalVoceroEnfoque').remove();
+                        // Recargar datos
+                        await this.fetchData();
+                        this.renderGrid();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error al guardar vocero:', error);
+                    alert('Error al guardar vocero de enfoque');
+                }
             },
 
             asignarRepresentante() {
@@ -523,19 +695,28 @@
                 }
                 
                 try {
-                    // Aquí iría la lógica para eliminar de la base de datos
-                    // Por ahora, solo mostramos mensaje y actualizamos la vista
-                    alert(`Eliminando aprendiz ${documento} de la población...\n\nFuncionalidad en desarrollo...`);
+                    const res = await fetch('api/liderazgo.php?action=eliminarDePoblacion', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ documento: documento, categoria: this.currentKey })
+                    });
+                    const data = await res.json();
                     
-                    // Actualizar vista
-                    currentCatData = currentCatData.filter(a => a.documento !== documento);
-                    this.renderTable();
-                    
-                    // Actualizar estadísticas
-                    statsPoblacion[this.currentKey] = Math.max(0, statsPoblacion[this.currentKey] - 1);
-                    this.renderGrid();
-                    this.renderCharts();
-                    
+                    if (data.success) {
+                        alert('Eliminado de la categoría correctamente');
+                        
+                        // Actualizar vista
+                        currentCatData = currentCatData.filter(a => a.documento !== documento);
+                        this.renderTable();
+                        
+                        // Actualizar estadísticas
+                        statsPoblacion[this.currentKey] = Math.max(0, statsPoblacion[this.currentKey] - 1);
+                        this.renderGrid();
+                        this.renderCharts();
+                        
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
                 } catch (error) {
                     console.error('Error al eliminar de población:', error);
                     alert('Error al eliminar de población');
