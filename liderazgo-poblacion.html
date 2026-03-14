@@ -53,6 +53,19 @@
             </div>
 
             <!-- Dashboard Analytics -->
+            <!-- Botones de Gestión -->
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 2rem; flex-wrap: wrap;">
+                <button class="btn-lid" style="background: linear-gradient(135deg, #39A900, #2d7d00); color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);" onclick="PoblacionUI.gestionarTipos()">
+                    <i class="fas fa-users-cog"></i> Gestionar Tipos
+                </button>
+                <button class="btn-lid" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);" onclick="PoblacionUI.gestionarVoceroEnfoque()">
+                    <i class="fas fa-user-friends"></i> Vocero Enfoque Diferencial
+                </button>
+                <button class="btn-lid" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);" onclick="PoblacionUI.gestionarRepresentantes()">
+                    <i class="fas fa-user-tie"></i> Representantes (Diurna/Mixta)
+                </button>
+            </div>
+
             <!-- Layout Principal -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 
@@ -327,7 +340,9 @@
                         <td style="padding: 1rem; color: #64748b;">${a.numero_ficha || 'N/A'}</td>
                         <td style="padding: 1rem; color: #64748b;">Titulada</td>
                         <td style="padding: 1rem;">
-                            <button style="background:none; border:none; color:#0284c7; cursor:pointer;" title="Más opciones"><i class="fas fa-ellipsis-v"></i></button>
+                            <button style="background:#fee2e2; color:#dc2626; border:none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; transition: all 0.2s;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'" onclick="PoblacionUI.eliminarDePoblacion('${a.documento}')" title="Eliminar de población">
+                                <i class="fas fa-trash-alt" style="font-size: 0.85rem;"></i>
+                            </button>
                         </td>
                     </tr>
                 `).join('');
@@ -372,6 +387,152 @@
                         }
                     }
                 });
+            },
+
+            // Funciones de gestión
+            gestionarTipos() {
+                alert('Gestión de Tipos de Población\n\nEsta función permitirá:\n• Editar categorías de población\n• Configurar patrones de búsqueda\n• Gestionar reglas de asignación automática\n\nFuncionalidad en desarrollo...');
+            },
+
+            gestionarVoceroEnfoque() {
+                // Abrir modal para gestionar vocero de enfoque diferencial
+                const modalHtml = `
+                    <div class="modal-overlay" id="modalVoceroEnfoque" style="display:flex;">
+                        <div class="modal-glass" style="max-width: 500px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2 style="font-family: 'Outfit'; font-size: 1.3rem; color: #1e293b; margin: 0;">
+                                    <i class="fas fa-user-friends" style="color: #f59e0b; margin-right: 10px;"></i>
+                                    Vocero de Enfoque Diferencial
+                                </h2>
+                                <button type="button" onclick="document.getElementById('modalVoceroEnfoque').remove()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Categoría</label>
+                                <select id="enfoque-categoria" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Mujer">Mujer</option>
+                                    <option value="Indígena">Indígena</option>
+                                    <option value="NARP">NARP</option>
+                                    <option value="Campesino">Campesino</option>
+                                    <option value="LGBTIQ+">LGBTIQ+</option>
+                                    <option value="Discapacidad">Discapacidad</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Vocero Actual</label>
+                                <div id="vocero-actual" style="padding: 10px; background: #f8fafc; border-radius: 8px; color: #64748b;">No asignado</div>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Nuevo Vocero</label>
+                                <input type="text" id="nuevo-vocero" placeholder="Buscar aprendiz..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" onclick="document.getElementById('modalVoceroEnfoque').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancelar</button>
+                                <button type="button" onclick="PoblacionUI.guardarVoceroEnfoque()" style="padding: 8px 16px; background: #39A900; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Cargar voceros actuales
+                Object.entries(vocerosEnfoqueMap).forEach(([categoria, vocero]) => {
+                    const select = document.getElementById('enfoque-categoria');
+                    if (select) {
+                        select.value = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+                        document.getElementById('vocero-actual').textContent = vocero;
+                    }
+                });
+            },
+
+            gestionarRepresentantes() {
+                // Abrir modal para gestionar representantes diurna/mixta
+                const modalHtml = `
+                    <div class="modal-overlay" id="modalRepresentantes" style="display:flex;">
+                        <div class="modal-glass" style="max-width: 600px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2 style="font-family: 'Outfit'; font-size: 1.3rem; color: #1e293b; margin: 0;">
+                                    <i class="fas fa-user-tie" style="color: #0ea5e9; margin-right: 10px;"></i>
+                                    Representantes (Diurna/Mixta)
+                                </h2>
+                                <button type="button" onclick="document.getElementById('modalRepresentantes').remove()" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Representante Diurno</label>
+                                    <div id="rep-diurno" style="padding: 10px; background: #f8fafc; border-radius: 8px; color: #64748b; min-height: 40px; display: flex; align-items: center;">No asignado</div>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #475569; margin-bottom: 8px;">Representante Mixto</label>
+                                    <div id="rep-mixto" style="padding: 10px; background: #f8fafc; border-radius: 8px; color: #64748b; min-height: 40px; display: flex; align-items: center;">No asignado</div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #fef3c7; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <p style="margin: 0; color: #92400e; font-size: 0.9rem;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Los representantes son elegidos democráticamente por los aprendices de cada jornada.
+                                    Esta función permite registrar y gestionar los representantes actuales.
+                                </p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" onclick="document.getElementById('modalRepresentantes').remove()" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cerrar</button>
+                                <button type="button" onclick="PoblacionUI.asignarRepresentante()" style="padding: 8px 16px; background: #0ea5e9; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Asignar Representante</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            },
+
+            async guardarVoceroEnfoque() {
+                const categoria = document.getElementById('enfoque-categoria').value;
+                const nuevoVocero = document.getElementById('nuevo-vocero').value;
+                
+                if (!categoria) {
+                    alert('Seleccione una categoría');
+                    return;
+                }
+                
+                // Aquí iría la lógica para guardar en la base de datos
+                alert(`Vocero de enfoque para ${categoria}:\n${nuevoVocero || 'Sin cambios'}\n\nFuncionalidad en desarrollo...`);
+                document.getElementById('modalVoceroEnfoque').remove();
+            },
+
+            asignarRepresentante() {
+                alert('Asignación de Representantes\n\nEsta función permitirá:\n• Seleccionar representante diurno\n• Seleccionar representante mixto\n• Gestionar periodo de representación\n• Registrar votaciones\n\nFuncionalidad en desarrollo...');
+                document.getElementById('modalRepresentantes').remove();
+            },
+
+            async eliminarDePoblacion(documento) {
+                if (!confirm('¿Está seguro de eliminar a este aprendiz de la categoría de población? Esta acción solo eliminará la etiqueta de población, no al aprendiz del sistema.')) {
+                    return;
+                }
+                
+                try {
+                    // Aquí iría la lógica para eliminar de la base de datos
+                    // Por ahora, solo mostramos mensaje y actualizamos la vista
+                    alert(`Eliminando aprendiz ${documento} de la población...\n\nFuncionalidad en desarrollo...`);
+                    
+                    // Actualizar vista
+                    currentCatData = currentCatData.filter(a => a.documento !== documento);
+                    this.renderTable();
+                    
+                    // Actualizar estadísticas
+                    statsPoblacion[this.currentKey] = Math.max(0, statsPoblacion[this.currentKey] - 1);
+                    this.renderGrid();
+                    this.renderCharts();
+                    
+                } catch (error) {
+                    console.error('Error al eliminar de población:', error);
+                    alert('Error al eliminar de población');
+                }
             },
 
             exportPDF() {
