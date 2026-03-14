@@ -47,6 +47,33 @@ const LiderazgoData = {
         }
     },
 
+    async fetchPoblacion(categoria) {
+        try {
+            const res = await fetch(`api/liderazgo.php?action=getAprendicesLectiva&categoria=${categoria}`);
+            const data = await res.json();
+            if (data.success) {
+                this.cache.poblacion = data.data;
+                return data.data;
+            }
+        } catch (e) {
+            console.error(`Error fetching población ${categoria}:`, e);
+            return [];
+        }
+    },
+
+    async fetchPoblacionStats() {
+        try {
+            const res = await fetch('api/liderazgo.php?action=getPoblacionStats');
+            const data = await res.json();
+            if (data.success) {
+                return data.stats;
+            }
+        } catch (e) {
+            console.error('Error fetching población stats:', e);
+            return {};
+        }
+    },
+
     async updateLider(documento, datos) {
         try {
             const res = await fetch('api/liderazgo.php?action=updateLider', {
