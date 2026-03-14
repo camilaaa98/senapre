@@ -51,7 +51,7 @@ try {
         } elseif (empty($tabla_poblacion) && empty($ficha) && empty($poblacion) && empty($search)) {
             // EXCLUIR estados de inactividad total SOLO si no hay filtros activos
             // Si el usuario busca algo específico, queremos que lo encuentre aunque sea cancelado.
-            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA')";
+            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA') AND a.estado IN ('LECTIVA', 'EN FORMACION', 'ACTIVO')";
         }
 
         if (!empty($tabla_poblacion)) {
