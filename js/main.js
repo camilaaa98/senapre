@@ -107,7 +107,8 @@ class AuthSystem {
         const areas = this.currentUser.bienestar_data || [];
 
         // PRIORIDAD ALTA: Si tiene área de Liderazgo (Jancy), redirigir directo sin importar el rol
-        if (areas.includes('voceros_y_representantes')) {
+        const esLiderazgo = areas.includes('voceros_y_representantes') || areas.includes('liderazgo') || areas.includes('vocero');
+        if (esLiderazgo) {
             if (!window.location.pathname.includes('liderazgo.html')) {
                 window.location.href = 'liderazgo.html';
                 return;
@@ -283,6 +284,11 @@ function aplicarRestriccionesDeRol() {
     const user = authSystem.getCurrentUser();
     if (!user) return;
 
+    const rol = (user.rol || '').toLowerCase();
+    const bienestar = user.bienestar_data || [];
+    const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
+    const scope = scopes.length > 0 ? scopes[0] : null;
+
     // Actualizar visualización del rol en el sidebar
     const roleDisplay = document.getElementById('user-role-display');
     if (roleDisplay) {
@@ -297,37 +303,34 @@ function aplicarRestriccionesDeRol() {
 
         displayRole = roleMap[rol] || displayRole;
 
-        if (user.bienestar_data && user.bienestar_data.length > 0) {
+        if (bienestar && bienestar.length > 0) {
             const areaMap = {
                 'jefe_bienestar': 'Jefe de Bienestar',
                 'voceros_y_representantes': 'Liderazgo',
+                'liderazgo': 'Liderazgo',
+                'vocero': 'Liderazgo',
                 'enfermeria': 'Bienestar (Salud)',
                 'socioemocional': 'Bienestar (Socioemocional)',
                 'deporte': 'Bienestar (Deporte)',
                 'arte': 'Bienestar (Cultura)',
                 'apoyos': 'Bienestar (Apoyos)'
             };
-            const displayAreas = user.bienestar_data.map(a => areaMap[a] || a);
+            const displayAreas = bienestar.map(a => areaMap[a] || a);
             displayRole = displayAreas[0]; // Mostrar la primera area como rol
         }
         
         // Parche visual: Si es Liderazgo, forzar el título limpio
-        if (user.bienestar_data && user.bienestar_data.includes('voceros_y_representantes')) {
+        if (bienestar && (bienestar.includes('voceros_y_representantes') || bienestar.includes('liderazgo'))) {
             displayRole = 'Liderazgo Estudiantil';
         }
 
         roleDisplay.textContent = displayRole;
     }
 
-    const rol = (user.rol || '').toLowerCase();
-    const bienestar = user.bienestar_data || [];
-    const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
-    const scope = scopes.length > 0 ? scopes[0] : null;
-
     // Unificado con AuthSystem
     const esDirector = authSystem.isAdmin();
     const esJefeBienestar = bienestar.includes('jefe_bienestar');
-    const esRespLiderazgo = bienestar.includes('voceros_y_representantes');
+    const esRespLiderazgo = bienestar.includes('voceros_y_representantes') || bienestar.includes('liderazgo') || bienestar.includes('vocero');
     const esVocero = rol === 'vocero';
 
     // Áreas restringidas (en construcción)

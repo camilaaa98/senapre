@@ -13,7 +13,7 @@
     }
 
     const bienestarData = user.bienestar_data || [];
-    const esRespLiderazgo = bienestarData.includes('voceros_y_representantes');
+    const esRespLiderazgo = bienestarData.includes('voceros_y_representantes') || bienestarData.includes('liderazgo') || bienestarData.includes('vocero');
 
     if (rol === 'vocero') {
         window.location.href = 'vocero-dashboard.html';
@@ -40,7 +40,7 @@
     }
 
     // Permitir acceso a roles directivos y de apoyo administrativo
-    const rolesDash = ['director', 'admin', 'administrativo', 'coordinador'];
+    const rolesDash = ['director', 'admin', 'administrativo', 'coordinador', 'administrador'];
     if (!rolesDash.includes(rol)) {
         window.location.href = 'index.html';
         return;
