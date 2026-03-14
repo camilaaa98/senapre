@@ -40,11 +40,18 @@
 
         <main class="lid-main">
             <header class="lid-topbar">
-                <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <span class="lid-topbar-title">Tipo de Población</span>
-                <div class="lid-topbar-user" id="lid-topbar-user"></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn-back-topbar" onclick="window.history.back()" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.2s; font-size: 0.9rem;" onmouseover="this.style.background='#e2e8f0'; this.style.borderColor='#cbd5e1'" onmouseout="this.style.background='#f1f5f9'; this.style.borderColor='#e2e8f0'">
+                        <i class="fas fa-arrow-left" style="font-size: 0.85rem;"></i> Volver
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="lid-topbar-title">Tipo de Población</span>
+                    <div class="lid-topbar-user" id="lid-topbar-user"></div>
+                </div>
             </header>
 
             <div style="text-align: center; margin-bottom: 2rem; margin-top: 1rem;">
