@@ -123,17 +123,49 @@ class AuthSystem {
             }
         }
 
+        // REGLA DE SEGURIDAD: Administrativos solo acceden a su panel si tienen área asignada
+        if (rol === 'administrativo') {
+            if (areas.includes('jefe_bienestar')) {
+                window.location.href = 'admin-bienestar-dashboard.html';
+                return;
+            } else if (areas.length > 0) {
+                // Tiene áreas asignadas pero no es jefe - redirigir según área
+                if (areas.includes('voceros_y_representantes') || areas.includes('liderazgo')) {
+                    window.location.href = 'liderazgo.html';
+                    return;
+                }
+            }
+            // Si no tiene áreas asignadas, mostrar acceso denegado
+            this.showAccessDenied();
+            return;
+        }
+
         if (rol === 'vocero') {
             window.location.href = 'vocero-dashboard.html';
         } else if (areas.includes('jefe_bienestar')) {
             window.location.href = 'admin-bienestar-dashboard.html';
         } else if (rol === 'instructor') {
             window.location.href = 'instructor-dashboard.html';
-        } else if (rol === 'admin' || rol === 'administrador' || rol === 'administrativo') {
+        } else if (rol === 'admin' || rol === 'administrador' || rol === 'director') {
             window.location.href = 'admin-dashboard.html';
         } else {
             window.location.href = 'admin-dashboard.html';
         }
+    }
+
+    showAccessDenied() {
+        document.body.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: system-ui;">
+                <div style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #f59e0b; margin-bottom: 20px;"></i>
+                    <h2 style="color: #1f2937; margin-bottom: 15px;">Acceso Restringido</h2>
+                    <p style="color: #6b7280; margin-bottom: 20px;">Su cuenta de administrativo no tiene áreas asignadas. Contacte al administrador del sistema para solicitar los permisos necesarios.</p>
+                    <button onclick="authSystem.logout()" style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        `;
     }
 }
 
