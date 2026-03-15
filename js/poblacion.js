@@ -12,6 +12,11 @@ class PoblacionManager {
         this.currentLabel = null;
         this.currentPage = 1;
         this.totalPages = 1;
+        this.filtrosActivos = {
+            ficha: '',
+            busqueda: ''
+        };
+        this.todosLosDatos = [];
     }
 
     /**
@@ -91,11 +96,15 @@ class PoblacionManager {
             const data = await res.json();
             
             if (data.success && data.data.length > 0) {
+                this.todosLosDatos = data.data;
                 this.currentCatData = data.data;
                 this.currentKey = key;
                 this.currentLabel = cat.label;
                 this.totalPages = data.pagination?.pages || 1;
                 this.currentPage = data.pagination?.page || 1;
+                
+                // Cargar fichas únicas para el filtro
+                this.cargarFichasUnicas();
                 
                 this.renderTable();
                 this.renderChart();
@@ -915,6 +924,88 @@ class PoblacionManager {
         } catch (error) {
             console.error('Error al eliminar aprendiz:', error);
             alert('Error al eliminar aprendiz. Por favor intente nuevamente.');
+        }
+    }
+    
+    /**
+     * Cargar fichas únicas para el filtro
+     */
+    cargarFichasUnicas() {
+        const fichasUnicas = [...new Set(this.todosLosDatos.map(a => a.numero_ficha).filter(f => f))].sort();
+        const select = document.getElementById('filtro-ficha');
+        
+        if (select) {
+            select.innerHTML = '<option value="">Todas las fichas</option>';
+            fichasUnicas.forEach(ficha => {
+                select.innerHTML += `<option value="${ficha}">${ficha}</option>`;
+            });
+        }
+    }
+    
+    /**
+     * Filtrar por ficha
+     */
+    filtrarPorFicha(ficha) {
+        this.filtrosActivos.ficha = ficha;
+        this.aplicarFiltros();
+    }
+    
+    /**
+     * Filtrar por búsqueda
+     */
+    filtrarPorBusqueda() {
+        const busqueda = document.getElementById('filtro-busqueda').value.trim();
+        this.filtrosActivos.busqueda = busqueda;
+        this.aplicarFiltros();
+    }
+    
+    /**
+     * Limpiar todos los filtros
+     */
+    limpiarFiltros() {
+        this.filtrosActivos = { ficha: '', busqueda: '' };
+        document.getElementById('filtro-ficha').value = '';
+        document.getElementById('filtro-busqueda').value = '';
+        this.currentCatData = this.todosLosDatos;
+        this.renderTable();
+    }
+    
+    /**
+     * Aplicar filtros activos
+     */
+    aplicarFiltros() {
+        let datosFiltrados = [...this.todosLosDatos];
+        
+        // Filtrar por ficha
+        if (this.filtrosActivos.ficha) {
+            datosFiltrados = datosFiltrados.filter(a => a.numero_ficha === this.filtrosActivos.ficha);
+        }
+        
+        // Filtrar por búsqueda (documento o nombre)
+        if (this.filtrosActivos.busqueda) {
+            const busquedaLower = this.filtrosActivos.busqueda.toLowerCase();
+            datosFiltrados = datosFiltrados.filter(a => 
+                a.documento.toLowerCase().includes(busquedaLower) ||
+                a.nombre.toLowerCase().includes(busquedaLower) ||
+                a.apellido.toLowerCase().includes(busquedaLower)
+            );
+        }
+        
+        this.currentCatData = datosFiltrados;
+        this.renderTable();
+        
+        // Mostrar mensaje si no hay resultados
+        if (datosFiltrados.length === 0) {
+            document.getElementById('pob-tabla-body').innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center" style="padding:2rem;color:#64748b;">
+                        <i class="fas fa-search"></i> No se encontraron resultados con los filtros aplicados.
+                        <br><button type="button" class="btn btn-outline btn-sm" onclick="poblacionManager.limpiarFiltros()" style="margin-top: 10px;">
+                            <i class="fas fa-times"></i> Limpiar filtros
+                        </button>
+                    </td>
+                </tr>
+            `;
         }
     }
 }

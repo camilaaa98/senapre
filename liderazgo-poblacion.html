@@ -120,6 +120,30 @@
                     </div>
                 </div>
                 
+                <!-- Filtros -->
+                <div class="filters-section" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label class="form-label" style="font-size: 0.9rem; margin-bottom: 5px;">Filtrar por Ficha:</label>
+                            <select id="filtro-ficha" class="form-control" onchange="poblacionManager.filtrarPorFicha(this.value)">
+                                <option value="">Todas las fichas</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <label class="form-label" style="font-size: 0.9rem; margin-bottom: 5px;">Buscar por Documento/Nombre:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="filtro-busqueda" class="form-control" placeholder="Escriba para buscar..." style="flex: 1;">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="poblacionManager.filtrarPorBusqueda()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="poblacionManager.limpiarFiltros()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
