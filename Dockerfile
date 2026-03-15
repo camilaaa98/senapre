@@ -9,12 +9,14 @@ RUN apt-get update && apt-get install -y \
 # Habilitar mod_rewrite para URLs limpias
 RUN a2enmod rewrite headers
 
-# Configurar Apache para el directorio del proyecto
-RUN echo '<Directory /var/www/html>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-    </Directory>' >> /etc/apache2/apache2.conf
+# Configuración de Apache
+RUN { \
+    echo '<Directory /var/www/html>'; \
+    echo '    Options Indexes FollowSymLinks'; \
+    echo '    AllowOverride All'; \
+    echo '    Require all granted'; \
+    echo '</Directory>'; \
+} >> /etc/apache2/apache2.conf
 
 # Copiar el proyecto
 COPY . /var/www/html/

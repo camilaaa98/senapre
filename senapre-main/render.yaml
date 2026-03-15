@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: senapre
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
-    envVars:
-      - key: DATABASE_URL
-        sync: false

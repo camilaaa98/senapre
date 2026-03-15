@@ -28,5 +28,6 @@ inspect_*.php
 fix_*.php
 add_col_*.php
 .venv/
+senapre-main/
 node_modules/
 .DS_Store
