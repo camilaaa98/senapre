@@ -734,138 +734,90 @@ class PoblacionManager {
     }
 
     /**
-     * Exportar a PDF
+     * Exportar a PDF usando el módulo estandarizado SenaPrePDF
      */
-    exportPDF() {
+    async exportPDF() {
         if (!this.currentCatData || this.currentCatData.length === 0) {
-            alert('No hay datos para exportar');
+            alert('No hay datos para exportar. Seleccione una categoría primero.');
             return;
         }
 
         const { jsPDF } = window.jspdf;
-        
-        // PDF Horizontal (landscape)
         const doc = new jsPDF({
             orientation: 'landscape',
             unit: 'mm',
             format: 'a4'
         });
-        
-        // Logo en la esquina superior derecha (50px de ancho)
+
         try {
-            const logoImg = new Image();
-            logoImg.src = 'img/logo-senapre.png';
-            logoImg.onload = () => {
-                doc.addImage(logoImg, 'PNG', 200, 10, 50, 20);
-                this.generatePDFContent(doc);
-            };
-            logoImg.onerror = () => {
-                // Si no carga el logo, continuar sin él
-                this.generatePDFContent(doc);
-            };
-        } catch (error) {
-            // Si hay error con el logo, continuar sin él
-            this.generatePDFContent(doc);
-        }
-    }
-    
-    generatePDFContent(doc) {
-        // Encabezado profesional con logo
-        try {
-            const logoImg = new Image();
-            logoImg.src = 'img/logo-senapre.png';
-            logoImg.onload = () => {
-                // Logo 50px de radio (diámetro 100px) en esquina superior derecha
-                doc.addImage(logoImg, 'PNG', 180, 10, 50, 50);
-                this.addPDFContent(doc);
-            };
-            logoImg.onerror = () => {
-                this.addPDFContent(doc);
-            };
-        } catch (error) {
-            this.addPDFContent(doc);
-        }
-    }
-    
-    addPDFContent(doc) {
-        // Línea superior del encabezado
-        doc.setDrawColor(57, 169, 0);
-        doc.setLineWidth(1);
-        doc.line(20, 70, 280, 70);
-        
-        // Título principal
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`Listado de Aprendices - ${this.currentLabel}`, 20, 80);
-        
-        // Subtítulo con estado
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Estado: LECTIVA', 20, 87);
-        doc.text(`Fecha: ${new Date().toLocaleDateString('es-CO')}`, 200, 87);
-        
-        // Línea separadora
-        doc.setDrawColor(57, 169, 0);
-        doc.setLineWidth(0.5);
-        doc.line(20, 92, 280, 92);
-        
-        // Tabla con más columnas para landscape
-        const columns = [
-            { header: 'Documento', dataKey: 'documento', width: 30 },
-            { header: 'Nombres', dataKey: 'nombre', width: 40 },
-            { header: 'Apellidos', dataKey: 'apellido', width: 40 },
-            { header: 'Correo', dataKey: 'correo', width: 50 },
-            { header: 'Celular', dataKey: 'celular', width: 30 },
-            { header: 'Ficha', dataKey: 'numero_ficha', width: 20 },
-            { header: 'Tipo Formación', dataKey: 'tipo_formacion', width: 40 },
-            { header: 'Estado', dataKey: 'estado', width: 20 }
-        ];
-        
-        // Preparar datos para la tabla
-        const tableData = this.currentCatData.map(item => ({
-            documento: item.documento || '',
-            nombre: item.nombre || '',
-            apellido: item.apellido || '',
-            correo: item.correo || '',
-            celular: item.celular || '',
-            numero_ficha: item.numero_ficha || '',
-            tipo_formacion: item.tipo_formacion || '',
-            estado: 'LECTIVA'
-        }));
-        
-        // Generar tabla profesional
-        doc.autoTable({
-            columns: columns,
-            body: tableData,
-            startY: 97,
-            theme: 'grid',
-            styles: { 
-                fontSize: 9,
-                font: 'helvetica',
-                cellPadding: 3
-            },
-            headStyles: { 
-                fillColor: [57, 169, 0],
-                textColor: 255,
-                fontStyle: 'bold',
-                fontSize: 10
-            },
-            alternateRowStyles: {
-                fillColor: [245, 245, 245]
-            },
-            margin: { top: 97, right: 20, bottom: 20, left: 20 },
-            columnWidth: 'wrap',
-            didDrawPage: (data) => {
-                // Footer en cada página
-                doc.setFontSize(8);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Página ${doc.internal.getNumberOfPages()}`, 280, 200);
-                doc.text('Sistema Nacional de Aprendizaje - SenApre', 20, 200);
+            // 1. Crear cabecera profesional centralizada
+            // Título: Listado de Aprendices - [Categoría]
+            // Subtítulo: Filtros aplicados si existen
+            let subtitulo = `Categoría: ${this.currentLabel}`;
+            if (this.filtrosActivos.ficha) {
+                subtitulo += ` | Ficha: ${this.filtrosActivos.ficha}`;
             }
-        });
-        
-        // Guardar PDF
-        doc.save(`poblacion-${this.currentKey}-${Date.now()}.pdf`);
+
+            const cabeceraY = await SenaPrePDF.crearCabecera(doc, {
+                titulo: 'REPORTE DE POBLACIÓN VULNERABLE',
+                subtitulo: subtitulo,
+                orientacion: 'landscape'
+            });
+
+            // 2. Definir columnas (Match exacto con la guía)
+            const columns = [
+                { header: 'N°', dataKey: 'index' },
+                { header: 'Documento', dataKey: 'documento' },
+                { header: 'Nombres', dataKey: 'nombre' },
+                { header: 'Apellidos', dataKey: 'apellido' },
+                { header: 'Correo Electrónico', dataKey: 'correo' },
+                { header: 'Celular', dataKey: 'celular' },
+                { header: 'Estado', dataKey: 'estado' },
+                { header: 'Ficha', dataKey: 'numero_ficha' }
+            ];
+
+            // 3. Preparar datos
+            const tableData = this.currentCatData.map((a, i) => ({
+                index: i + 1,
+                documento: a.documento || '',
+                nombre: (a.nombre || '').toUpperCase(),
+                apellido: (a.apellido || '').toUpperCase(),
+                correo: a.correo || '',
+                celular: a.celular || '',
+                estado: 'LECTIVA', // Por defecto en este panel
+                numero_ficha: a.numero_ficha || ''
+            }));
+
+            // 4. Generar tabla con estilos compartidos
+            doc.autoTable({
+                ...SenaPrePDF.ESTILOS_TABLA,
+                columns: columns,
+                body: tableData,
+                startY: cabeceraY,
+                margin: { horizontal: 14 },
+                didParseCell: (data) => {
+                    // Colorear el estado (columna index 6)
+                    SenaPrePDF.colorearEstado(data, 6);
+                },
+                didDrawPage: (data) => {
+                    SenaPrePDF.pieDePagina(doc);
+                },
+                columnStyles: {
+                    index: { cellWidth: 10 },
+                    documento: { cellWidth: 25 },
+                    estado: { cellWidth: 20 },
+                    numero_ficha: { cellWidth: 20 }
+                }
+            });
+
+            // 5. Descargar
+            const filename = `Reporte_Poblacion_${this.currentLabel.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(filename);
+
+        } catch (error) {
+            console.error('Error al generar PDF:', error);
+            alert('Ocurrió un error al generar el PDF. Revise la consola para más detalles.');
+        }
     }
     
     /**
