@@ -737,25 +737,47 @@ class PoblacionManager {
      * Exportar a PDF usando el módulo estandarizado SenaPrePDF
      */
     async exportPDF() {
-        if (!this.currentCatData || this.currentCatData.length === 0) {
-            alert('No hay datos para exportar. Seleccione una categoría primero.');
+        if (!this.currentKey) {
+            alert('Por favor seleccione una categoría primero.');
             return;
         }
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-            orientation: 'landscape',
-            unit: 'mm',
-            format: 'a4'
-        });
-
         try {
-            // 1. Crear cabecera profesional centralizada
-            // Título: Listado de Aprendices - [Categoría]
-            // Subtítulo: Filtros aplicados si existen
-            let subtitulo = `Categoría: ${this.currentLabel}`;
+            // Mostrar loading en el botón
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            // 1. Obtener patrones y fetch de DATOS COMPLETOS (sin límite)
+            const patrones = this.getPatronesPorCategoria(this.currentKey);
+            const whereConditions = patrones.map(p => `UPPER(a.tipo_poblacion) LIKE UPPER('${p}')`).join(' OR ');
+            
+            // Usamos limit=-1 para traernos absolutamente todo para el reporte
+            const res = await fetch(`api/aprendices.php?estado=LECTIVA&custom_filter=${encodeURIComponent(whereConditions)}&limit=-1&_v=${Date.now()}`);
+            const data = await res.json();
+
+            if (!data.success || !data.data || data.data.length === 0) {
+                alert('No hay datos disponibles para exportar.');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                return;
+            }
+
+            const aprendicesParaReporte = data.data;
+
+            // 2. Inicializar jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // 3. Crear cabecera profesional centralizada (SENAPRE - Regional Caquetá)
+            let subtitulo = `Categoría: ${this.currentLabel} (${aprendicesParaReporte.length} Aprendices)`;
             if (this.filtrosActivos.ficha) {
-                subtitulo += ` | Ficha: ${this.filtrosActivos.ficha}`;
+                subtitulo += ` | Ficha Filtro: ${this.filtrosActivos.ficha}`;
             }
 
             const cabeceraY = await SenaPrePDF.crearCabecera(doc, {
@@ -764,7 +786,7 @@ class PoblacionManager {
                 orientacion: 'landscape'
             });
 
-            // 2. Definir columnas (Match exacto con la guía)
+            // 4. Definir columnas (Match exacto con la guía)
             const columns = [
                 { header: 'N°', dataKey: 'index' },
                 { header: 'Documento', dataKey: 'documento' },
@@ -776,19 +798,19 @@ class PoblacionManager {
                 { header: 'Ficha', dataKey: 'numero_ficha' }
             ];
 
-            // 3. Preparar datos
-            const tableData = this.currentCatData.map((a, i) => ({
+            // 5. Preparar datos
+            const tableData = aprendicesParaReporte.map((a, i) => ({
                 index: i + 1,
                 documento: a.documento || '',
                 nombre: (a.nombre || '').toUpperCase(),
                 apellido: (a.apellido || '').toUpperCase(),
                 correo: a.correo || '',
                 celular: a.celular || '',
-                estado: 'LECTIVA', // Por defecto en este panel
+                estado: 'LECTIVA',
                 numero_ficha: a.numero_ficha || ''
             }));
 
-            // 4. Generar tabla con estilos compartidos
+            // 6. Generar tabla con estilos compartidos
             doc.autoTable({
                 ...SenaPrePDF.ESTILOS_TABLA,
                 columns: columns,
@@ -796,7 +818,6 @@ class PoblacionManager {
                 startY: cabeceraY,
                 margin: { horizontal: 14 },
                 didParseCell: (data) => {
-                    // Colorear el estado (columna index 6)
                     SenaPrePDF.colorearEstado(data, 6);
                 },
                 didDrawPage: (data) => {
@@ -810,13 +831,23 @@ class PoblacionManager {
                 }
             });
 
-            // 5. Descargar
+            // 7. Descargar
             const filename = `Reporte_Poblacion_${this.currentLabel.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
             doc.save(filename);
 
+            // Restaurar botón
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+
         } catch (error) {
             console.error('Error al generar PDF:', error);
-            alert('Ocurrió un error al generar el PDF. Revise la consola para más detalles.');
+            alert('Error al generar el PDF. Revise su conexión.');
+            // Restaurar botón si hay error
+            const btn = document.querySelector('button[onclick="poblacionManager.exportPDF()"]');
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+                btn.disabled = false;
+            }
         }
     }
     
