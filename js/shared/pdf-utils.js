@@ -38,9 +38,12 @@ const SenaPrePDF = (() => {
     /**
      * Crea la cabecera profesional SENA — SenApre en el PDF
      */
+    /**
+     * Crea la cabecera profesional SENA — SenApre en el PDF
+     */
     async function crearCabecera(doc, { titulo = '', subtitulo = '', responsable = '', orientacion = 'landscape' } = {}) {
         const pw = doc.internal.pageSize.getWidth();
-        const headerH = 50; // Altura fija optimizada
+        const headerH = 45; // Altura fija más compacta
 
         // ── Fondo cabecera principal (verde sena)
         doc.setFillColor(0, 100, 0);
@@ -48,7 +51,7 @@ const SenaPrePDF = (() => {
 
         // ── Franja inferior más oscura
         doc.setFillColor(0, 60, 0);
-        doc.rect(0, headerH - 8, pw, 8, 'F');
+        doc.rect(0, headerH - 6, pw, 6, 'F');
 
         // ── Logos
         const [imgSena, imgSenapre] = await Promise.all([
@@ -57,22 +60,14 @@ const SenaPrePDF = (() => {
         ]);
 
         // Logo SENA izquierda
-        if (imgSena) doc.addImage(imgSena, 'PNG', 12, 8, 25, 25);
+        if (imgSena) doc.addImage(imgSena, 'PNG', 12, 6, 22, 22);
 
-        // Logo SenApre circular (Radio 50px ≈ 13.2mm -> Diámetro 26.4mm)
-        // Usamos un radio de 13mm para un corte limpio
-        const logoRad = 14; 
-        const logoX = pw - 15 - (logoRad * 2);
+        // Logo SenApre derecha (Sin clipping complejo por ahora para asegurar visibilidad)
+        const logoSize = 24;
+        const logoX = pw - 12 - logoSize;
         const logoY = 6;
-        
         if (imgSenapre) {
-            doc.saveGraphicsState();
-            // Definir círculo de recorte (x, y, radio, estilo)
-            // Estilo null o 'S' define el path sin rellenar
-            doc.circle(logoX + logoRad, logoY + logoRad, logoRad, 'S'); 
-            doc.clip(); 
-            doc.addImage(imgSenapre, 'PNG', logoX, logoY, logoRad * 2, logoRad * 2);
-            doc.restoreGraphicsState();
+            doc.addImage(imgSenapre, 'PNG', logoX, logoY, logoSize, logoSize);
         }
 
         // ── Texto del Encabezado
@@ -80,18 +75,18 @@ const SenaPrePDF = (() => {
         doc.setFont('helvetica', 'bold');
         
         // SENAPRE
-        doc.setFontSize(22);
+        doc.setFontSize(20);
         doc.text('SENAPRE', pw / 2, 16, { align: 'center' });
 
         // REGIONAL CAQUETÁ
-        doc.setFontSize(14);
-        doc.text('REGIONAL CAQUET\u00c1', pw / 2, 24, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('REGIONAL CAQUET\u00c1', pw / 2, 23, { align: 'center' });
 
         // Detalle
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         const info = `${titulo}${subtitulo ? ' | ' + subtitulo : ''}`;
-        doc.text(info, pw / 2, 34, { align: 'center' });
+        doc.text(info, pw / 2, 32, { align: 'center' });
 
         // Franja de fecha
         const fechaY = headerH;
@@ -113,8 +108,8 @@ const SenaPrePDF = (() => {
      * Pie de página estándar
      */
     function pieDePagina(doc) {
-        const pw = doc.internal.pageSize.getWidth();
         const ph = doc.internal.pageSize.getHeight();
+        const pw = doc.internal.pageSize.getWidth();
         const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
         const totalPags = doc.internal.getNumberOfPages();
 
@@ -122,22 +117,21 @@ const SenaPrePDF = (() => {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(140, 140, 140);
         doc.line(12, ph - 11, pw - 12, ph - 11);
-        doc.text('Generado por SenApre \u2014 SENA Regional Caquet\u00e1', 14, ph - 6);
+        doc.text('Generado por SenApre \u2014 SENA Regional Caquetá', 14, ph - 6);
         doc.text(`Página ${pageNum} de ${totalPags}`, pw - 14, ph - 6, { align: 'right' });
     }
 
     /**
-     * Estilos de tabla optimizados para espacio
+     * Estilos de tabla
      */
     const ESTILOS_TABLA = {
         theme: 'grid',
         styles: {
             font: 'helvetica',
-            fontSize: 8.5,
-            cellPadding: 2.5, // Reducido para que quepan más filas
+            fontSize: 8,
+            cellPadding: 2,
             halign: 'center',
-            valign: 'middle',
-            lineColor: [210, 210, 210]
+            valign: 'middle'
         },
         headStyles: {
             fillColor: [0, 100, 0],

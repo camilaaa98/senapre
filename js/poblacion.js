@@ -811,54 +811,44 @@ class PoblacionManager {
             }));
 
             // 6. Generar tabla con estilos compartidos (Llamada explícita para máxima compatibilidad)
-            const docWidth = doc.internal.pageSize.getWidth();
-            const headerHeight = 50; // Debe coincidir con el del modulo
-
             doc.autoTable({
                 theme: 'grid',
                 columns: columns,
                 body: tableData,
                 startY: cabeceraY,
-                margin: { horizontal: 14, top: headerHeight + 15 }, // Margen top para paginas siguientes
+                margin: { horizontal: 14, top: 20 }, // Margen para páginas siguientes (no para la primera)
                 styles: {
                     font: 'helvetica',
                     fontSize: 8,
                     cellPadding: 2,
                     halign: 'center',
-                    valign: 'middle',
-                    overflow: 'linebreak'
+                    valign: 'middle'
                 },
                 headStyles: {
                     fillColor: [0, 100, 0],
                     textColor: [255, 255, 255],
-                    fontStyle: 'bold',
-                    fontSize: 8.5
+                    fontStyle: 'bold'
                 },
                 alternateRowStyles: {
                     fillColor: [245, 252, 240]
                 },
                 columnStyles: {
-                    index: { cellWidth: 12 }, // Más ancho para evitar que el '10' se vea feo
+                    index: { cellWidth: 10 },
                     documento: { cellWidth: 25 },
-                    nombres: { cellWidth: 'auto' },
-                    apellidos: { cellWidth: 'auto' },
+                    nombre: { cellWidth: 'auto' },
+                    apellido: { cellWidth: 'auto' },
                     estado: { cellWidth: 20 },
                     numero_ficha: { cellWidth: 20 }
                 },
                 didParseCell: function(data) {
-                    // Colorear estado (Nombres de columnas del dataKey)
                     if (data.section === 'body' && data.column.dataKey === 'estado') {
                         data.cell.styles.textColor = [22, 163, 74];
                     }
                 },
                 didDrawPage: function(data) {
-                    // Footer
                     if (typeof SenaPrePDF !== 'undefined' && SenaPrePDF.pieDePagina) {
                         SenaPrePDF.pieDePagina(doc);
                     }
-                    
-                    // Si ya no es la primera página, opcionalmente podrías llamar a crearCabecera de nuevo
-                    // Pero por ahora aseguramos que no se tape el contenido con el margin.top
                 }
             });
 
