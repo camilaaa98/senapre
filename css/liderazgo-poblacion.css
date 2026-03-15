@@ -463,16 +463,18 @@ textarea.form-control {
     justify-content: center;
     align-items: center;
     min-height: 180px;
+    height: 100%; /* Forzar misma altura */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
     width: 100%;
-    height: 100%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     /* Forzar que ocupe todo el espacio del grid */
     margin: 0;
     box-sizing: border-box;
+    /* Asegurar contenido centrado */
+    align-content: center;
 }
 
 .categoria-card::before {
@@ -503,6 +505,7 @@ textarea.form-control {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     display: block;
     text-align: center;
+    flex-shrink: 0; /* No encoger */
 }
 
 .categoria-label {
@@ -514,6 +517,7 @@ textarea.form-control {
     margin-bottom: 4px;
     text-align: center;
     line-height: 1.2;
+    flex-shrink: 0; /* No encoger */
 }
 
 .categoria-count {
@@ -523,6 +527,7 @@ textarea.form-control {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     text-align: center;
     line-height: 1.1;
+    flex-shrink: 0; /* No encoger */
 }
 
 /* Colores específicos para cada categoría */
