@@ -441,13 +441,18 @@ textarea.form-control {
     min-height: 600px;
     width: 100%;
     height: 600px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .categoria-card {
     background: linear-gradient(135deg, var(--card-bg-start), var(--card-bg-end));
     color: var(--card-text);
-    border-radius: 12px;
-    padding: 1.5rem 0.75rem;
+    border-radius: 16px;
+    padding: 2rem 1rem;
     text-align: center;
     cursor: pointer;
     display: flex;
@@ -461,6 +466,7 @@ textarea.form-control {
     overflow: hidden;
     width: 100%;
     height: 100%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .categoria-card::before {
@@ -548,6 +554,41 @@ textarea.form-control {
     --card-bg-start: #74b9ff;
     --card-bg-end: #0984e3;
     --card-text: #ffffff;
+}
+
+/* ====== TÍTULOS Y SUBTÍTULOS CENTRADOS ====== */
+h1, h2, h3, h4, h5, h6 {
+    text-align: center !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin-bottom: 1rem !important;
+}
+
+.table-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center !important;
+}
+
+.modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.form-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #475569;
+    text-align: center !important;
+    margin-bottom: 0.5rem !important;
+    display: block !important;
 }
 
 /* ====== TABLA DE APRENDICES ====== */
