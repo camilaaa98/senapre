@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
-    <link rel="stylesheet" href="css/liderazgo-layout.css?v=3.5.0">
-    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.5.0">
-    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=3.5.0">
+    <link rel="stylesheet" href="css/liderazgo-layout.css?v=3.6.0">
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.6.0">
+    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=3.6.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/shared/pdf-utils.js?v=3.0.0"></script>
-    <script src="js/poblacion.js?v=3.2.0"></script>
+    <script src="js/poblacion.js?v=3.3.0"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
                 <div class="lid-sb-logo">
-                    <i class="fas fa-graduation-cap"></i>
+                    <img src="assets/img/asi.png" alt="SENAPRE Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
                 </div>
                 <h2 class="lid-sb-title">SenApre</h2>
             </div>
@@ -175,9 +175,6 @@
                 // Cargar estadísticas iniciales
                 await poblacionManager.cargarEstadisticas();
                 
-                // Renderizar grid de categorías
-                poblacionManager.renderGrid();
-                
                 // Inicializar gráfico
                 const ctx = document.getElementById('chartPoblacion');
                 if (ctx) {
@@ -209,7 +206,7 @@
                                         padding: 15,
                                         font: {
                                             family: "'Inter', sans-serif",
-                                            size: 12
+                                            size: 11
                                         }
                                     }
                                 },
@@ -217,7 +214,7 @@
                                     callbacks: {
                                         label: function(context) {
                                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                            const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
                                             return `${context.label}: ${context.parsed} (${percentage}%)`;
                                         }
                                     }
@@ -226,6 +223,12 @@
                         }
                     });
                 }
+
+                // Renderizar grid de categorías
+                poblacionManager.renderGrid();
+                
+                // CARGAR DATOS EN EL GRÁFICO INMEDIATAMENTE
+                poblacionManager.renderChart();
                 
                 console.log('✅ Página de población inicializada correctamente');
             } catch (error) {

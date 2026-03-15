@@ -428,9 +428,9 @@ textarea.form-control {
 
 .categorias-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas solicitadas */
     gap: 1.5rem;
-    max-width: 100%;
+    max-width: 800px; /* Ancho más controlado para 2 columnas */
     padding: 1rem;
     background: rgba(248, 250, 252, 0.5);
     border-radius: 20px;
