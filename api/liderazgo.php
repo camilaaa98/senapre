@@ -330,29 +330,29 @@ try {
 
         // Guardar representante (diurna/mixta)
         if ($action === 'saveRepresentante') {
-            $tipo = $data['tipo'] ?? ''; // 'diurna' o 'mixta'
+            $tipo_jornada = $data['tipo_jornada'] ?? ''; // 'diurna' o 'mixta'
             $documento = $data['documento'] ?? '';
             
-            if (empty($tipo) || empty($documento)) {
+            if (empty($tipo_jornada) || empty($documento)) {
                 throw new Exception('Datos incompletos');
             }
             
             // Verificar si ya existe un representante para ese tipo
             $sqlCheck = "SELECT id FROM representantes WHERE tipo_jornada = :tipo";
             $stmtCheck = $conn->prepare($sqlCheck);
-            $stmtCheck->execute([':tipo' => $tipo]);
+            $stmtCheck->execute([':tipo' => $tipo_jornada]);
             $existing = $stmtCheck->fetch();
             
             if ($existing) {
                 // Actualizar existente
                 $sql = "UPDATE representantes SET documento = :doc, fecha_asignacion = CURRENT_DATE WHERE tipo_jornada = :tipo";
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([':doc' => $documento, ':tipo' => $tipo]);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo_jornada]);
             } else {
                 // Insertar nuevo
                 $sql = "INSERT INTO representantes (documento, tipo_jornada, fecha_asignacion) VALUES (:doc, :tipo, CURRENT_DATE)";
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([':doc' => $documento, ':tipo' => $tipo]);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo_jornada]);
             }
             
             echo json_encode(['success' => true, 'message' => 'Representante asignado correctamente']);

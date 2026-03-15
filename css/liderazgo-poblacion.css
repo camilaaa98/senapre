@@ -436,6 +436,7 @@ textarea.form-control {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
+    max-width: 100%;
 }
 
 .categoria-card {

@@ -97,7 +97,10 @@ class PoblacionManager {
                 this.renderChart();
                 
                 // Scroll suave a la tabla
-                document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const tableContainer = document.querySelector('.table-container');
+                if (tableContainer) {
+                    tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             } else {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding:2rem;color:#64748b;">No se encontraron aprendices para la categoría ${cat.label}.</td></tr>`;
             }
@@ -388,9 +391,27 @@ class PoblacionManager {
     async cargarRepresentantes() {
         try {
             const res = await fetch('api/liderazgo.php?action=getRepresentantes');
-            const data = await res.json();
             
-            if (data.success) {
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            
+            const text = await res.text();
+            
+            if (!text.trim()) {
+                console.warn('Respuesta vacía del API de representantes');
+                return;
+            }
+            
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Error parsing JSON:', e, 'Response:', text);
+                return;
+            }
+            
+            if (data && data.success) {
                 data.data.forEach(rep => {
                     const elem = document.getElementById(`rep-${rep.tipo_jornada}`);
                     if (elem) {
@@ -404,10 +425,134 @@ class PoblacionManager {
     }
 
     /**
-     * Asignar representante
+     * Asignar representante con búsqueda real
      */
-    asignarRepresentante(tipo) {
-        alert(`Función de asignación de representante ${tipo} implementada. Esta funcionalidad permitirá buscar y asignar aprendices como representantes.`);
+    async asignarRepresentante(tipo) {
+        const modalHtml = `
+            <div class="modal-overlay" id="modalBuscarRepresentante" style="display:flex;">
+                <div class="modal-glass" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            <i class="fas fa-user-plus" style="color: var(--secondary-blue); margin-right: 8px;"></i>
+                            Asignar Representante ${tipo === 'diurna' ? 'Diurno' : 'Mixto'}
+                        </h3>
+                        <button type="button" class="modal-close" onclick="document.getElementById('modalBuscarRepresentante').remove()">&times;</button>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label class="form-label">Buscar Aprendiz:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="buscar-representante" class="form-control" placeholder="Escriba documento o nombre..." style="flex: 1;">
+                            <button type="button" class="btn btn-primary" onclick="poblacionManager.buscarAprendicesParaRepresentante('${tipo}')">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="resultados-busqueda" style="max-height: 300px; overflow-y: auto; margin-bottom: 1rem;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Busque un aprendiz para asignar como representante ${tipo === 'diurna' ? 'diurno' : 'mixto'}.
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('modalBuscarRepresentante').remove()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Enfocar el campo de búsqueda
+        setTimeout(() => {
+            document.getElementById('buscar-representante').focus();
+        }, 100);
+    }
+
+    /**
+     * Buscar aprendices para asignar como representante
+     */
+    async buscarAprendicesParaRepresentante(tipo) {
+        const searchTerm = document.getElementById('buscar-representante').value.trim();
+        const resultadosDiv = document.getElementById('resultados-busqueda');
+        
+        if (!searchTerm) {
+            resultadosDiv.innerHTML = '<div class="alert alert-warning">Por favor ingrese un término de búsqueda.</div>';
+            return;
+        }
+
+        try {
+            resultadosDiv.innerHTML = '<div class="text-center" style="padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+            
+            const res = await fetch(`api/aprendices.php?search=${encodeURIComponent(searchTerm)}&estado=LECTIVA&limit=20`);
+            const data = await res.json();
+            
+            if (data.success && data.data.length > 0) {
+                let html = '<div style="margin-bottom: 1rem;"><strong>Resultados encontrados:</strong></div>';
+                html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                
+                data.data.forEach(aprendiz => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div>
+                                <strong>${aprendiz.nombre} ${aprendiz.apellido}</strong><br>
+                                <small style="color: var(--text-muted);">Documento: ${aprendiz.documento} | Ficha: ${aprendiz.numero_ficha}</small>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="poblacionManager.asignarRepresentanteSeleccionado('${aprendiz.documento}', '${aprendiz.nombre}', '${aprendiz.apellido}', '${tipo}')">
+                                <i class="fas fa-check"></i> Asignar
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultadosDiv.innerHTML = html;
+            } else {
+                resultadosDiv.innerHTML = '<div class="alert alert-warning">No se encontraron aprendices con ese criterio de búsqueda.</div>';
+            }
+        } catch (error) {
+            console.error('Error al buscar aprendices:', error);
+            resultadosDiv.innerHTML = '<div class="alert alert-danger">Error al buscar aprendices. Por favor intente nuevamente.</div>';
+        }
+    }
+
+    /**
+     * Asignar representante seleccionado
+     */
+    async asignarRepresentanteSeleccionado(documento, nombre, apellido, tipo) {
+        if (!confirm(`¿Está seguro de asignar a ${nombre} ${apellido} como representante ${tipo === 'diurna' ? 'diurno' : 'mixto'}?`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch('api/liderazgo.php?action=saveRepresentante', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo_jornada: tipo, documento: documento })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                alert('Representante asignado correctamente');
+                document.getElementById('modalBuscarRepresentante').remove();
+                
+                // Actualizar el modal de representantes
+                const elem = document.getElementById(`rep-${tipo}`);
+                if (elem) {
+                    elem.innerHTML = `${nombre} ${apellido}`;
+                }
+                
+                // Recargar representantes
+                await this.cargarRepresentantes();
+            } else {
+                alert('Error: ' + (data.message || 'No se pudo asignar el representante'));
+            }
+        } catch (error) {
+            console.error('Error al asignar representante:', error);
+            alert('Error al asignar representante. Por favor intente nuevamente.');
+        }
     }
 
     /**
