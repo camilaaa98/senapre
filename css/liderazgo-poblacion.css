@@ -428,12 +428,12 @@ textarea.form-control {
 
 .categorias-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas solicitadas */
+    grid-template-columns: repeat(2, 1fr) !important; /* Forzado a 2 columnas */
     gap: 1.5rem;
-    max-width: 800px; /* Ancho más controlado para 2 columnas */
-    padding: 1rem;
-    background: rgba(248, 250, 252, 0.5);
-    border-radius: 20px;
+    max-width: 900px; 
+    padding: 1.5rem;
+    background: rgba(248, 250, 252, 0.7);
+    border-radius: 24px;
     border: 1px solid rgba(0, 0, 0, 0.05);
     align-items: stretch;
     margin: 0 auto;
@@ -441,28 +441,23 @@ textarea.form-control {
 
 .categoria-card {
     background: linear-gradient(135deg, var(--card-bg-start), var(--card-bg-end));
-    color: var(--card-text);
-    border-radius: 16px;
-    padding: 2.5rem 1.5rem; /* Más padding para PC */
+    color: var(--card-text) !important;
+    border-radius: 20px;
+    padding: 2rem 1rem;
     text-align: center;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 180px;
-    height: 100%; /* Forzar misma altura */
+    min-height: 180px; /* Altura suficiente para que sea legible */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
     width: 100%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    /* Forzar que ocupe todo el espacio del grid */
-    margin: 0;
     box-sizing: border-box;
-    /* Asegurar contenido centrado */
-    align-content: center;
 }
 
 .categoria-card::before {
@@ -822,7 +817,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Tablet */
 @media (min-width: 769px) and (max-width: 1024px) {
     .categorias-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr) !important;
     }
     
     .modal-glass {
@@ -833,7 +828,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Desktop */
 @media (min-width: 1025px) {
     .categorias-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(2, 1fr) !important;
     }
     
     .modal-glass {
@@ -844,8 +839,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Large Desktop */
 @media (min-width: 1440px) {
     .categorias-grid {
-        grid-template-columns: repeat(6, 1fr);
-        gap: 1.5rem;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 2rem;
     }
 }
 
