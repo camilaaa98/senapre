@@ -906,7 +906,7 @@ class PoblacionManager {
         }
         
         try {
-            const res = await fetch('api/aprendices.php', {
+            const res = await fetch('/api/aprendices.php', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ documento: documento })
