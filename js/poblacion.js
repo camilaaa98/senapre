@@ -156,6 +156,50 @@ class PoblacionManager {
         `).join('');
         
         document.getElementById('pob-tabla-body').innerHTML = html;
+        
+        // Renderizar paginación
+        this.renderPagination();
+    }
+    
+    /**
+     * Renderizar paginación
+     */
+    renderPagination() {
+        const paginationDiv = document.getElementById('pagination-container');
+        if (!paginationDiv) {
+            // Crear contenedor de paginación si no existe
+            const tableContainer = document.querySelector('.table-responsive');
+            if (tableContainer) {
+                const paginationHtml = `
+                    <div id="pagination-container" class="pagination-wrapper" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; padding: 15px;">
+                        <!-- Paginación se renderizará aquí -->
+                    </div>
+                `;
+                tableContainer.insertAdjacentHTML('afterend', paginationHtml);
+            }
+        }
+        
+        const container = document.getElementById('pagination-container');
+        if (this.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        let paginationHtml = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="btn btn-outline btn-sm" onclick="poblacionManager.cambiarPagina(${this.currentPage - 1})" ${this.currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span style="padding: 8px 16px; background: var(--bg-secondary); border-radius: 6px; font-size: 14px;">
+                    Página ${this.currentPage} de ${this.totalPages}
+                </span>
+                <button class="btn btn-outline btn-sm" onclick="poblacionManager.cambiarPagina(${this.currentPage + 1})" ${this.currentPage === this.totalPages ? 'disabled' : ''}>
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        `;
+        
+        container.innerHTML = paginationHtml;
     }
 
     /**
