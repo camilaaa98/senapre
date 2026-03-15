@@ -8,9 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
-    <link rel="stylesheet" href="css/liderazgo-layout.css?v=3.6.0">
+    <link rel="stylesheet" href="css/liderazgo-layout.css?v=4.2.0">
     <link rel="stylesheet" href="css/liderazgo-main.css?v=2.6.0">
-    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=3.8.0">
+    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=4.0.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,52 +25,60 @@
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
                 <div class="lid-sb-logo">
-                    <img src="assets/img/asi.png" alt="SENAPRE Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">
+                    <img src="assets/img/asi.png" alt="SenApre">
                 </div>
-                <h2 class="lid-sb-title">SenApre</h2>
+                <div class="lid-sb-brand">SenApre</div>
+                <div class="lid-sb-role">Liderazgo</div>
             </div>
-
             <nav class="lid-sb-nav">
-                <a href="liderazgo.html" class="nav-item active">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
+                <a href="liderazgo.html" class="lid-sb-link">
+                    <i class="fas fa-th-large"></i><span>Panel Principal</span>
                 </a>
-                <a href="liderazgo-poblacion.html" class="nav-item active">
-                    <i class="fas fa-users"></i>
-                    <span>Población</span>
+                <a href="liderazgo.html#voceros" class="lid-sb-link">
+                    <i class="fas fa-users"></i><span>Voceros</span>
                 </a>
-                <a href="liderazgo-reuniones.html" class="nav-item">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Reuniones</span>
+                <a href="liderazgo.html#representantes" class="lid-sb-link">
+                    <i class="fas fa-user-tie"></i><span>Representantes</span>
                 </a>
-                <a href="liderazgo-reportes.html" class="nav-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Reportes</span>
+                <a href="liderazgo-poblacion.html" class="lid-sb-link active">
+                    <i class="fas fa-layer-group"></i><span>Tipo de Población</span>
+                </a>
+                <a href="liderazgo.html#reuniones" class="lid-sb-link">
+                    <i class="fas fa-calendar-check"></i><span>Reuniones</span>
+                </a>
+                <a href="asistencia-liderazgo.html" class="lid-sb-link">
+                    <i class="fas fa-clipboard-user"></i><span>Asistencia</span>
                 </a>
             </nav>
+            <div class="lid-sb-footer">
+                <button class="lid-sb-logout" onclick="authSystem.logout()">
+                    <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
+                </button>
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="lid-main">
             <!-- TOPBAR -->
             <header class="lid-topbar">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <button type="button" id="menu-toggle" class="menu-toggle" style="background: none; border: none; color: #1e293b; font-size: 1.5rem; cursor: pointer;">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <button type="button" onclick="window.history.back()" class="btn btn-outline btn-sm" style="display: flex; align-items: center; gap: 8px;">
+                <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="lid-topbar-title">Liderazgo Estudiantil</span>
+                <div class="lid-topbar-user" id="user-name-display">Usuario</div>
+            </header>
+
+            <div class="premium-header">
+                <div class="premium-header-content">
+                    <div class="premium-header-icon"><i class="fas fa-users"></i></div>
+                    <div style="flex:1;">
+                        <h1 class="premium-header-title">Distribución de Población</h1>
+                        <p class="premium-header-desc">Estadísticas por categorías de vulnerabilidad</p>
+                    </div>
+                    <button class="btn-sync-premium" onclick="window.history.back()" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
                         <i class="fas fa-arrow-left"></i> Volver
                     </button>
                 </div>
-                <div class="lid-user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="user-name">Usuario</span>
-                </div>
-            </header>
-
-            <div style="text-align: center; margin-bottom: 2rem; margin-top: 1rem;">
-                <h1 style="font-family: 'Outfit'; font-size: 2.2rem; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem;">Distribución de Población</h1>
-                <p style="color: #64748b; font-size: 0.95rem;">Estadísticas por categorías de vulnerabilidad</p>
             </div>
 
             <!-- Dashboard Analytics -->

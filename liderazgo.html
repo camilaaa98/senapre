@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
-    <link rel="stylesheet" href="css/liderazgo-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="css/liderazgo-layout.css?v=4.2.0">
     <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
 </head>
 
@@ -17,18 +17,20 @@
         <!-- SIDEBAR -->
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
-                <img src="assets/img/asi.png" alt="SenApre" class="lid-sb-logo">
+                <div class="lid-sb-logo">
+                    <img src="assets/img/asi.png" alt="SenApre">
+                </div>
                 <div class="lid-sb-brand">SenApre</div>
-                <div class="lid-sb-role" id="lid-role-display">Liderazgo</div>
+                <div class="lid-sb-role">Liderazgo</div>
             </div>
             <nav class="lid-sb-nav">
                 <a href="liderazgo.html" class="lid-sb-link active">
                     <i class="fas fa-th-large"></i><span>Panel Principal</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="LiderazgoUI.switchTab('voceros');">
+                <a href="liderazgo.html#voceros" class="lid-sb-link" onclick="LiderazgoUI.switchTab('voceros');">
                     <i class="fas fa-users"></i><span>Voceros</span>
                 </a>
-                <a href="#" class="lid-sb-link" onclick="LiderazgoUI.switchTab('representantes');">
+                <a href="liderazgo.html#representantes" class="lid-sb-link" onclick="LiderazgoUI.switchTab('representantes');">
                     <i class="fas fa-user-tie"></i><span>Representantes</span>
                 </a>
                 <a href="liderazgo-poblacion.html" class="lid-sb-link">
@@ -244,6 +246,14 @@
     <script>
         // Init Logic
         LiderazgoUI.init();
+
+        // Handle URL Hash for deep-linking tabs
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['voceros', 'suplentes', 'enfoque', 'representantes', 'reuniones'].includes(hash)) {
+                LiderazgoUI.switchTab(hash);
+            }
+        });
         
         async function cargarLiderazgo() {
             // Cargar inicial (Principales)
