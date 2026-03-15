@@ -810,23 +810,48 @@ class PoblacionManager {
                 numero_ficha: a.numero_ficha || ''
             }));
 
-            // 6. Generar tabla con estilos compartidos
+            // 6. Generar tabla con estilos compartidos (Llamada explícita para máxima compatibilidad)
+            console.log(`Generando tabla con ${tableData.length} registros...`);
+            
             doc.autoTable({
-                ...SenaPrePDF.ESTILOS_TABLA,
+                theme: 'grid',
                 columns: columns,
                 body: tableData,
                 startY: cabeceraY,
                 margin: { horizontal: 14 },
-                didParseCell: (data) => {
-                    SenaPrePDF.colorearEstado(data, 6);
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 8.5,
+                    cellPadding: 4,
+                    halign: 'center',
+                    valign: 'middle'
                 },
-                didDrawPage: (data) => {
-                    SenaPrePDF.pieDePagina(doc);
+                headStyles: {
+                    fillColor: [0, 100, 0],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 252, 240]
+                },
+                didParseCell: function(data) {
+                    // Intento seguro de colorear estado
+                    if (data.section === 'body' && data.column.index === 6) {
+                        const val = (data.cell.raw || '').toString().toUpperCase();
+                        if (val === 'LECTIVA') {
+                            data.cell.styles.textColor = [22, 163, 74];
+                        }
+                    }
+                },
+                didDrawPage: function(data) {
+                    if (typeof SenaPrePDF !== 'undefined' && SenaPrePDF.pieDePagina) {
+                        SenaPrePDF.pieDePagina(doc);
+                    }
                 },
                 columnStyles: {
                     index: { cellWidth: 10 },
                     documento: { cellWidth: 25 },
-                    estado: { cellWidth: 20 },
+                    estado: { cellWidth: 22 },
                     numero_ficha: { cellWidth: 20 }
                 }
             });
