@@ -67,9 +67,10 @@ const SenaPrePDF = (() => {
         
         if (imgSenapre) {
             doc.saveGraphicsState();
-            doc.beginPath();
-            doc.arc(logoX + logoRad, logoY + logoRad, logoRad, 0, Math.PI * 2);
-            doc.clip();
+            // Definir círculo de recorte (x, y, radio, estilo)
+            // Estilo null o 'S' define el path sin rellenar
+            doc.circle(logoX + logoRad, logoY + logoRad, logoRad, 'S'); 
+            doc.clip(); 
             doc.addImage(imgSenapre, 'PNG', logoX, logoY, logoRad * 2, logoRad * 2);
             doc.restoreGraphicsState();
         }
