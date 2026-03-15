@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/aprendices/page": "app/admin/aprendices/page.js",
+  "/admin/asistencias/page": "app/admin/asistencias/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/admin/fichas/page": "app/admin/fichas/page.js",
+  "/admin/programas/page": "app/admin/programas/page.js",
+  "/admin/reportes/page": "app/admin/reportes/page.js",
+  "/admin/usuarios/page": "app/admin/usuarios/page.js",
+  "/instructor/asistencias/page": "app/instructor/asistencias/page.js",
+  "/instructor/dashboard/page": "app/instructor/dashboard/page.js",
+  "/instructor/registrar/page": "app/instructor/registrar/page.js",
+  "/instructor/reportes/page": "app/instructor/reportes/page.js",
+  "/page": "app/page.js"
+}
