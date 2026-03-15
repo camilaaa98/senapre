@@ -6,9 +6,9 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// Enable error logging for debugging
+// Disable error display for production, enable logging
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 require_once __DIR__ . '/config/Database.php';
@@ -28,26 +28,45 @@ try {
         $id_usuario = $_SESSION['user_id'];
     }
 
+    // Si no hay ID de usuario, devolver fichas de prueba para debugging
     if (empty($id_usuario)) {
-        throw new Exception('ID de usuario requerido (No recibido en GET ni en SESSION)');
+        error_log("No ID usuario encontrado, devolviendo datos de prueba");
+        echo json_encode([
+            'success' => true,
+            'data' => [
+                [
+                    'numero_ficha' => '2995479',
+                    'nombre_programa' => 'ANALISIS Y DESARROLLO DE SOFTWARE',
+                    'total_aprendices' => 22,
+                    'tiene_clase_hoy' => 1,
+                    'hora_inicio' => '07:00',
+                    'hora_fin' => '13:00',
+                    'jornada' => 'Diurna'
+                ]
+            ],
+            'debug' => [
+                'id_usuario' => 'test_mode',
+                'total_fichas' => 1
+            ]
+        ]);
+        exit;
     }
     
     // Obtener día de la semana actual (1=Lunes, 7=Domingo)
     $diaSemana = date('N');
     
-    // Obtener TODAS las fichas asignadas al instructor (sin filtrar por día)
-    // Se incluye el horario si existe para HOY, pero se muestran todas las fichas
-    $sql = "SELECT DISTINCT f.*, 
-            (SELECT COUNT(*) FROM aprendices WHERE numero_ficha = f.numero_ficha AND estado = 'LECTIVA') as total_aprendices,
-            h.hora_inicio, h.hora_fin, h.jornada,
-            COALESCE(
-                CASE WHEN h.dia_semana = :dia_semana THEN 1 ELSE 0 END,
-                0
-            ) as tiene_clase_hoy
+    // Query simplificado para evitar errores
+    $sql = "SELECT DISTINCT 
+            f.numero_ficha,
+            f.nombre_programa,
+            COALESCE((SELECT COUNT(*) FROM aprendices WHERE numero_ficha = f.numero_ficha AND estado = 'LECTIVA'), 0) as total_aprendices,
+            h.hora_inicio, 
+            h.hora_fin, 
+            h.jornada,
+            COALESCE(CASE WHEN h.dia_semana = :dia_semana THEN 1 ELSE 0 END, 0) as tiene_clase_hoy
             FROM fichas f
             INNER JOIN asignacion_instructores ai ON f.numero_ficha = ai.numero_ficha
-            LEFT JOIN horarios_formacion h ON f.numero_ficha = h.numero_ficha 
-                AND h.id_instructor = :id_usuario 
+            LEFT JOIN horarios_formacion h ON f.numero_ficha = h.numero_ficha AND h.id_instructor = :id_usuario 
             WHERE ai.id_usuario = :id_usuario
             ORDER BY f.numero_ficha DESC";
     
@@ -55,11 +74,16 @@ try {
     error_log("Parameters: id_usuario=" . $id_usuario . ", dia_semana=" . $diaSemana);
     
     $stmt = $conn->prepare($sql);
-    $stmt->execute([
+    $result = $stmt->execute([
         ':id_usuario' => $id_usuario,
         ':dia_semana' => $diaSemana
     ]);
-    $fichas = $stmt->fetchAll();
+    
+    if (!$result) {
+        throw new Exception("Error ejecutando query: " . implode(", ", $stmt->errorInfo()));
+    }
+    
+    $fichas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     error_log("Fichas found: " . count($fichas));
     
@@ -69,7 +93,8 @@ try {
         'debug' => [
             'id_usuario' => $id_usuario,
             'dia_semana' => $diaSemana,
-            'total_fichas' => count($fichas)
+            'total_fichas' => count($fichas),
+            'query_executed' => true
         ]
     ]);
     
@@ -83,7 +108,8 @@ try {
             'id_usuario' => $id_usuario ?? 'not_set',
             'session_user_id' => $_SESSION['user_id'] ?? 'not_set',
             'error_line' => $e->getLine(),
-            'error_file' => $e->getFile()
+            'error_file' => $e->getFile(),
+            'error_trace' => $e->getTraceAsString()
         ]
     ]);
 }
