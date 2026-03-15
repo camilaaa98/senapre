@@ -43,29 +43,22 @@ class Database {
                     PDO::ATTR_PERSISTENT         => false,
                 ]);
             } else {
-                // Desarrollo local: SQLite (sin cambios)
-                $db_file = __DIR__ . '/../../database/Asistnet.db';
-                if (!file_exists($db_file)) {
-                    throw new Exception("CRITICO: No se encuentra la BD en: $db_file");
-                }
-                $this->conn = new PDO("sqlite:$db_file");
-                $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-                $this->conn->exec('PRAGMA foreign_keys = ON;');
-                $this->conn->exec('PRAGMA busy_timeout = 30000;');
+                // Desarrollo local: PostgreSQL (configurar variables de entorno)
+                // O usar archivo .env con DATABASE_URL
+                throw new Exception("DATABASE_URL no configurada. Por favor configura la variable de entorno o usa el script de configuración: setup/configurar_postgresql.php");
             }
 
             return $this->conn;
 
         } catch (PDOException $e) {
             error_log("Connection Error: " . $e->getMessage());
-            throw new Exception("Error de conexión a base de datos");
+            throw new Exception("Error de conexión a base de datos PostgreSQL. Configura DATABASE_URL o usa setup/configurar_postgresql.php");
         }
     }
 
     // Compatibilidad con el código existente
     public function getDbPath(): string {
-        return getenv('DATABASE_URL') ? 'PostgreSQL (Supabase)' : 'SQLite (local)';
+        return getenv('DATABASE_URL') ? 'PostgreSQL (Producción)' : 'PostgreSQL (Local)';
     }
 
     // Método de consulta directa (alias: singleton)
