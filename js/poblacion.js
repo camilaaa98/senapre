@@ -565,30 +565,105 @@ class PoblacionManager {
         }
 
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
         
-        // Título
-        doc.setFontSize(16);
-        doc.text(`Listado de Aprendices - ${this.currentLabel}`, 14, 20);
-        
-        // Tabla
-        const columns = [
-            { header: 'Documento', dataKey: 'documento' },
-            { header: 'Nombres', dataKey: 'nombre' },
-            { header: 'Apellidos', dataKey: 'apellido' },
-            { header: 'Correo', dataKey: 'correo' },
-            { header: 'Celular', dataKey: 'celular' },
-            { header: 'Ficha', dataKey: 'numero_ficha' },
-            { header: 'Tipo Formación', dataKey: 'tipo_formacion' }
-        ];
-        
-        doc.autoTable(columns, this.currentCatData, {
-            startY: 30,
-            theme: 'grid',
-            styles: { fontSize: 10 },
-            headStyles: { fillColor: [57, 169, 0] }
+        // PDF Horizontal (landscape)
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
         });
         
+        // Logo en la esquina superior derecha (50px de ancho)
+        try {
+            const logoImg = new Image();
+            logoImg.src = 'img/logo-senapre.png';
+            logoImg.onload = () => {
+                doc.addImage(logoImg, 'PNG', 200, 10, 50, 20);
+                this.generatePDFContent(doc);
+            };
+            logoImg.onerror = () => {
+                // Si no carga el logo, continuar sin él
+                this.generatePDFContent(doc);
+            };
+        } catch (error) {
+            // Si hay error con el logo, continuar sin él
+            this.generatePDFContent(doc);
+        }
+    }
+    
+    generatePDFContent(doc) {
+        // Título principal
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Listado de Aprendices - ${this.currentLabel}`, 20, 25);
+        
+        // Subtítulo con estado
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Estado: LECTIVA', 20, 32);
+        doc.text(`Fecha: ${new Date().toLocaleDateString('es-CO')}`, 200, 32);
+        
+        // Línea separadora
+        doc.setDrawColor(57, 169, 0);
+        doc.setLineWidth(0.5);
+        doc.line(20, 35, 280, 35);
+        
+        // Tabla con más columnas para landscape
+        const columns = [
+            { header: 'Documento', dataKey: 'documento', width: 30 },
+            { header: 'Nombres', dataKey: 'nombre', width: 40 },
+            { header: 'Apellidos', dataKey: 'apellido', width: 40 },
+            { header: 'Correo', dataKey: 'correo', width: 50 },
+            { header: 'Celular', dataKey: 'celular', width: 30 },
+            { header: 'Ficha', dataKey: 'numero_ficha', width: 20 },
+            { header: 'Tipo Formación', dataKey: 'tipo_formacion', width: 40 },
+            { header: 'Estado', dataKey: 'estado', width: 20 }
+        ];
+        
+        // Preparar datos para la tabla
+        const tableData = this.currentCatData.map(item => ({
+            documento: item.documento || '',
+            nombre: item.nombre || '',
+            apellido: item.apellido || '',
+            correo: item.correo || '',
+            celular: item.celular || '',
+            numero_ficha: item.numero_ficha || '',
+            tipo_formacion: item.tipo_formacion || '',
+            estado: 'LECTIVA'
+        }));
+        
+        // Generar tabla profesional
+        doc.autoTable({
+            columns: columns,
+            body: tableData,
+            startY: 40,
+            theme: 'grid',
+            styles: { 
+                fontSize: 9,
+                font: 'helvetica',
+                cellPadding: 3
+            },
+            headStyles: { 
+                fillColor: [57, 169, 0],
+                textColor: 255,
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            alternateRowStyles: {
+                fillColor: [245, 245, 245]
+            },
+            margin: { top: 40, right: 20, bottom: 20, left: 20 },
+            columnWidth: 'wrap',
+            didDrawPage: (data) => {
+                // Footer en cada página
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Página ${doc.internal.getNumberOfPages()}`, 280, 200);
+                doc.text('Sistema Nacional de Aprendizaje - SenApre', 20, 200);
+            }
+        });
+        
+        // Guardar PDF
         doc.save(`poblacion-${this.currentKey}-${Date.now()}.pdf`);
     }
 }
