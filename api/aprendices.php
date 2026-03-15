@@ -26,6 +26,7 @@ try {
         $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
         $poblacion = isset($_GET['poblacion']) ? $_GET['poblacion'] : '';
         $tabla_poblacion = isset($_GET['tabla_poblacion']) ? $_GET['tabla_poblacion'] : '';
+        $custom_filter = isset($_GET['custom_filter']) ? $_GET['custom_filter'] : '';
         
         // Construir query con filtros
         $where = [];
@@ -65,6 +66,11 @@ try {
                           $tabla_poblacion === 'lgbtiq' ? 'l' : 'd')))));
                 $where[] = "$alias.documento IS NOT NULL";
             }
+        }
+
+        if (!empty($custom_filter)) {
+            // Aplicar filtro personalizado directamente (para consultas LIKE complejas)
+            $where[] = $custom_filter;
         }
 
         if (!empty($poblacion)) {

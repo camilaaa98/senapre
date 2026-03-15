@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Población Simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=1.0.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/poblacion.js?v=1.0.0"></script>
+</head>
+<body style="background: #f8fafc; padding: 20px;">
+    
+    <h1 style="text-align: center; margin-bottom: 30px;">Test Población Simple</h1>
+    
+    <!-- Botones de Gestión -->
+    <div class="gestion-buttons">
+        <button class="btn btn-primary" onclick="poblacionManager.gestionarTipos()">
+            <i class="fas fa-users-cog"></i> Gestionar Tipos
+        </button>
+        <button class="btn btn-secondary" onclick="poblacionManager.gestionarVoceroEnfoque()">
+            <i class="fas fa-user-friends"></i> Vocero Enfoque Diferencial
+        </button>
+        <button class="btn btn-info" onclick="poblacionManager.gestionarRepresentantes()">
+            <i class="fas fa-user-tie"></i> Representantes (Diurna/Mixta)
+        </button>
+    </div>
+
+    <!-- Layout Principal -->
+    <div class="main-grid">
+        
+        <!-- Panel Izquierdo: Grid 3x3 -->
+        <div class="categorias-container">
+            <h3 class="categorias-title">Distribución por Tipo de Población</h3>
+            <div id="pob-grid-categorias" class="categorias-grid">
+                <!-- Las categorías se cargarán dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Dona -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title">Gráfica de Distribución</h3>
+                <p class="chart-subtitle">Distribución de Población (En Formación)</p>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="chartPoblacion"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Panel Inferior: Tabla Activa -->
+    <div class="table-container mb-4">
+        <div class="table-header">
+            <h3 id="tabla-poblacion-titulo" class="table-title">Detalle de Aprendices</h3>
+            <div class="table-actions">
+                <button class="btn btn-danger btn-sm" onclick="poblacionManager.exportPDF()">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Celular</th>
+                        <th>Ficha</th>
+                        <th>Tipo Formación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="pob-tabla-body">
+                    <tr><td colspan="8" class="text-center" style="padding:2rem;color:#64748b;">Seleccione una categoría para ver los aprendices.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Inicialización cuando el DOM está listo
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('🚀 Iniciando página de población...');
+                
+                // Verificar que poblacionManager existe
+                if (typeof poblacionManager === 'undefined') {
+                    throw new Error('poblacionManager no está definido');
+                }
+                
+                console.log('✅ poblacionManager disponible');
+                
+                // Cargar estadísticas iniciales
+                console.log('📊 Cargando estadísticas...');
+                await poblacionManager.cargarEstadisticas();
+                console.log('✅ Estadísticas cargadas');
+                
+                // Renderizar grid de categorías
+                console.log('🎨 Renderizando grid...');
+                poblacionManager.renderGrid();
+                console.log('✅ Grid renderizado');
+                
+                // Inicializar gráfico
+                const ctx = document.getElementById('chartPoblacion');
+                if (ctx) {
+                    console.log('📈 Creando gráfico...');
+                    window.poblacionChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Mujer', 'Indígena', 'NARP', 'Campesino', 'LGBTIQ+', 'Discapacidad'],
+                            datasets: [{
+                                data: [0, 0, 0, 0, 0, 0],
+                                backgroundColor: [
+                                    '#f8bbd9',
+                                    '#a8dadc', 
+                                    '#f5b7b1',
+                                    '#ffeaa7',
+                                    '#fab1a0',
+                                    '#74b9ff'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        font: {
+                                            family: "'Inter', sans-serif",
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('✅ Gráfico creado');
+                }
+                
+                console.log('🎉 Página de población inicializada correctamente');
+                
+            } catch (error) {
+                console.error('❌ Error al inicializar página:', error);
+                document.body.innerHTML += `
+                    <div style="background: #fee2e2; color: #dc2626; padding: 20px; margin: 20px; border-radius: 8px;">
+                        <h3>❌ Error en la inicialización</h3>
+                        <p>${error.message}</p>
+                        <p>Revisa la consola para más detalles.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
