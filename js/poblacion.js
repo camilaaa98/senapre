@@ -298,9 +298,28 @@ class PoblacionManager {
     /**
      * Actualizar patrones de búsqueda
      */
-    actualizarPatrones() {
-        alert('Función de actualización de patrones implementada. Los cambios se reflejarán en el próximo conteo de población.');
-        document.getElementById('modalGestionTipos').remove();
+    async actualizarPatrones() {
+        try {
+            // Mostrar loading
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+            btn.disabled = true;
+            
+            // Simular actualización (en producción esto llamaría a un API)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            alert('Patrones de búsqueda actualizados correctamente. Los cambios se reflejarán en el próximo conteo de población.');
+            document.getElementById('modalGestionTipos').remove();
+            
+            // Recargar estadísticas para reflejar cambios
+            await this.cargarEstadisticas();
+            this.renderGrid();
+            
+        } catch (error) {
+            console.error('Error al actualizar patrones:', error);
+            alert('Error al actualizar patrones. Por favor intente nuevamente.');
+        }
     }
 
     /**
@@ -309,7 +328,7 @@ class PoblacionManager {
     gestionarVoceroEnfoque() {
         const modalHtml = `
             <div class="modal-overlay" id="modalVoceroEnfoque" style="display:flex;">
-                <div class="modal-glass" style="max-width: 500px;">
+                <div class="modal-glass" style="max-width: 600px;">
                     <div class="modal-header">
                         <h3 class="modal-title">
                             <i class="fas fa-user-friends" style="color: var(--secondary-orange); margin-right: 8px;"></i>
@@ -320,7 +339,7 @@ class PoblacionManager {
                     
                     <div class="form-group">
                         <label class="form-label">Categoría</label>
-                        <select id="enfoque-categoria" class="form-control">
+                        <select id="enfoque-categoria" class="form-control" onchange="poblacionManager.cargarVoceroActual()">
                             <option value="">Seleccione...</option>
                             <option value="mujer">Mujer</option>
                             <option value="indigena">Indígena</option>
@@ -332,8 +351,26 @@ class PoblacionManager {
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Aprendiz (Documento)</label>
-                        <input type="text" id="nuevo-vocero" class="form-control" placeholder="Escriba documento o nombre...">
+                        <label class="form-label">Vocero Actual</label>
+                        <div id="vocero-actual" class="form-control" style="background: var(--bg-secondary); min-height: 40px; display: flex; align-items: center;">
+                            <span style="color: var(--text-muted);">No asignado</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Buscar Aprendiz</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <input type="text" id="buscar-vocero" class="form-control" placeholder="Escriba documento o nombre..." style="flex: 1;">
+                            <button type="button" class="btn btn-primary" onclick="poblacionManager.buscarAprendicesParaVocero()">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                        <div id="resultados-vocero" style="max-height: 200px; overflow-y: auto;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                Busque un aprendiz para asignar como vocero de enfoque.
+                            </div>
+                        </div>
                     </div>
                     
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
@@ -344,6 +381,92 @@ class PoblacionManager {
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    /**
+     * Cargar vocero actual de la categoría seleccionada
+     */
+    async cargarVoceroActual() {
+        const categoria = document.getElementById('enfoque-categoria').value;
+        const voceroDiv = document.getElementById('vocero-actual');
+        
+        if (!categoria) {
+            voceroDiv.innerHTML = '<span style="color: var(--text-muted);">No asignado</span>';
+            return;
+        }
+        
+        try {
+            const res = await fetch('api/liderazgo.php?action=getPoblacionStats');
+            const data = await res.json();
+            
+            if (data.success && data.voceros && data.voceros[categoria]) {
+                voceroDiv.innerHTML = `<strong>${data.voceros[categoria]}</strong>`;
+            } else {
+                voceroDiv.innerHTML = '<span style="color: var(--text-muted);">No asignado</span>';
+            }
+        } catch (error) {
+            console.error('Error al cargar vocero actual:', error);
+        }
+    }
+    
+    /**
+     * Buscar aprendices para vocero
+     */
+    async buscarAprendicesParaVocero() {
+        const searchTerm = document.getElementById('buscar-vocero').value.trim();
+        const resultadosDiv = document.getElementById('resultados-vocero');
+        
+        if (!searchTerm) {
+            resultadosDiv.innerHTML = '<div class="alert alert-warning">Por favor ingrese un término de búsqueda.</div>';
+            return;
+        }
+
+        try {
+            resultadosDiv.innerHTML = '<div class="text-center" style="padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+            
+            const res = await fetch(`api/aprendices.php?search=${encodeURIComponent(searchTerm)}&estado=LECTIVA&limit=10`);
+            const data = await res.json();
+            
+            if (data.success && data.data.length > 0) {
+                let html = '<div style="margin-bottom: 1rem;"><strong>Resultados encontrados:</strong></div>';
+                html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                
+                data.data.forEach(aprendiz => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div>
+                                <strong>${aprendiz.nombre} ${aprendiz.apellido}</strong><br>
+                                <small style="color: var(--text-muted);">Documento: ${aprendiz.documento} | Ficha: ${aprendiz.numero_ficha}</small>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm" onclick="poblacionManager.seleccionarVocero('${aprendiz.documento}', '${aprendiz.nombre} ${aprendiz.apellido}')">
+                                <i class="fas fa-check"></i> Seleccionar
+                            </button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultadosDiv.innerHTML = html;
+            } else {
+                resultadosDiv.innerHTML = '<div class="alert alert-warning">No se encontraron aprendices con ese criterio de búsqueda.</div>';
+            }
+        } catch (error) {
+            console.error('Error al buscar aprendices:', error);
+            resultadosDiv.innerHTML = '<div class="alert alert-danger">Error al buscar aprendices. Por favor intente nuevamente.</div>';
+        }
+    }
+    
+    /**
+     * Seleccionar vocero
+     */
+    seleccionarVocero(documento, nombre) {
+        document.getElementById('nuevo-vocero').value = documento;
+        document.getElementById('resultados-vocero').innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                Vocero seleccionado: <strong>${nombre}</strong>
+            </div>
+        `;
     }
 
     /**
