@@ -10,6 +10,8 @@ class PoblacionManager {
         this.currentCatData = [];
         this.currentKey = null;
         this.currentLabel = null;
+        this.currentPage = 1;
+        this.totalPages = 1;
     }
 
     /**
@@ -84,14 +86,16 @@ class PoblacionManager {
             // Construir la consulta SQL con múltiples patrones LIKE
             const whereConditions = patrones.map(p => `UPPER(a.tipo_poblacion) LIKE UPPER('${p}')`).join(' OR ');
             
-            // Llamar al API con los patrones específicos
-            const res = await fetch(`api/aprendices.php?estado=LECTIVA&custom_filter=${encodeURIComponent(whereConditions)}`);
+            // Llamar al API con los patrones específicos y paginación
+            const res = await fetch(`api/aprendices.php?estado=LECTIVA&custom_filter=${encodeURIComponent(whereConditions)}&limit=5&page=1`);
             const data = await res.json();
             
             if (data.success && data.data.length > 0) {
                 this.currentCatData = data.data;
                 this.currentKey = key;
                 this.currentLabel = cat.label;
+                this.totalPages = data.pagination?.pages || 1;
+                this.currentPage = data.pagination?.page || 1;
                 
                 this.renderTable();
                 this.renderChart();
@@ -144,11 +148,9 @@ class PoblacionManager {
                 <td>${a.numero_ficha}</td>
                 <td>${a.tipo_formacion}</td>
                 <td>
-                    <div class="table-actions">
-                        <button class="btn-delete" onclick="poblacionManager.eliminarDePoblacion('${a.documento}')" title="Eliminar de población">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="poblacionManager.eliminarAprendiz('${a.documento}', '${a.nombre} ${a.apellido}')" style="padding: 4px 8px; font-size: 11px;">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
                 </td>
             </tr>
         `).join('');
@@ -592,21 +594,44 @@ class PoblacionManager {
     }
     
     generatePDFContent(doc) {
+        // Encabezado profesional con logo
+        try {
+            const logoImg = new Image();
+            logoImg.src = 'img/logo-senapre.png';
+            logoImg.onload = () => {
+                // Logo 50px de radio (diámetro 100px) en esquina superior derecha
+                doc.addImage(logoImg, 'PNG', 180, 10, 50, 50);
+                this.addPDFContent(doc);
+            };
+            logoImg.onerror = () => {
+                this.addPDFContent(doc);
+            };
+        } catch (error) {
+            this.addPDFContent(doc);
+        }
+    }
+    
+    addPDFContent(doc) {
+        // Línea superior del encabezado
+        doc.setDrawColor(57, 169, 0);
+        doc.setLineWidth(1);
+        doc.line(20, 70, 280, 70);
+        
         // Título principal
         doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text(`Listado de Aprendices - ${this.currentLabel}`, 20, 25);
+        doc.text(`Listado de Aprendices - ${this.currentLabel}`, 20, 80);
         
         // Subtítulo con estado
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
-        doc.text('Estado: LECTIVA', 20, 32);
-        doc.text(`Fecha: ${new Date().toLocaleDateString('es-CO')}`, 200, 32);
+        doc.text('Estado: LECTIVA', 20, 87);
+        doc.text(`Fecha: ${new Date().toLocaleDateString('es-CO')}`, 200, 87);
         
         // Línea separadora
         doc.setDrawColor(57, 169, 0);
         doc.setLineWidth(0.5);
-        doc.line(20, 35, 280, 35);
+        doc.line(20, 92, 280, 92);
         
         // Tabla con más columnas para landscape
         const columns = [
@@ -636,7 +661,7 @@ class PoblacionManager {
         doc.autoTable({
             columns: columns,
             body: tableData,
-            startY: 40,
+            startY: 97,
             theme: 'grid',
             styles: { 
                 fontSize: 9,
@@ -652,7 +677,7 @@ class PoblacionManager {
             alternateRowStyles: {
                 fillColor: [245, 245, 245]
             },
-            margin: { top: 40, right: 20, bottom: 20, left: 20 },
+            margin: { top: 97, right: 20, bottom: 20, left: 20 },
             columnWidth: 'wrap',
             didDrawPage: (data) => {
                 // Footer en cada página
@@ -665,6 +690,65 @@ class PoblacionManager {
         
         // Guardar PDF
         doc.save(`poblacion-${this.currentKey}-${Date.now()}.pdf`);
+    }
+    
+    /**
+     * Cambiar página
+     */
+    async cambiarPagina(page) {
+        if (page < 1 || page > this.totalPages || page === this.currentPage) {
+            return;
+        }
+        
+        try {
+            // Obtener patrones de búsqueda para esta categoría
+            const patrones = this.getPatronesPorCategoria(this.currentKey);
+            
+            // Construir la consulta SQL con múltiples patrones LIKE
+            const whereConditions = patrones.map(p => `UPPER(a.tipo_poblacion) LIKE UPPER('${p}')`).join(' OR ');
+            
+            // Llamar al API con los patrones específicos y nueva página
+            const res = await fetch(`api/aprendices.php?estado=LECTIVA&custom_filter=${encodeURIComponent(whereConditions)}&limit=5&page=${page}`);
+            const data = await res.json();
+            
+            if (data.success) {
+                this.currentCatData = data.data;
+                this.currentPage = page;
+                this.renderTable();
+            }
+        } catch (error) {
+            console.error('Error al cambiar página:', error);
+        }
+    }
+    
+    /**
+     * Eliminar aprendiz sin trabas
+     */
+    async eliminarAprendiz(documento, nombre) {
+        if (!confirm(`¿Está seguro de eliminar a ${nombre} (Documento: ${documento})?\n\nEsta acción eliminará permanentemente al aprendiz del sistema.`)) {
+            return;
+        }
+        
+        try {
+            const res = await fetch('api/aprendices.php', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ documento: documento })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                alert(`Aprendiz ${nombre} eliminado correctamente`);
+                // Recargar la página actual
+                await this.cargarAprendicesPorCategoria(this.currentKey);
+            } else {
+                alert('Error al eliminar aprendiz: ' + (data.message || 'Error desconocido'));
+            }
+        } catch (error) {
+            console.error('Error al eliminar aprendiz:', error);
+            alert('Error al eliminar aprendiz. Por favor intente nuevamente.');
+        }
     }
 }
 

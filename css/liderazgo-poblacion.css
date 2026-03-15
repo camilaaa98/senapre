@@ -434,11 +434,11 @@ textarea.form-control {
 
 .categorias-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 1.5rem;
     max-width: 100%;
-    min-height: 400px;
+    min-height: 600px;
 }
 
 .categoria-card {
