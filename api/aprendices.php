@@ -267,7 +267,9 @@ try {
     
     // DELETE - Eliminar aprendiz
     if ($method === 'DELETE') {
-        $documento = isset($_GET['documento']) ? $_GET['documento'] : '';
+        // Obtener documento del body JSON (no de GET)
+        $input = json_decode(file_get_contents('php://input'), true);
+        $documento = $input['documento'] ?? '';
         
         if (empty($documento)) {
             throw new Exception('Documento requerido');
