@@ -264,6 +264,21 @@ try {
             echo json_encode(['success' => true, 'data' => $aprendices]);
             exit;
         }
+
+        // Obtener representantes (Movido a GET para mayor consistencia)
+        if ($action === 'getRepresentantes') {
+            $sql = "SELECT r.tipo_jornada, a.documento, a.nombre, a.apellido 
+                     FROM representantes r
+                     JOIN aprendices a ON TRIM(CAST(r.documento AS TEXT)) = TRIM(CAST(a.documento AS TEXT))
+                     ORDER BY r.tipo_jornada";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $representantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $representantes]);
+            exit;
+        }
     }
 
     // ACCIONES POST
@@ -279,21 +294,6 @@ try {
             $stmt->execute([':user' => $data['id_usuario'], ':area' => $data['area'] ?? 'liderazgo']);
             
             echo json_encode(['success' => true, 'message' => 'Responsable asignado']);
-            exit;
-        }
-
-        // Obtener representantes
-        if ($action === 'getRepresentantes') {
-            $sql = "SELECT r.tipo_jornada, a.documento, a.nombre, a.apellido 
-                     FROM representantes r
-                     JOIN aprendices a ON r.documento = a.documento
-                     ORDER BY r.tipo_jornada";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $representantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            echo json_encode(['success' => true, 'data' => $representantes]);
             exit;
         }
 
@@ -470,7 +470,7 @@ try {
             if ($tipo === 'Vocero Principal') $sql = "UPDATE fichas SET vocero_principal = NULL WHERE vocero_principal = :doc";
             else if ($tipo === 'Vocero Suplente') $sql = "UPDATE fichas SET vocero_suplente = NULL WHERE vocero_suplente = :doc";
             else if ($tipo === 'Vocero Enfoque') $sql = "DELETE FROM voceros_enfoque WHERE documento = :doc";
-            else if ($tipo === 'Representante') $sql = "DELETE FROM representantes_jornada WHERE documento = :doc";
+            else if ($tipo === 'Representante') $sql = "DELETE FROM representantes WHERE documento = :doc";
             
             if (!$sql) throw new Exception('Tipo de rol inválido: ' . $tipo);
             
@@ -631,7 +631,7 @@ function verificarPerdidaRol($documento, $conn) {
         $conn->prepare("UPDATE fichas SET vocero_principal = NULL WHERE vocero_principal = :doc")->execute([':doc' => $documento]);
         $conn->prepare("UPDATE fichas SET vocero_suplente = NULL WHERE vocero_suplente = :doc")->execute([':doc' => $documento]);
         $conn->prepare("UPDATE voceros_enfoque SET documento = NULL WHERE documento = :doc")->execute([':doc' => $documento]);
-        $conn->prepare("DELETE FROM representantes_jornada WHERE documento = :doc")->execute([':doc' => $documento]);
+        $conn->prepare("DELETE FROM representantes WHERE documento = :doc")->execute([':doc' => $documento]);
         $revocado = true;
     }
     return ['fallas' => $fallas, 'revocado' => $revocado];

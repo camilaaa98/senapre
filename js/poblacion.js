@@ -370,6 +370,7 @@ class PoblacionManager {
                         <label class="form-label">Buscar Aprendiz</label>
                         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                             <input type="text" id="buscar-vocero" class="form-control" placeholder="Escriba documento o nombre..." style="flex: 1;">
+                            <input type="hidden" id="nuevo-vocero"> <!-- Campo oculto faltante -->
                             <button type="button" class="btn btn-primary" onclick="poblacionManager.buscarAprendicesParaVocero()">
                                 <i class="fas fa-search"></i> Buscar
                             </button>
@@ -398,7 +399,13 @@ class PoblacionManager {
     async cargarVoceroActual() {
         const categoria = document.getElementById('enfoque-categoria').value;
         const voceroDiv = document.getElementById('vocero-actual');
+        const resultadosDiv = document.getElementById('resultados-vocero');
+        const hiddenInput = document.getElementById('nuevo-vocero');
         
+        // Limpiar búsqueda al cambiar categoría
+        if (resultadosDiv) resultadosDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> Busque un aprendiz para asignar.</div>';
+        if (hiddenInput) hiddenInput.value = '';
+
         if (!categoria) {
             voceroDiv.innerHTML = '<span style="color: var(--text-muted);">No asignado</span>';
             return;
@@ -409,9 +416,9 @@ class PoblacionManager {
             const data = await res.json();
             
             if (data.success && data.voceros && data.voceros[categoria]) {
-                voceroDiv.innerHTML = `<strong>${data.voceros[categoria]}</strong>`;
+                voceroDiv.innerHTML = `<strong style="color: var(--primary-green);">${data.voceros[categoria]}</strong>`;
             } else {
-                voceroDiv.innerHTML = '<span style="color: var(--text-muted);">No asignado</span>';
+                voceroDiv.innerHTML = '<span style="color: var(--text-muted);">Sin asignar</span>';
             }
         } catch (error) {
             console.error('Error al cargar vocero actual:', error);
@@ -530,11 +537,11 @@ class PoblacionManager {
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 1rem;">
                         <div>
                             <label class="form-label">Representante Diurno</label>
-                            <div id="rep-diurno" class="form-control" style="background: var(--bg-secondary);">No asignado</div>
+                            <div id="rep-diurna" class="form-control" style="background: var(--bg-secondary); min-height: 40px; display: flex; align-items: center; border: 1px solid var(--border-color);">No asignado</div>
                         </div>
                         <div>
                             <label class="form-label">Representante Mixto</label>
-                            <div id="rep-mixto" class="form-control" style="background: var(--bg-secondary);">No asignado</div>
+                            <div id="rep-mixta" class="form-control" style="background: var(--bg-secondary); min-height: 40px; display: flex; align-items: center; border: 1px solid var(--border-color);">No asignado</div>
                         </div>
                     </div>
                     
@@ -593,7 +600,7 @@ class PoblacionManager {
                 data.data.forEach(rep => {
                     const elem = document.getElementById(`rep-${rep.tipo_jornada}`);
                     if (elem) {
-                        elem.innerHTML = `${rep.nombre} ${rep.apellido}`;
+                        elem.innerHTML = `<strong style="color: var(--primary-green);">${rep.nombre} ${rep.apellido}</strong>`;
                     }
                 });
             }
