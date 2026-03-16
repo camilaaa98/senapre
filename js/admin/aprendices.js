@@ -316,7 +316,6 @@ async function cargarAprendices(pagina = 1) {
                     thead.innerHTML = `
                         <th>Documento</th>
                         <th>Nombres</th>
-                        <th>Apellidos</th>
                         <th>Población</th>
                         <th>Correo</th>
                         <th>Celular</th>
@@ -1212,19 +1211,15 @@ function filtrarPorPoblacion(tipo) {
 
     const tablaDetalle = document.getElementById('tablaDetallePoblacion');
     if (tablaDetalle) {
-        const filtrados = todosAprendices.filter(a => {
-            const estado = (a.estado || '').toUpperCase();
-            return a[key] == 1 && (estado === 'LECTIVA');
-        });
+        const filtrados = todosAprendices.filter(a => a[key] == 1);
 
         if (filtrados.length === 0) {
-            tablaDetalle.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999; padding: 20px;">No hay aprendices en esta categoría (Lectiva)</td></tr>';
+            tablaDetalle.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999; padding: 20px;">No hay aprendices en esta categoría</td></tr>';
         } else {
             tablaDetalle.innerHTML = filtrados.map(a => `
                 <tr>
                     <td>${a.documento}</td>
-                    <td>${a.nombre}</td>
-                    <td>${a.apellido}</td>
+                    <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
                     <td>${a.correo || ''}</td>
                     <td>${a.celular || ''}</td>
                     <td>${a.numero_ficha || 'N/A'}</td>
@@ -1564,7 +1559,7 @@ async function cargarAprendicesGP(pagina = 1) {
     try {
         const search = document.getElementById('filtroSearchGP')?.value || '';
         const ficha = document.getElementById('filtroFichaGP')?.value || '';
-        const estado = document.getElementById('filtroEstadoGP')?.value || 'LECTIVA'; // Solo LECTIVA en Tipo de Población
+        const estado = document.getElementById('filtroEstadoGP')?.value || ''; // Permitir todos los estados por defecto
 
         const res = await fetch(`api/aprendices.php?page=${pagina}&limit=${ITEMS_POR_PAGINA}&search=${encodeURIComponent(search)}&ficha=${ficha}&estado=${estado}`);
         const result = await res.json();
@@ -1603,8 +1598,7 @@ function renderizarFilaAprendizGP(a) {
     return `
         <tr class="hover-row">
             <td class="font-medium">${a.documento}</td>
-            <td>${a.nombre}</td>
-            <td>${a.apellido}</td>
+            <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
             <td class="text-center">${cb('mujer', 'Mujer')}</td>
             <td class="text-center">${cb('indigena', 'Indígena')}</td>
             <td class="text-center">${cb('narp', 'NARP')}</td>

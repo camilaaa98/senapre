@@ -49,10 +49,6 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } elseif (empty($tabla_poblacion) && empty($ficha) && empty($poblacion) && empty($search)) {
-            // EXCLUIR estados de inactividad total SOLO si no hay filtros activos
-            // Se muestran todos los aprendices que NO estén en estados finales o de salida.
-            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA', 'FINALIZADA')";
         }
 
         if (!empty($tabla_poblacion)) {
@@ -233,33 +229,48 @@ try {
         if (empty($documento)) {
             throw new Exception('Documento requerido');
         }
-        
-        // Actualización parcial de estado o datos
-        $sql = "UPDATE aprendices SET 
-                tipo_identificacion = :tipo,
-                nombre = :nombre,
-                apellido = :apellido,
-                correo = :correo,
-                celular = :celular,
-                numero_ficha = :ficha,
-                estado = :estado,
-                tipo_poblacion = :poblacion,
-                id_instructor_lider = :lider
-                WHERE documento = :doc";
-        
+
+        // Definir mapeo de campos permitidos
+        $mappings = [
+            'tipo_identificacion' => 'tipo_identificacion',
+            'nombre' => 'nombre',
+            'nombres' => 'nombre',
+            'apellido' => 'apellido',
+            'apellidos' => 'apellido',
+            'correo' => 'correo',
+            'celular' => 'celular',
+            'telefono' => 'celular',
+            'numero_ficha' => 'numero_ficha',
+            'ficha_id' => 'numero_ficha',
+            'estado' => 'estado',
+            'tipo_poblacion' => 'tipo_poblacion',
+            'poblacion' => 'tipo_poblacion',
+            'id_instructor_lider' => 'id_instructor_lider',
+            'mujer' => 'mujer',
+            'indigena' => 'indigena',
+            'narp' => 'narp',
+            'campesino' => 'campesino',
+            'lgbtiq' => 'lgbtiq',
+            'discapacidad' => 'discapacidad'
+        ];
+
+        $fields = [];
+        $params = [':doc' => $documento];
+
+        foreach ($mappings as $key => $column) {
+            if (array_key_exists($key, $data)) {
+                $fields[] = "$column = :$key";
+                $params[":$key"] = $data[$key];
+            }
+        }
+
+        if (empty($fields)) {
+            throw new Exception('No se enviaron datos para actualizar');
+        }
+
+        $sql = "UPDATE aprendices SET " . implode(', ', $fields) . " WHERE documento = :doc";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':tipo' => $data['tipo_identificacion'] ?? 'CC',
-            ':nombre' => $data['nombre'],
-            ':apellido' => $data['apellido'],
-            ':correo' => $data['correo'],
-            ':celular' => $data['celular'] ?? null,
-            ':ficha' => $data['numero_ficha'],
-            ':estado' => $data['estado'] ?? 'LECTIVA',
-            ':poblacion' => $data['tipo_poblacion'] ?? '',
-            ':lider' => $data['id_instructor_lider'] ?? null,
-            ':doc' => $documento
-        ]);
+        $stmt->execute($params);
         
         echo json_encode(['success' => true, 'message' => 'Aprendiz actualizado exitosamente']);
         exit;
