@@ -82,6 +82,14 @@ async function cargarFichasInstructor() {
             if (select.value) {
                 select.dispatchEvent(new Event('change'));
             }
+            
+            // Agregar evento change para carga automática de aprendices
+            select.addEventListener('change', async () => {
+                if (select.value) {
+                    console.log('Ficha seleccionada, cargando aprendices automáticamente...');
+                    await cargarAprendices();
+                }
+            });
         }
     } catch (error) {
         console.error('Error cargando fichas:', error);
