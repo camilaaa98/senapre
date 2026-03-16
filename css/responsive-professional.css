@@ -63,14 +63,28 @@
     }
 }
 
-/* 2. Table Responsiveness */
+/* 2. Table Responsiveness & Premium Styling */
 .table-container {
     width: 100%;
+    overflow: hidden; /* Changed to hidden, we want the wrapper to handle scroll */
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.table-container:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.table-wrapper {
+    width: 100%;
     overflow-x: auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
+    padding: 0;
+    scrollbar-width: thin;
 }
 
 .data-table {
@@ -144,10 +158,18 @@
 }
 
 .card {
-    border: none !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-    border-radius: 16px !important;
-    background: white !important;
+    border: 0 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06) !important;
 }
 
 .card-header {

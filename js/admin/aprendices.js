@@ -135,10 +135,10 @@ function aplicarRestriccionesDePagina() {
     const bienestar = user.bienestar_data || [];
     const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
 
-    const esDirector = ['director', 'admin', 'administrador'].includes(rol);
+    const esDirector = ['director', 'admin', 'administrador', 'jefe'].some(r => rol.includes(r));
     const esJefeBienestar = bienestar.includes('jefe_bienestar');
-    const esRespLiderazgo = bienestar.includes('voceros_y_representantes');
-    const esVocero = rol === 'vocero';
+    const esRespLiderazgo = bienestar.includes('voceros_y_representantes') || bienestar.includes('liderazgo');
+    const esVocero = rol.includes('vocero');
 
     const esVoceroEnfoque = scopes.some(s => s.tipo === 'enfoque');
     const esVoceroFicha = scopes.some(s => s.tipo === 'principal' || s.tipo === 'suplente');
