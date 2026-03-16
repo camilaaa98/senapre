@@ -1,0 +1,118 @@
+/* ===========================================
+   INSTRUCTOR-FICHA-DETALLE.CSS — v1.0.0
+   Estilos para vista detallada de ficha
+   Responsivo, Profesional, SOLID
+   =========================================== */
+
+/* === Grid de Información de Ficha === */
+.ficha-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--inst-text-main);
+    padding: 0.5rem;
+    background: var(--inst-bg);
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* === Grid de Acciones === */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+.btn-action {
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 60px;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* === Loading Spinner === */
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--inst-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .ficha-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ficha-info-grid {
+        padding: 0.75rem;
+    }
+    
+    .actions-grid {
+        padding: 0.75rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        min-height: 45px;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    .table-actions input {
+        width: 100% !important;
+    }
+}

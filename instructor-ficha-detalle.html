@@ -1,0 +1,183 @@
+/**
+ * instructor-ficha-detalle.html - Vista detallada de ficha
+ * SOLID: Single Responsibility, Responsive Design
+ */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Ficha - SenApre</title>
+    <link rel="icon" href="assets/img/logosena.png" type="image/png">
+    <link rel="stylesheet" href="css/main.css?v=2.0.2">
+    <link rel="stylesheet" href="css/instructor-layout.css?v=1.0.0">
+    <link rel="stylesheet" href="css/instructor-enhancements.css?v=1.0.0">
+    <link rel="stylesheet" href="css/instructor-ficha-detalle.css?v=1.0.0">
+    <link rel="stylesheet" href="css/instructor-responsive.css?v=1.0.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/img/asi.png" alt="SenApre Logo" class="logo-principal">
+                <h3>SenApre</h3>
+                <div class="sidebar-subtitle">Instructor</div>
+                <div id="userInfo" class="sidebar-user-info"></div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="instructor-dashboard" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-home"></i></div>
+                        <span>Panel Principal</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-fichas" class="menu-link active">
+                        <div class="menu-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <span>Mis Fichas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-asistencia" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <span>Registrar Asistencia</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-consultar" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-search"></i></div>
+                        <span>Consultar Asistencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="instructor-reportes" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-file-alt"></i></div>
+                        <span>Generar Reportes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="authSystem.logout()" class="menu-link">
+                        <div class="menu-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </nav>
+            <div class="sidebar-footer">
+                <img src="assets/img/logosena.png" alt="SENA Logo">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h1 class="content-title">Detalle de Ficha</h1>
+                        <p class="content-description">Información completa de la ficha y aprendices</p>
+                    </div>
+                    <button onclick="window.history.back()" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
+            </header>
+
+            <!-- Ficha Info Card -->
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3 class="card-title">Información de la Ficha</h3>
+                </div>
+                <div class="ficha-info-grid">
+                    <div class="info-item">
+                        <label class="form-label">Número de Ficha:</label>
+                        <div class="info-value" id="fichaNumero">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label class="form-label">Programa de Formación:</label>
+                        <div class="info-value" id="fichaPrograma">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label class="form-label">Jornada:</label>
+                        <div class="info-value" id="fichaJornada">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label class="form-label">Total Aprendices LECTIVA:</label>
+                        <div class="info-value" id="fichaAprendices">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3 class="card-title">Acciones Rápidas</h3>
+                </div>
+                <div class="actions-grid">
+                    <button onclick="irAAsistencia()" class="btn-primary btn-action">
+                        <i class="fas fa-clipboard-check"></i> Tomar Asistencia
+                    </button>
+                    <button onclick="irAReportes()" class="btn-secondary btn-action">
+                        <i class="fas fa-file-alt"></i> Generar Reporte
+                    </button>
+                    <button onclick="verAprendices()" class="btn-info btn-action">
+                        <i class="fas fa-users"></i> Ver Aprendices
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aprendices Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Lista de Aprendices</h3>
+                    <div class="table-actions">
+                        <input type="text" id="buscarAprendiz" placeholder="Buscar aprendiz..." 
+                               class="form-control" style="width: 250px;" oninput="filtrarAprendices()">
+                        <button onclick="exportarAprendices()" class="btn-success btn-sm">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container-scroll">
+                    <table class="table-instructor">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Documento</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Correo</th>
+                                <th>Celular</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="aprendicesTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-state-row">
+                                    <div class="loading-spinner"></div>
+                                    Cargando aprendices...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/main.js?v=1.0.6"></script>
+    <script src="js/instructor/ficha-detalle.js?v=1.0.0"></script>
+    <script>
+        const user = authSystem.getCurrentUser();
+        if (!authSystem.isAuthenticated() || user.rol !== 'instructor') {
+            window.location.href = 'index';
+        } else {
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) userInfo.textContent = `${user.nombre} ${user.apellido}`;
+        }
+    </script>
+</body>
+</html>

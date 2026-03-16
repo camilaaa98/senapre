@@ -76,6 +76,6 @@ async function loadFichas(userId) {
 }
 
 function verDetalle(ficha) {
-    alert(`Funcionalidad para ver detalle de ficha ${ficha} en desarrollo.`);
-    // window.location.href = `instructor-ficha-detalle.html?ficha=${ficha}`;
+    // Redirigir a la página de detalle con el número de ficha
+    window.location.href = `instructor-ficha-detalle.html?ficha=${ficha}`;
 }
