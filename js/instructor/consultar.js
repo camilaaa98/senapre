@@ -277,7 +277,7 @@ function mostrarResultados(datos) {
     if (!datos || datos.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 color-muted">No se encontraron resultados</td></tr>';
         const resumen = document.getElementById('resumenContainer');
-        if (resumen) resumen.classList.add('hidden');
+        if (resumen) resumen.classList.add('hide');
         return;
     }
 
@@ -303,7 +303,7 @@ function mostrarResultados(datos) {
 function mostrarResumen() {
     if (asistenciasActuales.length === 0) {
         const resumen = document.getElementById('resumenContainer');
-        if (resumen) resumen.classList.add('hidden');
+        if (resumen) resumen.classList.add('hide');
         return;
     }
 
@@ -323,7 +323,7 @@ function mostrarResumen() {
     if (elAusentes) elAusentes.textContent = ausentes;
     if (elJustificados) elJustificados.textContent = justificados;
     if (elPorcentaje) elPorcentaje.textContent = porcentaje + '%';
-    if (elResumen) elResumen.classList.remove('hidden');
+    if (elResumen) elResumen.classList.remove('hide');
 }
 
 function getEstadoBadge(estado) {
@@ -378,7 +378,7 @@ function limpiarFiltros() {
     asistenciasActuales = [];
 
     document.getElementById('tablaResultados').innerHTML = '<tr><td colspan="7" class="text-center py-4 color-muted">Seleccione filtros y haga clic en Buscar</td></tr>';
-    document.getElementById('resumenContainer').classList.add('hidden');
+    document.getElementById('resumenContainer').classList.add('hide');
 }
 
 // ========== GESTIÓN DE EXCUSAS ==========

@@ -146,8 +146,8 @@ async function cargarAprendices() {
         }));
 
         mostrarAprendices(aprendicesActuales);
-        document.getElementById('accionesRapidas').classList.remove('hidden');
-        document.getElementById('listaAprendices').classList.remove('hidden');
+        document.getElementById('accionesRapidas').classList.remove('hide');
+        document.getElementById('listaAprendices').classList.remove('hide');
 
     } catch (error) {
         console.error('Error:', error);
@@ -221,8 +221,8 @@ function filtrarAprendices() {
 
     filas.forEach(fila => {
         const texto = fila.innerText.toLowerCase();
-        if (texto.includes(busqueda)) fila.classList.remove('hidden');
-        else fila.classList.add('hidden');
+        if (texto.includes(busqueda)) fila.classList.remove('hide');
+        else fila.classList.add('hide');
     });
 }
 
