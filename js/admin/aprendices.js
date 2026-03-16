@@ -1041,8 +1041,7 @@ async function exportarAprendicesPDF() {
 
         const rows = dataFiltrada.map(a => [
             a.documento,
-            (a.nombre || a.nombres || '').toUpperCase(),
-            (a.apellido || a.apellidos || '').toUpperCase(),
+            `${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}`.trim().toUpperCase(),
             (a.tipo_poblacion || 'SIN ESPECIFICAR').toUpperCase(),
             (a.correo || 'N/A').toLowerCase(),
             a.celular || a.telefono || 'N/A',
@@ -1075,14 +1074,13 @@ async function exportarAprendicesPDF() {
 
         doc.autoTable({
             startY: startY,
-            head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
+            head: [['DOCUMENTO', 'NOMBRE COMPLETO', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
             body: rows,
             theme: 'grid',
             headStyles: { fillColor: [57, 169, 0], textColor: [255, 255, 255], halign: 'center' },
             columnStyles: {
                 0: { halign: 'center', cellWidth: 25 },
-                1: { cellWidth: 35 },
-                2: { cellWidth: 35 },
+                1: { cellWidth: 70 },
                 3: { cellWidth: 25 },
                 4: { cellWidth: 50 },
                 5: { halign: 'center', cellWidth: 30 },
@@ -1377,8 +1375,7 @@ window.descargarPDFPoblacion = async function () {
     // Tabla de Datos
     const rows = filtrados.map(a => [
         a.documento,
-        a.nombre,
-        a.apellido,
+        `${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}`.trim().toUpperCase(),
         a.numero_ficha || 'N/A',
         a.nombre_programa || 'N/A',
         a.estado || 'N/A'
@@ -1386,7 +1383,7 @@ window.descargarPDFPoblacion = async function () {
 
     doc.autoTable({
         startY: startY,
-        head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'FICHA', 'PROGRAMA', 'ESTADO']],
+        head: [['DOCUMENTO', 'NOMBRE COMPLETO', 'FICHA', 'PROGRAMA', 'ESTADO']],
         body: rows,
         theme: 'grid',
         headStyles: {
@@ -1455,8 +1452,7 @@ async function exportarAprendices() {
                     <thead>
                         <tr style="background-color: #39A900; color: white;">
                             <th>Documento</th>
-                            <th>Nombres</th>
-                            <th>Apellidos</th>
+                            <th>Nombre Completo</th>
                             <th>Correo</th>
                             <th>Celular</th>
                             <th>Ficha</th>
@@ -1478,8 +1474,7 @@ async function exportarAprendices() {
             table += `
                 <tr>
                     <td style="mso-number-format:'@'">${a.documento}</td>
-                    <td>${a.nombre || a.nombres}</td>
-                    <td>${a.apellido || a.apellidos}</td>
+                    <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
                     <td>${a.correo || 'N/A'}</td>
                     <td style="mso-number-format:'@'">${a.celular || a.telefono || ''}</td>
                     <td>${a.numero_ficha || a.ficha_id || ''}</td>
