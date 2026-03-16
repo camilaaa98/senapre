@@ -15,7 +15,6 @@ try {
     
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     
-    // GET - Listar aprendices con paginación y filtros
     if ($method === 'GET') {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
@@ -27,13 +26,10 @@ try {
         $poblacion = isset($_GET['poblacion']) ? $_GET['poblacion'] : '';
         $tabla_poblacion = isset($_GET['tabla_poblacion']) ? $_GET['tabla_poblacion'] : '';
         $custom_filter = isset($_GET['custom_filter']) ? $_GET['custom_filter'] : '';
-        
-        // Construir query con filtros
         $where = [];
         $params = [];
         
         if (!empty($search)) {
-            // Búsqueda mejorada: incluye concatenación de nombre y apellido
             $where[] = "(a.nombre LIKE :search OR a.apellido LIKE :search OR a.documento LIKE :search OR a.correo LIKE :search OR (a.nombre || ' ' || a.apellido) LIKE :search)";
             $params[':search'] = "%$search%";
         }
