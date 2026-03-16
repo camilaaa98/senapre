@@ -8,11 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/liderazgo-premium.css?v=2.0.0">
-    <link rel="stylesheet" href="css/liderazgo-layout.css?v=1.0.0">
-    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.1.0">
+    <link rel="stylesheet" href="css/liderazgo-layout.css?v=4.4.0">
+    <link rel="stylesheet" href="css/liderazgo-main.css?v=2.6.0">
+    <link rel="stylesheet" href="css/liderazgo-poblacion.css?v=4.8.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/shared/pdf-utils.js?v=3.0.0"></script>
+    <script src="js/shared/report-utils.js?v=1.0.0"></script>
+    <script src="js/poblacion.js?v=3.3.0"></script>
 </head>
 
 <body>
@@ -20,91 +25,152 @@
         <!-- SIDEBAR -->
         <aside class="lid-sidebar" id="lid-sidebar">
             <div class="lid-sb-header">
-                <img src="assets/img/asi.png" alt="SenApre" class="lid-sb-logo">
+                <div class="lid-sb-logo">
+                    <img src="assets/img/asi.png" alt="SenApre">
+                </div>
                 <div class="lid-sb-brand">SenApre</div>
-                <div class="lid-sb-role" id="lid-role-display">Liderazgo</div>
+                <div class="lid-sb-role">Liderazgo</div>
             </div>
-            <!-- Mismo nav que liderazgo.html -->
             <nav class="lid-sb-nav">
                 <a href="liderazgo.html" class="lid-sb-link">
                     <i class="fas fa-th-large"></i><span>Panel Principal</span>
                 </a>
+                <a href="liderazgo.html#voceros" class="lid-sb-link">
+                    <i class="fas fa-users"></i><span>Voceros</span>
+                </a>
+                <a href="liderazgo.html#representantes" class="lid-sb-link">
+                    <i class="fas fa-user-tie"></i><span>Representantes</span>
+                </a>
                 <a href="liderazgo-poblacion.html" class="lid-sb-link active">
                     <i class="fas fa-layer-group"></i><span>Tipo de Población</span>
+                </a>
+                <a href="liderazgo.html#reuniones" class="lid-sb-link">
+                    <i class="fas fa-calendar-check"></i><span>Reuniones</span>
                 </a>
                 <a href="asistencia-liderazgo.html" class="lid-sb-link">
                     <i class="fas fa-clipboard-user"></i><span>Asistencia</span>
                 </a>
             </nav>
+            <div class="lid-sb-footer">
+                <button class="lid-sb-logout" onclick="authSystem.logout()">
+                    <i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span>
+                </button>
+            </div>
         </aside>
 
+        <!-- MAIN CONTENT -->
         <main class="lid-main">
+            <!-- TOPBAR -->
             <header class="lid-topbar">
                 <button class="lid-hamburger" onclick="document.getElementById('lid-sidebar').classList.toggle('open')">
                     <i class="fas fa-bars"></i>
                 </button>
-                <span class="lid-topbar-title">Tipo de Población</span>
-                <div class="lid-topbar-user" id="lid-topbar-user"></div>
+                <span class="lid-topbar-title">Liderazgo Estudiantil</span>
+                <div class="lid-topbar-user" id="user-name-display">Usuario</div>
             </header>
 
-            <div style="text-align: center; margin-bottom: 2rem; margin-top: 1rem;">
-                <h1 style="font-family: 'Outfit'; font-size: 2.2rem; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem;">Distribución de Población</h1>
-                <p style="color: #64748b; font-size: 0.95rem;">Estadísticas por categorías de vulnerabilidad</p>
+            <div class="premium-header">
+                <div class="premium-header-content">
+                    <div class="premium-header-icon"><i class="fas fa-users"></i></div>
+                    <div style="flex:1;">
+                        <h1 class="premium-header-title">Distribución de Población</h1>
+                        <p class="premium-header-desc">Estadísticas por categorías de vulnerabilidad</p>
+                    </div>
+                    <button class="btn-sync-premium" onclick="window.history.back()" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
             </div>
 
             <!-- Dashboard Analytics -->
+            <!-- Botones de Gestión -->
+            <div class="gestion-buttons">
+                <button class="btn btn-primary" onclick="poblacionManager.gestionarTipos()">
+                    <i class="fas fa-users-cog"></i> Gestionar Tipos
+                </button>
+                <button class="btn btn-secondary" onclick="poblacionManager.gestionarVoceroEnfoque()">
+                    <i class="fas fa-user-friends"></i> Vocero Enfoque Diferencial
+                </button>
+                <button class="btn btn-info" onclick="poblacionManager.gestionarRepresentantes()">
+                    <i class="fas fa-user-tie"></i> Representantes (Diurna/Mixta)
+                </button>
+            </div>
+
             <!-- Layout Principal -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="main-grid">
                 
                 <!-- Panel Izquierdo: Grid 3x3 -->
-                <div class="glass-card" style="padding: 1.5rem; border-radius: 8px;">
-                    <h3 style="color: #0c4a6e; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 1.5rem; font-family: 'Inter';">Distribución por Tipo de Población</h3>
-                    <div class="pob-grid" id="pob-grid-categorias" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                        <!-- JS renders here -->
+                <div class="categorias-container">
+                    <h3 class="categorias-title">Distribución por Tipo de Población</h3>
+                    <div id="pob-grid-categorias" class="categorias-grid">
+                        <!-- Las categorías se cargarán dinámicamente -->
                     </div>
                 </div>
 
                 <!-- Panel Derecho: Dona -->
-                <div class="glass-card" style="padding: 1.5rem; border-radius: 8px; text-align: center;">
-                    <h3 style="color: #0c4a6e; font-size: 1.1rem; text-align: left; margin-bottom: 1rem; font-family: 'Inter';">Gráfica de Distribución</h3>
-                    <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 1.5rem; font-weight: 600;">Distribución de Población (En Formación)</p>
-                    <div style="position: relative; height: 320px; width: 100%; display: flex; justify-content: center;">
-                        <canvas id="chartPoblacion" style="max-height: 280px;"></canvas>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Gráfica de Distribución</h3>
+                        <p class="chart-subtitle">Distribución de Población (En Formación)</p>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartPoblacion"></canvas>
                     </div>
                 </div>
 
             </div>
 
             <!-- Panel Inferior: Tabla Activa -->
-            <div class="glass-card" style="padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1rem;">
-                    <h3 id="tabla-poblacion-titulo" style="color: #0c4a6e; font-size: 1.1rem; font-family: 'Inter';">Detalle de Aprendices</h3>
-                    <div style="display:flex; gap: 10px;">
-                        <button class="btn-lid" id="btn-add-poblacion" style="background-color: #39A900; color: white; padding: 6px 15px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer; display: none;" onclick="PoblacionUI.abrirModalAgregar()">
-                            <i class="fas fa-plus"></i> Agregar
-                        </button>
-                        <button class="btn-lid" style="background-color: #ef4444; color: white; padding: 6px 15px; border-radius: 4px; border: none; font-weight: 600; cursor: pointer;" onclick="PoblacionUI.exportPDF()">
+            <div class="table-container mb-4">
+                <div class="table-header">
+                    <h3 id="tabla-poblacion-titulo" class="table-title">Detalle de Aprendices</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-danger btn-sm" onclick="poblacionManager.exportPDF()">
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
                     </div>
                 </div>
                 
-                <div class="table-responsive" style="border:none; box-shadow:none;">
-                    <table class="lid-table" style="width: 100%; border-collapse: collapse; text-align: center; font-family: 'Inter', sans-serif;">
+                <!-- Filtros -->
+                <div class="filters-section" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label class="form-label" style="font-size: 0.9rem; margin-bottom: 5px;">Filtrar por Ficha:</label>
+                            <select id="filtro-ficha" class="form-control" onchange="poblacionManager.filtrarPorFicha(this.value)">
+                                <option value="">Todas las fichas</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <label class="form-label" style="font-size: 0.9rem; margin-bottom: 5px;">Buscar por Documento/Nombre:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="filtro-busqueda" class="form-control" placeholder="Escriba para buscar..." style="flex: 1;">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="poblacionManager.filtrarPorBusqueda()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="poblacionManager.limpiarFiltros()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
                         <thead>
-                            <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Documento</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Nombres</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Apellidos</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Correo</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Celular</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Ficha</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Tipo Formación</th>
-                                <th style="padding: 1rem; color: #0c4a6e; font-weight: 600; font-size: 0.85rem;">Acciones</th>
+                            <tr>
+                                <th>Documento</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Correo</th>
+                                <th>Celular</th>
+                                <th>Ficha</th>
+                                <th>Tipo Formación</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="pob-tabla-body">
-                            <tr><td colspan="8" style="padding:2rem;color:#64748b;">Seleccione una categoría para ver los aprendices.</td></tr>
+                            <tr><td colspan="8" class="text-center" style="padding:2rem;color:#64748b;">Seleccione una categoría para ver los aprendices.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -112,296 +178,74 @@
         </main>
     </div>
 
-    <!-- Modales extra si son necesarios -->
-    <div class="modal-overlay" id="modalAddPoblacion" style="display:none; z-index: 2000;">
-        <div class="modal-glass" style="max-width: 450px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 style="font-family: 'Outfit'; font-size: 1.3rem; color: #1e293b; margin: 0;"><i class="fas fa-user-plus" style="color:#39A900;"></i> Agregar a Población</h2>
-                <button type="button" onclick="document.getElementById('modalAddPoblacion').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer;">&times;</button>
-            </div>
-            <form id="formAddPoblacion" onsubmit="event.preventDefault(); PoblacionUI.guardarAprendizPoblacion();">
-                <input type="hidden" id="pob-categoria-actual">
-                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Seleccione un aprendiz con estado LECTIVA para añadir a la categoría <strong id="pob-categoria-nombre" style="color:#00324D;"></strong>.</p>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size: 0.85rem; font-weight: 600; color: #1e293b; display: block; margin-bottom: 5px;">Buscar Aprendiz</label>
-                    <select id="pob-aprendiz-select" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; outline: none;" required>
-                        <option value="">Cargando aprendices...</option>
-                    </select>
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" onclick="document.getElementById('modalAddPoblacion').style.display='none'" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancelar</button>
-                    <button type="submit" id="btn-save-pob" style="padding: 8px 16px; background: #39A900; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;"><i class="fas fa-save"></i> Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <script src="js/main.js"></script>
     <script>
-        const CATEGORIAS = [
-            { key: 'mujer', label: 'Mujer', icon: 'fas fa-female', bg: 'linear-gradient(135deg, #d868eb, #b34fd2)', col: '#ffffff' },
-            { key: 'indigena', label: 'Indígena', icon: 'fas fa-mountain', bg: 'linear-gradient(135deg, #8bc34a, #689f38)', col: '#ffffff' },
-            { key: 'narp', label: 'NARP', icon: 'fas fa-fist-raised', bg: 'linear-gradient(135deg, #440000, #ff0000)', col: '#ffffff' },
-            { key: 'campesino', label: 'Campesino', icon: 'fas fa-seedling', bg: 'linear-gradient(135deg, #7cb342, #558b2f)', col: '#ffffff' },
-            { key: 'lgbtiq', label: 'lgbti', icon: 'fas fa-rainbow', bg: 'linear-gradient(135deg, #b71c1c, #004d40, #1a237e)', col: '#ffffff' },
-            { key: 'discapacidad', label: 'Discapacidad', icon: 'fas fa-wheelchair', bg: 'linear-gradient(135deg, #42a5f5, #1e88e5)', col: '#ffffff' }
-        ];
-
-        let statsPoblacion = {};
-        let currentCatData = [];
-        let vocerosEnfoqueMap = {};
-
-        const PoblacionUI = {
-            async init() {
-                const user = authSystem.getCurrentUser();
-                document.getElementById('lid-topbar-user').textContent = `${user.nombre} ${user.apellido}`;
+        // Inicialización cuando el DOM está listo
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Cargar estadísticas iniciales
+                await poblacionManager.cargarEstadisticas();
                 
-                try {
-                    const resR = await fetch('api/liderazgo.php?action=getResponsable&area=voceros_y_representantes').then(r => r.json());
-                    if (resR.success && resR.data) {
-                        document.getElementById('lid-role-display').innerHTML = `
-                            <strong style="color:#6ee47b;display:block;">Liderazgo</strong>
-                            <span style="font-size:0.75rem;opacity:0.9;color:white;display:block;margin-top:2px;text-transform:uppercase;">${resR.data.nombre} ${resR.data.apellido}</span>
-                            <span style="font-size:0.65rem;opacity:0.6;color:white;display:block;">${resR.data.correo}</span>
-                        `;
-                    }
-                } catch(e) {}
-
-                await this.fetchData();
-                this.renderGrid();
-                this.renderCharts();
-            },
-
-            async fetchData() {
-                try {
-                    const res = await fetch('api/liderazgo.php?action=getPoblacionStats').then(r => r.json());
-                    if (res.success) {
-                        statsPoblacion = res.counts || {};
-                        vocerosEnfoqueMap = res.voceros || {};
-                    }
-                } catch(e) {
-                    console.error("Error al cargar estadísticas:", e);
-                }
-            },
-
-            renderGrid() {
-                let html = CATEGORIAS.map(c => {
-                    const count = statsPoblacion[c.key] || 0;
-                    return `
-                    <div style="background:${c.bg}; color:${c.col}; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="PoblacionUI.abrirDetalle('${c.key}')" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
-                        <i class="${c.icon}" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.8rem; font-weight:700; text-transform:uppercase; font-family:'Inter'; font-weight:800; letter-spacing:0.5px;">${c.label}</span>
-                        <span style="font-size:1.3rem; font-weight:800; font-family:'Outfit'; margin-top:5px;">${count}</span>
-                    </div>`;
-                }).join('');
-
-                // Custom Extra Buttons
-                html += `
-                    <div style="background:#4caf50; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-plus-circle" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.85rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">AGREGAR</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">Gestionar Tipos</span>
-                    </div>
-                    <div style="background:#2962ff; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-user" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.8rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">VOCERO</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">ENFOQUE<br>DIFERENCIAL</span>
-                    </div>
-                    <div style="background:#f57c00; color:white; border-radius:6px; padding:1.5rem 0.5rem; text-align:center; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:110px; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='liderazgo.html'">
-                        <i class="fas fa-users" style="font-size:1.4rem; margin-bottom:8px;"></i>
-                        <span style="font-size:0.75rem; font-weight:800; font-family:'Inter'; text-transform:uppercase;">REPRESENTANTES</span>
-                        <span style="font-size:0.7rem; margin-top:4px;">DIURNA / MIXTA</span>
-                    </div>
-                `;
-
-                document.getElementById('pob-grid-categorias').innerHTML = html;
-            },
-
-            async abrirDetalle(key) {
-                const cat = CATEGORIAS.find(c => c.key === key);
-                const vocero = vocerosEnfoqueMap[key] || 'No asignado';
-                
-                document.getElementById('tabla-poblacion-titulo').innerHTML = `Detalle de Aprendices: <strong>${cat.label}</strong> <span style="font-size:0.8rem; color:#64748b; margin-left:1rem; font-weight:normal;">(Vocero: ${vocero})</span>`;
-                
-                // Mostrar cargando
-                const tbody = document.getElementById('pob-tabla-body');
-                tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Cargando aprendices de la categoría...</td></tr>';
-
-                try {
-                    // Fetch solo para esta categoría (limitado a 200 por rendimiento)
-                    const res = await fetch(`api/aprendices.php?poblacion=${cat.label}&limit=200`).then(r => r.json());
-                    currentCatData = res.success ? res.data : [];
-                    this.renderTabla(currentCatData);
-                } catch(e) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#ef4444;">Error al cargar datos detalle.</td></tr>';
-                }
-
-                this.currentKey = key;
-                this.currentLabel = cat.label;
-                
-                // Mostrar botón de agregar
-                const btnAdd = document.getElementById('btn-add-poblacion');
-                if (btnAdd) btnAdd.style.display = 'inline-flex';
-                
-                // Scroll to table smoothly
-                document.getElementById('tabla-poblacion-titulo').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            },
-
-            abrirModalAgregar() {
-                if (!this.currentKey) return;
-                document.getElementById('pob-categoria-actual').value = this.currentLabel;
-                document.getElementById('pob-categoria-nombre').textContent = this.currentLabel;
-                
-                // Poblar select
-                const select = document.getElementById('pob-aprendiz-select');
-                select.innerHTML = '<option value="">Cargando...</option>';
-                
-                // Solo aprendices en LECTIVA (con límite de búsqueda)
-                const res = await fetch('api/aprendices.php?estado=LECTIVA&limit=50').then(r => r.json());
-                const elegibles = res.success ? res.data : [];
-                
-                if (elegibles.length === 0) {
-                    select.innerHTML = '<option value="">No hay aprendices elegibles</option>';
-                } else {
-                    select.innerHTML = '<option value="">Seleccione un aprendiz...</option>' + elegibles.map(a => `<option value="${a.documento}">${a.documento} - ${a.nombre} ${a.apellido}</option>`).join('');
-                }
-                
-                document.getElementById('modalAddPoblacion').style.display = 'flex';
-            },
-
-            async guardarAprendizPoblacion() {
-                const doc = document.getElementById('pob-aprendiz-select').value;
-                const cat = document.getElementById('pob-categoria-actual').value;
-                if (!doc) return;
-                
-                const btn = document.getElementById('btn-save-pob');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                
-                try {
-                    const req = await fetch('api/liderazgo.php?action=addPoblacion', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ documento: doc, tipo_poblacion: cat })
-                    });
-                    const res = await req.json();
-                    
-                    if (res.success) {
-                        alert('Aprendiz añadido correctamente a la población');
-                        document.getElementById('modalAddPoblacion').style.display = 'none';
-                        await this.fetchData(); 
-                        this.renderGrid();
-                        this.abrirDetalle(this.currentKey);
-                    } else {
-                        alert('Error: ' + res.message);
-                    }
-                } catch(e) {
-                    alert('Error en el servidor.');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
-                }
-            },
-
-            renderTabla(lista) {
-                const tbody = document.getElementById('pob-tabla-body');
-                if(!lista || lista.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="padding:2rem;color:#64748b;">No hay aprendices registrados en esta categoría.</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = lista.map(a => `
-                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
-                        <td style="padding: 1rem; color: #1e293b; font-weight: 700;">${a.documento}</td>
-                        <td style="padding: 1rem; color: #475569;">${a.nombre}</td>
-                        <td style="padding: 1rem; color: #475569;">${a.apellido}</td>
-                        <td style="padding: 1rem; color: #64748b;">${a.correo || 'N/A'}</td>
-                        <td style="padding: 1rem; color: #64748b;">${a.celular || 'N/A'}</td>
-                        <td style="padding: 1rem; color: #64748b;">${a.numero_ficha || 'N/A'}</td>
-                        <td style="padding: 1rem; color: #64748b;">Titulada</td>
-                        <td style="padding: 1rem;">
-                            <button style="background:none; border:none; color:#0284c7; cursor:pointer;" title="Más opciones"><i class="fas fa-ellipsis-v"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-            },
-
-            renderCharts() {
-                const ctx1 = document.getElementById('chartPoblacion').getContext('2d');
-                
-                // Extract plain colors from gradients for chart if needed, or define solid map
-                const chartColors = [
-                    '#d868eb', // Mujer
-                    '#8bc34a', // Indigena
-                    '#000000', // NARP
-                    '#7cb342', // Campesino
-                    '#b71c1c', // LGBTIQ
-                    '#42a5f5'  // Discap
-                ];
-
-                new Chart(ctx1, {
-                    type: 'doughnut',
-                    data: {
-                        labels: CATEGORIAS.map(c => c.label),
-                        datasets: [{
-                            data: CATEGORIAS.map(c => statsPoblacion[c.key] || 0),
-                            backgroundColor: chartColors,
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '60%',
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    font: { size: 11, family: 'Inter' }
+                // Inicializar gráfico
+                const ctx = document.getElementById('chartPoblacion');
+                if (ctx) {
+                    window.poblacionChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Mujer', 'Indígena', 'NARP', 'Campesino', 'LGBTIQ+', 'Discapacidad'],
+                            datasets: [{
+                                data: [0, 0, 0, 0, 0, 0],
+                                backgroundColor: [
+                                    '#f8bbd9',
+                                    '#a8dadc', 
+                                    '#f5b7b1',
+                                    '#ffeaa7',
+                                    '#fab1a0',
+                                    '#74b9ff'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        font: {
+                                            family: "'Inter', sans-serif",
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-            },
-
-            exportPDF() {
-                if(!this.currentKey) {
-                    alert("Seleccione primero una categoría en la cuadrícula.");
-                    return;
+                    });
                 }
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const cat = CATEGORIAS.find(c => c.key === this.currentKey);
-                const vocero = vocerosEnfoqueMap[this.currentKey] || 'No asignado';
 
-                // Títulos
-                doc.setFontSize(18);
-                doc.setTextColor(57, 169, 0); // SENA Green
-                doc.text('REPORTE OFICIAL DE POBLACIÓN - SENAPRE', 105, 20, { align: 'center' });
+                // Renderizar grid de categorías
+                poblacionManager.renderGrid();
                 
-                doc.setFontSize(12);
-                doc.setTextColor(0, 50, 77); // Navy
-                doc.text(`Categoría: ${cat.label}`, 20, 35);
-                doc.text(`Vocero de Enfoque: ${vocero}`, 20, 42);
-                doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 160, 35);
-
-                const tableData = currentCatData.map(a => [a.documento, `${a.nombre} ${a.apellido}`, a.numero_ficha, a.estado]);
+                // CARGAR DATOS EN EL GRÁFICO INMEDIATAMENTE
+                poblacionManager.renderChart();
                 
-                doc.autoTable({
-                    startY: 50,
-                    head: [['Documento', 'Aprendiz', 'Ficha', 'Estado']],
-                    body: tableData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [57, 169, 0] }
-                });
-
-                doc.save(`Reporte_${cat.label}_SenApre.pdf`);
+                console.log('✅ Página de población inicializada correctamente');
+            } catch (error) {
+                console.error('❌ Error al inicializar página:', error);
             }
-        };
-
-        PoblacionUI.init();
+        });
     </script>
 </body>
+
 </html>

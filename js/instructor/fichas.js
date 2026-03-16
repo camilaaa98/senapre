@@ -41,8 +41,12 @@ async function loadFichas(userId) {
     const tableBody = document.getElementById('fichasTableBody');
 
     try {
-        const response = await fetch(`api/instructor-fichas.php?id_usuario=${userId}`);
+        // Usar URL absoluta para producción y modo test
+        const testUserId = userId || 'test_instructor';
+        const response = await fetch(`https://senapre.onrender.com/api/instructor-fichas.php?id_usuario=${testUserId}`);
         const data = await response.json();
+
+        console.log('Datos de fichas:', data); // Debug
 
         if (data.success) {
             if (data.data.length === 0) {
@@ -76,6 +80,6 @@ async function loadFichas(userId) {
 }
 
 function verDetalle(ficha) {
-    alert(`Funcionalidad para ver detalle de ficha ${ficha} en desarrollo.`);
-    // window.location.href = `instructor-ficha-detalle.html?ficha=${ficha}`;
+    // Redirigir a la página de detalle con el número de ficha
+    window.location.href = `instructor-ficha-detalle.html?ficha=${ficha}`;
 }

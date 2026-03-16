@@ -151,16 +151,31 @@ try {
             exit;
         }
         
-        // Estadísticas de Población (Optimizado)
+        // Estadísticas de Población (Mejorado con patrones completos)
         if ($action === 'getPoblacionStats') {
             $stats = [];
-            $categorias = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
             
-            foreach ($categorias as $cat) {
-                // Coincidencia por columna boolean o por texto en tipo_poblacion
-                $sql = "SELECT COUNT(*) as total FROM aprendices WHERE $cat = 1 OR tipo_poblacion LIKE :p";
+            // Patrones mejorados para cada categoría
+            $categorias = [
+                'mujer' => ['%mujer%', '%mujeres%', '%femenino%', '%femenina%', '%F%', '%muj%'],
+                'indigena' => ['%indigena%', '%indígena%', '%etnia%', '%pueblos%', '%indígenas%', '%etnico%'],
+                'narp' => ['%narp%', '%negro%', '%afro%', '%afrodescendiente%', '%raizal%', '%palenquero%', '%afro%'],
+                'campesino' => ['%campesino%', '%campesina%', '%rural%', '%campo%', '%camp%'],
+                'lgbtiq' => ['%lgbti%', '%lgbt%', '%trans%', '%gay%', '%lesbiana%', '%bisexual%', '%queer%', '%homosexual%', '+'],
+                'discapacidad' => ['%discapacidad%', '%discapacitado%', '%discapacitada%', '%capacidad%', '%disc%']
+            ];
+            
+            foreach ($categorias as $cat => $patterns) {
+                // Construir consulta con múltiples patrones LIKE
+                $sql = "SELECT COUNT(*) as total FROM aprendices WHERE UPPER(estado) = 'LECTIVA' AND (";
+                $likeConditions = [];
+                foreach ($patterns as $pattern) {
+                    $likeConditions[] = "UPPER(tipo_poblacion) LIKE UPPER('" . $pattern . "')";
+                }
+                $sql .= implode(" OR ", $likeConditions) . ")";
+                
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([':p' => "%$cat%"]); 
+                $stmt->execute();
                 $stats[$cat] = $stmt->fetch()['total'];
             }
             
@@ -209,21 +224,59 @@ try {
             exit;
         }
 
-        // Obtener aprendices en LECTIVA
+        // Obtener aprendices en LECTIVA con filtros de población (patrones mejorados)
         if ($action === 'getAprendicesLectiva') {
-            $ficha = $_GET['ficha'] ?? null;
-            $camposPob = "documento, nombre, apellido, numero_ficha, tipo_poblacion, mujer, indigena, narp, campesino, lgbtiq, discapacidad";
-            if ($ficha) {
-                // Solo de una ficha específica
-                $sql = "SELECT $camposPob FROM aprendices WHERE numero_ficha = :ficha AND UPPER(estado) = 'LECTIVA' ORDER BY nombre ASC";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([':ficha' => $ficha]);
-            } else {
-                // Todos los lectiva (para enfoque y rpte)
-                $sql = "SELECT $camposPob FROM aprendices WHERE UPPER(estado) = 'LECTIVA' ORDER BY nombre ASC";
-                $stmt = $conn->query($sql);
+            $categoria = $_GET['categoria'] ?? '';
+            
+            // SQL base compatible con producción
+            $sql = "SELECT documento, nombre, apellido, numero_ficha, tipo_poblacion, correo, celular 
+                     FROM aprendices a 
+                     WHERE UPPER(a.estado) = 'LECTIVA'";
+            
+            // Patrones mejorados para cada categoría
+            $patrones = [
+                'mujer' => ['%mujer%', '%mujeres%', '%femenino%', '%femenina%', '%F%', '%muj%'],
+                'indigena' => ['%indigena%', '%indígena%', '%etnia%', '%pueblos%', '%indígenas%', '%etnico%'],
+                'narp' => ['%narp%', '%negro%', '%afro%', '%afrodescendiente%', '%raizal%', '%palenquero%', '%afro%'],
+                'campesino' => ['%campesino%', '%campesina%', '%rural%', '%campo%', '%camp%'],
+                'lgbtiq' => ['%lgbti%', '%lgbt%', '%trans%', '%gay%', '%lesbiana%', '%bisexual%', '%queer%', '%homosexual%', '+'],
+                'discapacidad' => ['%discapacidad%', '%discapacitado%', '%discapacitada%', '%capacidad%', '%disc%']
+            ];
+            
+            // Aplicar filtros usando patrones mejorados
+            if (isset($patrones[$categoria])) {
+                $patterns = $patrones[$categoria];
+                $sql .= " AND (";
+                $likeConditions = [];
+                foreach ($patterns as $pattern) {
+                    $likeConditions[] = "UPPER(a.tipo_poblacion) LIKE UPPER('" . $pattern . "')";
+                }
+                $sql .= implode(" OR ", $likeConditions) . ")";
             }
-            echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            
+            // Ordenar y limitar para mejor rendimiento
+            $sql .= " ORDER BY a.nombre, a.apellido LIMIT 50";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $aprendices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $aprendices]);
+            exit;
+        }
+
+        // Obtener representantes (Movido a GET para mayor consistencia)
+        if ($action === 'getRepresentantes') {
+            $sql = "SELECT r.tipo_jornada, a.documento, a.nombre, a.apellido 
+                     FROM representantes r
+                     JOIN aprendices a ON TRIM(CAST(r.documento AS TEXT)) = TRIM(CAST(a.documento AS TEXT))
+                     ORDER BY r.tipo_jornada";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $representantes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $representantes]);
             exit;
         }
     }
@@ -241,6 +294,125 @@ try {
             $stmt->execute([':user' => $data['id_usuario'], ':area' => $data['area'] ?? 'liderazgo']);
             
             echo json_encode(['success' => true, 'message' => 'Responsable asignado']);
+            exit;
+        }
+
+        // Guardar vocero de enfoque diferencial
+        if ($action === 'saveVoceroEnfoque') {
+            $categoria = $data['categoria'] ?? '';
+            $documento = $data['documento'] ?? '';
+            
+            if (empty($categoria) || empty($documento)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Verificar si ya existe un vocero para esa categoría
+            $sqlCheck = "SELECT id FROM voceros_enfoque WHERE tipo_poblacion = :cat";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->execute([':cat' => $categoria]);
+            $existing = $stmtCheck->fetch();
+            
+            if ($existing) {
+                // Actualizar existente
+                $sql = "UPDATE voceros_enfoque SET documento = :doc WHERE tipo_poblacion = :cat";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':cat' => $categoria]);
+            } else {
+                // Insertar nuevo
+                $sql = "INSERT INTO voceros_enfoque (tipo_poblacion, documento) VALUES (:cat, :doc)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':cat' => $categoria, ':doc' => $documento]);
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Vocero de enfoque asignado correctamente']);
+            exit;
+        }
+
+        // Guardar representante (diurna/mixta)
+        if ($action === 'saveRepresentante') {
+            $tipo_jornada = $data['tipo_jornada'] ?? ''; // 'diurna' o 'mixta'
+            $documento = $data['documento'] ?? '';
+            
+            if (empty($tipo_jornada) || empty($documento)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Verificar si ya existe un representante para ese tipo
+            $sqlCheck = "SELECT id FROM representantes WHERE tipo_jornada = :tipo";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->execute([':tipo' => $tipo_jornada]);
+            $existing = $stmtCheck->fetch();
+            
+            if ($existing) {
+                // Actualizar existente
+                $sql = "UPDATE representantes SET documento = :doc, fecha_asignacion = CURRENT_DATE WHERE tipo_jornada = :tipo";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo_jornada]);
+            } else {
+                // Insertar nuevo
+                $sql = "INSERT INTO representantes (documento, tipo_jornada, fecha_asignacion) VALUES (:doc, :tipo, CURRENT_DATE)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([':doc' => $documento, ':tipo' => $tipo_jornada]);
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Representante asignado correctamente']);
+            exit;
+        }
+
+        // Eliminar de población
+        if ($action === 'eliminarDePoblacion') {
+            $documento = $data['documento'] ?? '';
+            $categoria = $data['categoria'] ?? '';
+            
+            if (empty($documento) || empty($categoria)) {
+                throw new Exception('Datos incompletos');
+            }
+            
+            // Obtener el tipo_poblacion actual
+            $sqlGet = "SELECT tipo_poblacion FROM aprendices WHERE documento = :doc";
+            $stmtGet = $conn->prepare($sqlGet);
+            $stmtGet->execute([':doc' => $documento]);
+            $aprendiz = $stmtGet->fetch();
+            
+            if ($aprendiz && $aprendiz['tipo_poblacion']) {
+                // Eliminar la categoría específica del tipo_poblacion
+                $tipoPoblacion = $aprendiz['tipo_poblacion'];
+                $patron = '';
+                
+                switch ($categoria) {
+                    case 'mujer':
+                        $patron = 'mujer|mujeres|femenino|femenina|F|muj';
+                        break;
+                    case 'indigena':
+                        $patron = 'indigena|indígena|etnia|pueblos|indígenas|etnico';
+                        break;
+                    case 'narp':
+                        $patron = 'narp|negro|afro|afrodescendiente|raizal|palenquero';
+                        break;
+                    case 'campesino':
+                        $patron = 'campesino|campesina|rural|campo|camp';
+                        break;
+                    case 'lgbtiq':
+                        $patron = 'lgbti|lgbt|trans|gay|lesbiana|bisexual|queer|homosexual|\\+';
+                        break;
+                    case 'discapacidad':
+                        $patron = 'discapacidad|discapacitado|discapacitada|capacidad|disc';
+                        break;
+                }
+                
+                if ($patron) {
+                    // Eliminar patrones específicos
+                    $nuevoTipo = preg_replace("/\b($patron)\b/i", '', $tipoPoblacion);
+                    $nuevoTipo = preg_replace('/,\s*,/', ',', $nuevoTipo); // Eliminar comas dobles
+                    $nuevoTipo = trim($nuevoTipo, ', ');
+                    
+                    $sql = "UPDATE aprendices SET tipo_poblacion = :nuevoTipo WHERE documento = :doc";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([':nuevoTipo' => $nuevoTipo, ':doc' => $documento]);
+                }
+            }
+            
+            echo json_encode(['success' => true, 'message' => 'Eliminado de la categoría correctamente']);
             exit;
         }
 
@@ -298,7 +470,7 @@ try {
             if ($tipo === 'Vocero Principal') $sql = "UPDATE fichas SET vocero_principal = NULL WHERE vocero_principal = :doc";
             else if ($tipo === 'Vocero Suplente') $sql = "UPDATE fichas SET vocero_suplente = NULL WHERE vocero_suplente = :doc";
             else if ($tipo === 'Vocero Enfoque') $sql = "DELETE FROM voceros_enfoque WHERE documento = :doc";
-            else if ($tipo === 'Representante') $sql = "DELETE FROM representantes_jornada WHERE documento = :doc";
+            else if ($tipo === 'Representante') $sql = "DELETE FROM representantes WHERE documento = :doc";
             
             if (!$sql) throw new Exception('Tipo de rol inválido: ' . $tipo);
             
@@ -459,7 +631,7 @@ function verificarPerdidaRol($documento, $conn) {
         $conn->prepare("UPDATE fichas SET vocero_principal = NULL WHERE vocero_principal = :doc")->execute([':doc' => $documento]);
         $conn->prepare("UPDATE fichas SET vocero_suplente = NULL WHERE vocero_suplente = :doc")->execute([':doc' => $documento]);
         $conn->prepare("UPDATE voceros_enfoque SET documento = NULL WHERE documento = :doc")->execute([':doc' => $documento]);
-        $conn->prepare("DELETE FROM representantes_jornada WHERE documento = :doc")->execute([':doc' => $documento]);
+        $conn->prepare("DELETE FROM representantes WHERE documento = :doc")->execute([':doc' => $documento]);
         $revocado = true;
     }
     return ['fallas' => $fallas, 'revocado' => $revocado];

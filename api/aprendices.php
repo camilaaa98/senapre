@@ -26,6 +26,7 @@ try {
         $estado = isset($_GET['estado']) ? $_GET['estado'] : '';
         $poblacion = isset($_GET['poblacion']) ? $_GET['poblacion'] : '';
         $tabla_poblacion = isset($_GET['tabla_poblacion']) ? $_GET['tabla_poblacion'] : '';
+        $custom_filter = isset($_GET['custom_filter']) ? $_GET['custom_filter'] : '';
         
         // Construir query con filtros
         $where = [];
@@ -48,10 +49,9 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } elseif (empty($tabla_poblacion) && empty($ficha) && empty($poblacion) && empty($search)) {
-            // EXCLUIR estados de inactividad total SOLO si no hay filtros activos
-            // Si el usuario busca algo específico, queremos que lo encuentre aunque sea cancelado.
-            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA')";
+        } else {
+            // Por defecto, solo mostrar aprendices en estado LECTIVA para asistencia
+            $where[] = "a.estado = 'LECTIVA'";
         }
 
         if (!empty($tabla_poblacion)) {
@@ -65,6 +65,11 @@ try {
                           $tabla_poblacion === 'lgbtiq' ? 'l' : 'd')))));
                 $where[] = "$alias.documento IS NOT NULL";
             }
+        }
+
+        if (!empty($custom_filter)) {
+            // Aplicar filtro personalizado directamente (para consultas LIKE complejas)
+            $where[] = $custom_filter;
         }
 
         if (!empty($poblacion)) {
@@ -227,33 +232,48 @@ try {
         if (empty($documento)) {
             throw new Exception('Documento requerido');
         }
-        
-        // Actualización parcial de estado o datos
-        $sql = "UPDATE aprendices SET 
-                tipo_identificacion = :tipo,
-                nombre = :nombre,
-                apellido = :apellido,
-                correo = :correo,
-                celular = :celular,
-                numero_ficha = :ficha,
-                estado = :estado,
-                tipo_poblacion = :poblacion,
-                id_instructor_lider = :lider
-                WHERE documento = :doc";
-        
+
+        // Definir mapeo de campos permitidos
+        $mappings = [
+            'tipo_identificacion' => 'tipo_identificacion',
+            'nombre' => 'nombre',
+            'nombres' => 'nombre',
+            'apellido' => 'apellido',
+            'apellidos' => 'apellido',
+            'correo' => 'correo',
+            'celular' => 'celular',
+            'telefono' => 'celular',
+            'numero_ficha' => 'numero_ficha',
+            'ficha_id' => 'numero_ficha',
+            'estado' => 'estado',
+            'tipo_poblacion' => 'tipo_poblacion',
+            'poblacion' => 'tipo_poblacion',
+            'id_instructor_lider' => 'id_instructor_lider',
+            'mujer' => 'mujer',
+            'indigena' => 'indigena',
+            'narp' => 'narp',
+            'campesino' => 'campesino',
+            'lgbtiq' => 'lgbtiq',
+            'discapacidad' => 'discapacidad'
+        ];
+
+        $fields = [];
+        $params = [':doc' => $documento];
+
+        foreach ($mappings as $key => $column) {
+            if (array_key_exists($key, $data)) {
+                $fields[] = "$column = :$key";
+                $params[":$key"] = $data[$key];
+            }
+        }
+
+        if (empty($fields)) {
+            throw new Exception('No se enviaron datos para actualizar');
+        }
+
+        $sql = "UPDATE aprendices SET " . implode(', ', $fields) . " WHERE documento = :doc";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':tipo' => $data['tipo_identificacion'] ?? 'CC',
-            ':nombre' => $data['nombre'],
-            ':apellido' => $data['apellido'],
-            ':correo' => $data['correo'],
-            ':celular' => $data['celular'] ?? null,
-            ':ficha' => $data['numero_ficha'],
-            ':estado' => $data['estado'] ?? 'LECTIVA',
-            ':poblacion' => $data['tipo_poblacion'] ?? '',
-            ':lider' => $data['id_instructor_lider'] ?? null,
-            ':doc' => $documento
-        ]);
+        $stmt->execute($params);
         
         echo json_encode(['success' => true, 'message' => 'Aprendiz actualizado exitosamente']);
         exit;
@@ -261,7 +281,9 @@ try {
     
     // DELETE - Eliminar aprendiz
     if ($method === 'DELETE') {
-        $documento = isset($_GET['documento']) ? $_GET['documento'] : '';
+        // Obtener documento del body JSON (no de GET)
+        $input = json_decode(file_get_contents('php://input'), true);
+        $documento = $input['documento'] ?? '';
         
         if (empty($documento)) {
             throw new Exception('Documento requerido');

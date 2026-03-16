@@ -1,4 +1,4 @@
-const areas = ['jefe_bienestar', 'liderazgo', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
+const areas = ['jefe_bienestar', 'voceros_y_representantes', 'enfermeria', 'socioemocional', 'deporte', 'arte', 'apoyos'];
 
 document.addEventListener('DOMContentLoaded', () => {
     areas.forEach(area => cargarResponsable(area));
@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 async function cargarResponsable(area) {
     const domMap = {
         'jefe_bienestar': 'info-jefe-bienestar',
-        'liderazgo': 'info-liderazgo',
+        'voceros_y_representantes': 'info-voceros_y_representantes',
+        'liderazgo': 'info-voceros_y_representantes',
         'enfermeria': 'info-enfermeria',
         'socioemocional': 'info-socioemocional',
         'deporte': 'info-deporte',

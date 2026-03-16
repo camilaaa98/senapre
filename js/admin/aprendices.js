@@ -135,10 +135,10 @@ function aplicarRestriccionesDePagina() {
     const bienestar = user.bienestar_data || [];
     const scopes = user.vocero_scopes || (user.vocero_scope ? [user.vocero_scope] : []);
 
-    const esDirector = ['director', 'admin', 'administrador'].includes(rol);
+    const esDirector = ['director', 'admin', 'administrador', 'jefe'].some(r => rol.includes(r));
     const esJefeBienestar = bienestar.includes('jefe_bienestar');
-    const esRespLiderazgo = bienestar.includes('voceros_y_representantes');
-    const esVocero = rol === 'vocero';
+    const esRespLiderazgo = bienestar.includes('voceros_y_representantes') || bienestar.includes('liderazgo');
+    const esVocero = rol.includes('vocero');
 
     const esVoceroEnfoque = scopes.some(s => s.tipo === 'enfoque');
     const esVoceroFicha = scopes.some(s => s.tipo === 'principal' || s.tipo === 'suplente');
@@ -315,8 +315,7 @@ async function cargarAprendices(pagina = 1) {
                 } else {
                     thead.innerHTML = `
                         <th>Documento</th>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
+                        <th>Nombre Completo</th>
                         <th>Población</th>
                         <th>Correo</th>
                         <th>Celular</th>
@@ -1042,8 +1041,7 @@ async function exportarAprendicesPDF() {
 
         const rows = dataFiltrada.map(a => [
             a.documento,
-            (a.nombre || a.nombres || '').toUpperCase(),
-            (a.apellido || a.apellidos || '').toUpperCase(),
+            `${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}`.trim().toUpperCase(),
             (a.tipo_poblacion || 'SIN ESPECIFICAR').toUpperCase(),
             (a.correo || 'N/A').toLowerCase(),
             a.celular || a.telefono || 'N/A',
@@ -1076,14 +1074,13 @@ async function exportarAprendicesPDF() {
 
         doc.autoTable({
             startY: startY,
-            head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
+            head: [['DOCUMENTO', 'NOMBRE COMPLETO', 'POBLACIÓN', 'CORREO', 'CELULAR', 'FICHA', 'ESTADO']],
             body: rows,
             theme: 'grid',
             headStyles: { fillColor: [57, 169, 0], textColor: [255, 255, 255], halign: 'center' },
             columnStyles: {
                 0: { halign: 'center', cellWidth: 25 },
-                1: { cellWidth: 35 },
-                2: { cellWidth: 35 },
+                1: { cellWidth: 70 },
                 3: { cellWidth: 25 },
                 4: { cellWidth: 50 },
                 5: { halign: 'center', cellWidth: 30 },
@@ -1212,19 +1209,15 @@ function filtrarPorPoblacion(tipo) {
 
     const tablaDetalle = document.getElementById('tablaDetallePoblacion');
     if (tablaDetalle) {
-        const filtrados = todosAprendices.filter(a => {
-            const estado = (a.estado || '').toUpperCase();
-            return a[key] == 1 && (estado === 'LECTIVA');
-        });
+        const filtrados = todosAprendices.filter(a => a[key] == 1);
 
         if (filtrados.length === 0) {
-            tablaDetalle.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999; padding: 20px;">No hay aprendices en esta categoría (Lectiva)</td></tr>';
+            tablaDetalle.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999; padding: 20px;">No hay aprendices en esta categoría</td></tr>';
         } else {
             tablaDetalle.innerHTML = filtrados.map(a => `
                 <tr>
                     <td>${a.documento}</td>
-                    <td>${a.nombre}</td>
-                    <td>${a.apellido}</td>
+                    <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
                     <td>${a.correo || ''}</td>
                     <td>${a.celular || ''}</td>
                     <td>${a.numero_ficha || 'N/A'}</td>
@@ -1382,8 +1375,7 @@ window.descargarPDFPoblacion = async function () {
     // Tabla de Datos
     const rows = filtrados.map(a => [
         a.documento,
-        a.nombre,
-        a.apellido,
+        `${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}`.trim().toUpperCase(),
         a.numero_ficha || 'N/A',
         a.nombre_programa || 'N/A',
         a.estado || 'N/A'
@@ -1391,7 +1383,7 @@ window.descargarPDFPoblacion = async function () {
 
     doc.autoTable({
         startY: startY,
-        head: [['DOCUMENTO', 'NOMBRES', 'APELLIDOS', 'FICHA', 'PROGRAMA', 'ESTADO']],
+        head: [['DOCUMENTO', 'NOMBRE COMPLETO', 'FICHA', 'PROGRAMA', 'ESTADO']],
         body: rows,
         theme: 'grid',
         headStyles: {
@@ -1460,8 +1452,7 @@ async function exportarAprendices() {
                     <thead>
                         <tr style="background-color: #39A900; color: white;">
                             <th>Documento</th>
-                            <th>Nombres</th>
-                            <th>Apellidos</th>
+                            <th>Nombre Completo</th>
                             <th>Correo</th>
                             <th>Celular</th>
                             <th>Ficha</th>
@@ -1483,8 +1474,7 @@ async function exportarAprendices() {
             table += `
                 <tr>
                     <td style="mso-number-format:'@'">${a.documento}</td>
-                    <td>${a.nombre || a.nombres}</td>
-                    <td>${a.apellido || a.apellidos}</td>
+                    <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
                     <td>${a.correo || 'N/A'}</td>
                     <td style="mso-number-format:'@'">${a.celular || a.telefono || ''}</td>
                     <td>${a.numero_ficha || a.ficha_id || ''}</td>
@@ -1564,7 +1554,7 @@ async function cargarAprendicesGP(pagina = 1) {
     try {
         const search = document.getElementById('filtroSearchGP')?.value || '';
         const ficha = document.getElementById('filtroFichaGP')?.value || '';
-        const estado = document.getElementById('filtroEstadoGP')?.value || 'LECTIVA'; // Solo LECTIVA en Tipo de Población
+        const estado = document.getElementById('filtroEstadoGP')?.value || ''; // Permitir todos los estados por defecto
 
         const res = await fetch(`api/aprendices.php?page=${pagina}&limit=${ITEMS_POR_PAGINA}&search=${encodeURIComponent(search)}&ficha=${ficha}&estado=${estado}`);
         const result = await res.json();
@@ -1603,8 +1593,7 @@ function renderizarFilaAprendizGP(a) {
     return `
         <tr class="hover-row">
             <td class="font-medium">${a.documento}</td>
-            <td>${a.nombre}</td>
-            <td>${a.apellido}</td>
+            <td>${a.nombre || a.nombres || ''} ${a.apellido || a.apellidos || ''}</td>
             <td class="text-center">${cb('mujer', 'Mujer')}</td>
             <td class="text-center">${cb('indigena', 'Indígena')}</td>
             <td class="text-center">${cb('narp', 'NARP')}</td>

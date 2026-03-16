@@ -1,0 +1,16 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/aprendices/page": "/admin/aprendices",
+  "/admin/asistencias/page": "/admin/asistencias",
+  "/admin/dashboard/page": "/admin/dashboard",
+  "/admin/fichas/page": "/admin/fichas",
+  "/admin/programas/page": "/admin/programas",
+  "/admin/reportes/page": "/admin/reportes",
+  "/admin/usuarios/page": "/admin/usuarios",
+  "/instructor/asistencias/page": "/instructor/asistencias",
+  "/instructor/dashboard/page": "/instructor/dashboard",
+  "/instructor/registrar/page": "/instructor/registrar",
+  "/instructor/reportes/page": "/instructor/reportes",
+  "/page": "/"
+}

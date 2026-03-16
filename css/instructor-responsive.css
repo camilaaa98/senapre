@@ -1,0 +1,208 @@
+/* ===========================================
+   INSTRUCTOR-RESPONSIVE.CSS — v1.0.0
+   Media Queries para Panel de Instructores
+   Mobile-First, Progressive Enhancement
+   =========================================== */
+
+/* === Mobile First (Base) === */
+@media (max-width: 480px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        transform: translateX(0);
+    }
+    
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .content-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .modal-content {
+        margin: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* === Tablet (481px - 768px) === */
+@media (min-width: 481px) and (max-width: 768px) {
+    .sidebar {
+        width: 280px;
+    }
+    
+    .main-content {
+        margin-left: 280px;
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+    
+    .content-title {
+        font-size: 1.75rem;
+    }
+    
+    .btn-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+/* === Desktop (769px - 1024px) === */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 300px;
+    }
+    
+    .main-content {
+        margin-left: 300px;
+        padding: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .content-title {
+        font-size: 1.875rem;
+    }
+}
+
+/* === Large Desktop (1025px+) === */
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 320px;
+    }
+    
+    .main-content {
+        margin-left: 320px;
+        padding: 2.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+    
+    .content-title {
+        font-size: 2rem;
+    }
+}
+
+/* === Print Styles === */
+@media print {
+    .sidebar,
+    .btn,
+    .modal,
+    .form-actions {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+    }
+    
+    .table-container {
+        overflow: visible;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        break-inside: avoid;
+    }
+    
+    .card {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+    }
+}
+
+/* === Accessibility === */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .btn,
+    .card,
+    .modal {
+        transition: none;
+    }
+}
+
+/* === High Contrast === */
+@media (prefers-contrast: high) {
+    :root {
+        --inst-primary: #000000;
+        --inst-bg: #ffffff;
+        --inst-text-main: #000000;
+        --inst-text-muted: #333333;
+    }
+    
+    .card {
+        border: 2px solid #000000;
+    }
+    
+    .btn {
+        border: 2px solid #000000;
+    }
+}
