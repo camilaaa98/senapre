@@ -128,8 +128,25 @@ function filtrarAprendices() {
 }
 
 function verAprendiz(documento) {
-    // TODO: Implementar modal con detalles del aprendiz
-    alert(`Funcionalidad para ver detalles del aprendiz ${documento} en desarrollo.`);
+    const aprendiz = aprendicesOriginales.find(a => a.documento == documento);
+    if (!aprendiz) return;
+
+    document.getElementById('modalAprendizNombre').textContent = `${aprendiz.nombre} ${aprendiz.apellido}`;
+    document.getElementById('modalAprendizDocumento').textContent = `Documento: ${aprendiz.documento}`;
+    
+    const estadoBadge = document.getElementById('modalAprendizEstado');
+    estadoBadge.textContent = aprendiz.estado || 'LECTIVA';
+    estadoBadge.className = `badge ${getEstadoClass(aprendiz.estado)}`;
+    
+    document.getElementById('modalAprendizCorreo').textContent = aprendiz.correo || 'Correo no registrado';
+    document.getElementById('modalAprendizCelular').textContent = aprendiz.celular || 'Celular no registrado';
+    document.getElementById('modalAprendizFicha').textContent = `Ficha: ${fichaActual.numero_ficha}`;
+
+    document.getElementById('modalAprendiz').style.display = 'flex';
+}
+
+function cerrarModalAprendiz() {
+    document.getElementById('modalAprendiz').style.display = 'none';
 }
 
 function irAAsistencia() {

@@ -1,0 +1,108 @@
+/* ==================== EXPORT BUTTONS GROUP ==================== */
+.export-buttons-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ==================== VOCERO PDF BUTTON STYLE ==================== */
+.voc-btn-pdf {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.voc-btn-pdf:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.voc-btn-pdf:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.voc-btn-pdf i {
+    font-size: 14px;
+}
+
+/* ==================== INSTRUCTOR MAIN ROW ==================== */
+.instructor-main-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.instructor-main-row .card-stat {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.instructor-main-row .card-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1024px) {
+    .instructor-main-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .instructor-main-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .export-buttons-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .voc-btn-pdf {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 16px;
+    }
+    
+    .voc-btn-pdf[style*="margin-right"] {
+        margin-right: 0 !important;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .export-buttons-group {
+        gap: 6px;
+    }
+    
+    .voc-btn-pdf {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+    
+    .instructor-main-row .card-stat {
+        padding: 16px;
+    }
+}

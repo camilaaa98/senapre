@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
     <link rel="stylesheet" href="css/instructor-layout.css?v=1.0.0">
     <link rel="stylesheet" href="css/instructor-enhancements.css?v=1.0.0">
+    <link rel="stylesheet" href="css/instructor-export-buttons.css?v=1.0.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -74,8 +75,9 @@
                 <div class="date-display" id="currentDate"></div>
             </div>
 
-            <!-- Métricas Principales -->
-            <div class="stats-grid">
+            <!-- Fichas Asignadas, Aprendices, Promedio Asistencias, Alertas en una fila -->
+            <div class="instructor-main-row">
+                <!-- Fichas Asignadas -->
                 <div class="card-stat">
                     <div class="card-header-flex">
                         <h3 class="card-title">Fichas Asignadas</h3>
@@ -85,6 +87,7 @@
                     <p class="stat-label">Total de fichas activas</p>
                 </div>
 
+                <!-- Aprendices -->
                 <div class="card-stat">
                     <div class="card-header-flex">
                         <h3 class="card-title">Aprendices</h3>
@@ -94,6 +97,7 @@
                     <p class="stat-label">En formación activa</p>
                 </div>
 
+                <!-- Promedio Asistencia -->
                 <div class="card-stat">
                     <div class="card-header-flex">
                         <h3 class="card-title">Promedio Asistencia</h3>
@@ -103,6 +107,7 @@
                     <p class="stat-label">General del instructor</p>
                 </div>
 
+                <!-- Alertas -->
                 <div class="card-stat">
                     <div class="card-header-flex">
                         <h3 class="card-title">Alertas</h3>
@@ -113,25 +118,22 @@
                 </div>
             </div>
 
-            <!-- Alertas y Calendario -->
-            <div class="content-grid-2-1">
-                <!-- Alertas -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-exclamation-circle"></i> Aprendices en Riesgo</h3>
-                    </div>
-                    <div id="alertasContainer" class="scroll-container-sm">
-                        <p class="text-center-muted p-20">Cargando...</p>
-                    </div>
+            <!-- Aprendices en Riesgo -->
+            <div class="card mb-20">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-exclamation-circle"></i> Aprendices en Riesgo</h3>
                 </div>
+                <div id="alertasContainer" class="scroll-container-sm">
+                    <p class="text-center-muted p-20">Cargando...</p>
+                </div>
+            </div>
 
-                <!-- Calendario -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Mi Programación</h3>
-                    </div>
-                    <div id="calendar" class="p-20"></div>
+            <!-- Calendario separado -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-calendar-alt"></i> Mi Programación</h3>
                 </div>
+                <div id="calendar" class="p-20"></div>
             </div>
         </main>
     </div>

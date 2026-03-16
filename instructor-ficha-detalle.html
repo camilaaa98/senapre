@@ -167,6 +167,42 @@
         </main>
     </div>
 
+    <!-- Modal de Detalles del Aprendiz -->
+    <div id="modalAprendiz" class="modal-overlay-generic hide">
+        <div class="modal-content">
+            <button onclick="cerrarModalAprendiz()" class="btn-close-modal">&times;</button>
+            <div class="modal-header-accent">
+                <h3 class="modal-title">Detalles del Aprendiz</h3>
+            </div>
+            <div class="modal-body">
+                <div class="aprendiz-profile-grid">
+                    <div class="profile-main-info">
+                        <h4 id="modalAprendizNombre" class="profile-name">-</h4>
+                        <p id="modalAprendizDocumento" class="profile-id">-</p>
+                        <span id="modalAprendizEstado" class="badge">-</span>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <i class="fas fa-envelope"></i>
+                            <span id="modalAprendizCorreo">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-phone"></i>
+                            <span id="modalAprendizCelular">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-address-card"></i>
+                            <span id="modalAprendizFicha">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions-footer">
+                    <button onclick="cerrarModalAprendiz()" class="btn btn-primary w-full">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/main.js?v=1.0.6"></script>
     <script src="js/instructor/ficha-detalle.js?v=1.0.0"></script>
