@@ -315,7 +315,7 @@ async function cargarAprendices(pagina = 1) {
                 } else {
                     thead.innerHTML = `
                         <th>Documento</th>
-                        <th>Nombres</th>
+                        <th>Nombre Completo</th>
                         <th>Población</th>
                         <th>Correo</th>
                         <th>Celular</th>
