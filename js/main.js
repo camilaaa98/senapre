@@ -97,8 +97,8 @@ class AuthSystem {
     isAdmin() {
         if (!this.currentUser) return false;
         const rol = (this.currentUser.rol || '').toLowerCase();
-        // Solo Directores y Administradores generales son "Admins" reales con poder total
-        return ['director', 'admin'].includes(rol);
+        // Incluir variaciones comunes de roles administrativos
+        return ['director', 'admin', 'administrador', 'coordinador', 'jefe'].some(r => rol.includes(r));
     }
 
     redirectToDashboard() {
@@ -591,13 +591,15 @@ function ocultarMenusRestringidos(ocultarTodo = false, esRespLiderazgo = false, 
             const sublinks = submenuAprendices.querySelectorAll('li');
             sublinks.forEach(li => {
                 const subtext = li.innerText.toLowerCase();
-                if (esRespLiderazgo) {
-                    // Resp Liderazgo ve todo el submenú de Aprendices
+                if (esDirector || esRespLiderazgo) {
+                    // Director y Resp Liderazgo ven todo el submenú de Aprendices
                     li.style.display = 'block';
-                } else if (!esDirector) {
-                    // Jefe de Bienestar (y otros) ve Lista y Población
+                } else {
+                    // Otros roles (Jefe de Bienestar, etc.) solo ven Lista y Población
                     if (!subtext.includes('población') && !subtext.includes('lista')) {
                         li.style.display = 'none';
+                    } else {
+                        li.style.display = 'block';
                     }
                 }
             });

@@ -15,7 +15,6 @@ try {
     
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     
-    // GET - Listar aprendices con paginación y filtros
     if ($method === 'GET') {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
@@ -27,13 +26,10 @@ try {
         $poblacion = isset($_GET['poblacion']) ? $_GET['poblacion'] : '';
         $tabla_poblacion = isset($_GET['tabla_poblacion']) ? $_GET['tabla_poblacion'] : '';
         $custom_filter = isset($_GET['custom_filter']) ? $_GET['custom_filter'] : '';
-        
-        // Construir query con filtros
         $where = [];
         $params = [];
         
         if (!empty($search)) {
-            // Búsqueda mejorada: incluye concatenación de nombre y apellido
             $where[] = "(a.nombre LIKE :search OR a.apellido LIKE :search OR a.documento LIKE :search OR a.correo LIKE :search OR (a.nombre || ' ' || a.apellido) LIKE :search)";
             $params[':search'] = "%$search%";
         }
@@ -49,10 +45,9 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } elseif (empty($tabla_poblacion) && empty($ficha) && empty($poblacion) && empty($search)) {
-            // EXCLUIR estados de inactividad total SOLO si no hay filtros activos
-            // Si el usuario busca algo específico, queremos que lo encuentre aunque sea cancelado.
-            $where[] = "a.estado NOT IN ('RETIRADO', 'CANCELADO', 'FINALIZADO', 'TRASLADO', 'APLAZADO', 'RETIRO', 'CANCELADA') AND a.estado IN ('LECTIVA')";
+        } else {
+            // Por defecto, solo mostrar aprendices en estado LECTIVA para asistencia
+            $where[] = "a.estado = 'LECTIVA'";
         }
 
         if (!empty($tabla_poblacion)) {
@@ -233,33 +228,48 @@ try {
         if (empty($documento)) {
             throw new Exception('Documento requerido');
         }
-        
-        // Actualización parcial de estado o datos
-        $sql = "UPDATE aprendices SET 
-                tipo_identificacion = :tipo,
-                nombre = :nombre,
-                apellido = :apellido,
-                correo = :correo,
-                celular = :celular,
-                numero_ficha = :ficha,
-                estado = :estado,
-                tipo_poblacion = :poblacion,
-                id_instructor_lider = :lider
-                WHERE documento = :doc";
-        
+
+        // Definir mapeo de campos permitidos
+        $mappings = [
+            'tipo_identificacion' => 'tipo_identificacion',
+            'nombre' => 'nombre',
+            'nombres' => 'nombre',
+            'apellido' => 'apellido',
+            'apellidos' => 'apellido',
+            'correo' => 'correo',
+            'celular' => 'celular',
+            'telefono' => 'celular',
+            'numero_ficha' => 'numero_ficha',
+            'ficha_id' => 'numero_ficha',
+            'estado' => 'estado',
+            'tipo_poblacion' => 'tipo_poblacion',
+            'poblacion' => 'tipo_poblacion',
+            'id_instructor_lider' => 'id_instructor_lider',
+            'mujer' => 'mujer',
+            'indigena' => 'indigena',
+            'narp' => 'narp',
+            'campesino' => 'campesino',
+            'lgbtiq' => 'lgbtiq',
+            'discapacidad' => 'discapacidad'
+        ];
+
+        $fields = [];
+        $params = [':doc' => $documento];
+
+        foreach ($mappings as $key => $column) {
+            if (array_key_exists($key, $data)) {
+                $fields[] = "$column = :$key";
+                $params[":$key"] = $data[$key];
+            }
+        }
+
+        if (empty($fields)) {
+            throw new Exception('No se enviaron datos para actualizar');
+        }
+
+        $sql = "UPDATE aprendices SET " . implode(', ', $fields) . " WHERE documento = :doc";
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':tipo' => $data['tipo_identificacion'] ?? 'CC',
-            ':nombre' => $data['nombre'],
-            ':apellido' => $data['apellido'],
-            ':correo' => $data['correo'],
-            ':celular' => $data['celular'] ?? null,
-            ':ficha' => $data['numero_ficha'],
-            ':estado' => $data['estado'] ?? 'LECTIVA',
-            ':poblacion' => $data['tipo_poblacion'] ?? '',
-            ':lider' => $data['id_instructor_lider'] ?? null,
-            ':doc' => $documento
-        ]);
+        $stmt->execute($params);
         
         echo json_encode(['success' => true, 'message' => 'Aprendiz actualizado exitosamente']);
         exit;
