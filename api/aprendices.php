@@ -49,6 +49,9 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
+        } else {
+            // Por defecto, solo mostrar aprendices en estado LECTIVA para asistencia
+            $where[] = "a.estado = 'LECTIVA'";
         }
 
         if (!empty($tabla_poblacion)) {
