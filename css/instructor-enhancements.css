@@ -171,6 +171,41 @@
     box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
+/* === Botones de Exportación === */
+.btn-excel {
+    background: linear-gradient(135deg, #1d6f42, #107c10) !important;
+    color: white !important;
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #e11d48, #be123c) !important;
+    color: white !important;
+}
+
+.btn-csv {
+    background: linear-gradient(135deg, #64748b, #475569) !important;
+    color: white !important;
+}
+
+.btn-compact {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-compact:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
 /* === Mejoras de Sidebar === */
 .sidebar {
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
