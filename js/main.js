@@ -97,8 +97,8 @@ class AuthSystem {
     isAdmin() {
         if (!this.currentUser) return false;
         const rol = (this.currentUser.rol || '').toLowerCase();
-        // Solo Directores y Administradores generales son "Admins" reales con poder total
-        return ['director', 'admin'].includes(rol);
+        // Incluir variaciones comunes de roles administrativos
+        return ['director', 'admin', 'administrador', 'coordinador', 'jefe'].some(r => rol.includes(r));
     }
 
     redirectToDashboard() {
