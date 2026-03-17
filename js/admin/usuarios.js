@@ -306,6 +306,15 @@ async function guardarUsuario(event) {
 
 async function cambiarEstadoUsuario(id, nuevoEstado) {
     try {
+        // Mostrar loading
+        const loadingHtml = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+        const selectElement = event.target;
+        const originalHtml = selectElement.outerHTML;
+        
+        // Deshabilitar el select durante la actualización
+        selectElement.disabled = true;
+        selectElement.innerHTML = `<option>${loadingHtml}</option>`;
+        
         const response = await fetch(`api/usuarios.php?id=${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -315,14 +324,24 @@ async function cambiarEstadoUsuario(id, nuevoEstado) {
         const result = await response.json();
 
         if (result.success) {
-            mostrarNotificacion('Estado actualizado', 'success');
-            cargarUsuarios();
+            // Mostrar notificación de éxito
+            mostrarNotificacion(`Estado ${nuevoEstado === 'activo' ? 'activado' : 'inactivado'} correctamente`, 'success');
+            
+            // Recargar la tabla para mostrar el cambio
+            await cargarUsuarios(paginaActual);
         } else {
-            mostrarNotificacion(result.message, 'error');
+            // Restaurar el select original
+            selectElement.outerHTML = originalHtml;
+            mostrarNotificacion(result.message || 'Error al cambiar estado', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        mostrarNotificacion('Error al cambiar estado', 'error');
+        mostrarNotificacion('Error de conexión al cambiar estado', 'error');
+        
+        // Recargar la página en caso de error grave
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
     }
 }
 
