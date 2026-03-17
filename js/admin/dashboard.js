@@ -117,6 +117,22 @@ async function cargarEstadisticas() {
                     `;
                 }).join('');
             }
+
+            // Estadísticas de Población Vulnerable
+            if (data.total_vulnerables !== undefined) {
+                animarContador('stat-total-poblacion', data.total_vulnerables);
+                // Si la API no dio desglose individual, podríamos estimar o pedirlo.
+                // Pero según api/reportes.php, total_vulnerables es la suma.
+                // Vamos a intentar obtener el desglose si existe.
+            }
+            
+            // Actualizar IDs individuales si están en data.resumen (necesitaría ajuste en API)
+            // Por ahora animamos los que tenemos
+            const pobElements = ['stat-mujer', 'stat-indigena', 'stat-narp', 'stat-campesino', 'stat-lgbtiq', 'stat-discapacidad'];
+            pobElements.forEach(id => {
+                const key = id.replace('stat-', '');
+                if (data[key] !== undefined) animarContador(id, data[key]);
+            });
         }
     } catch (error) {
         console.error('Error cargando estadísticas:', error);
@@ -181,10 +197,50 @@ async function cargarGraficaAprendices() {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { position: 'bottom' },
-                        title: { display: true, text: 'Aprendices por Estado' }
+                        title: { display: false }
                     }
                 }
             });
+
+            // Gráfica de Población (Polar Area o Radar para efecto Premium)
+            const ctxPob = document.getElementById('chartPoblacionDash');
+            if (ctxPob) {
+                const dataResumen = result.data.resumen;
+                new Chart(ctxPob.getContext('2d'), {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['Mujer', 'Indígena', 'NARP', 'Campesino', 'LGBTIQ+', 'Discapacidad'],
+                        datasets: [{
+                            data: [
+                                dataResumen.mujer || 0,
+                                dataResumen.indigena || 0,
+                                dataResumen.narp || 0,
+                                dataResumen.campesino || 0,
+                                dataResumen.lgbtiq || 0,
+                                dataResumen.discapacidad || 0
+                            ],
+                            backgroundColor: [
+                                'rgba(168, 85, 247, 0.7)',
+                                'rgba(132, 204, 22, 0.7)',
+                                'rgba(220, 38, 38, 0.7)',
+                                'rgba(107, 142, 35, 0.7)',
+                                'rgba(239, 68, 68, 0.7)',
+                                'rgba(74, 144, 226, 0.7)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            r: { display: false }
+                        }
+                    }
+                });
+            }
         }
     } catch (error) {
         console.error('Error cargando gráfica de aprendices:', error);

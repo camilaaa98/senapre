@@ -107,18 +107,21 @@ try {
     // 4. Aprendices por Estado (para la gráfica)
     // Ya agrupamos arriba en $aprendicesDetalle
     
+    $detalleVulnerables = [];
     $totalVulnerables = 0;
     try {
         $tablasPob = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
         foreach($tablasPob as $t) {
-            $totalVulnerables += safeQuery($conn, "SELECT COUNT(*) as total FROM $t");
+            $count = safeQuery($conn, "SELECT COUNT(*) as total FROM $t $where");
+            $detalleVulnerables[$t] = $count;
+            $totalVulnerables += $count;
         }
     } catch(Exception $e) {}
 
     echo json_encode([
         'success' => true,
         'data' => [
-            'resumen' => [
+            'resumen' => array_merge([
                 'aprendices' => $totalAprendices,
                 'aprendices_detalle' => $aprendicesDetalle,
                 'fichas' => $totalFichas,
@@ -131,7 +134,7 @@ try {
                 'voceros_enfoque' => $vocerosEnfoque,
                 'programas' => $totalProgramas,
                 'total_vulnerables' => $totalVulnerables
-            ],
+            ], $detalleVulnerables),
             'aprendices_estado' => $aprendicesDetalle,
             'fichas_programa' => $fichasPorPrograma,
             'asistencias_trend' => $asistenciasRecientes

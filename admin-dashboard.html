@@ -154,84 +154,59 @@
                     <p class="stat-desc">Programas activos en el sistema</p>
                 </div>
             </div>
-
-            <!-- Tarjetas Bienestar (Jefe Bienestar / Enfoque) -->
-            <div id="dashboard-bienestar-cards" class="admin-stats-grid" style="display:none">
-                <div class="stat-card lila" onclick="window.location.href='admin-aprendices.html#poblacion'">
-                    <div class="stat-icon lila"><i class="fas fa-female"></i></div>
-                    <h3>Mujeres</h3>
-                    <div class="stat-num" id="dashStatMujer">0</div>
-                    <p class="stat-desc">Población Femenina</p>
-                </div>
-                <div class="stat-card" style="border-top-color:#84cc16"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
-                    <div class="stat-icon" style="color:#84cc16"><i class="fas fa-seedling"></i></div>
-                    <h3>Indígenas</h3>
-                    <div class="stat-num" id="dashStatIndigena">0</div>
-                    <p class="stat-desc">Población Étnica</p>
-                </div>
-                <div class="stat-card rojo" onclick="window.location.href='admin-aprendices.html#poblacion'">
-                    <div class="stat-icon" style="color:#dc2626"><i class="fas fa-fist-raised"></i></div>
-                    <h3>NARP</h3>
-                    <div class="stat-num" id="dashStatNarp">0</div>
-                    <p class="stat-desc">Población Afro</p>
-                </div>
-                <div class="stat-card" style="border-top-color:#E91E63"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
-                    <div class="stat-icon" style="color:#ef4444"><i class="fas fa-rainbow"></i></div>
-                    <h3>LGBTIQ+</h3>
-                    <div class="stat-num" id="dashStatLgbtiq">0</div>
-                    <p class="stat-desc">Diversidad Sexual</p>
-                </div>
-                <div class="stat-card" style="border-top-color:#00324D;background:#00324D"
-                    onclick="window.location.href='admin-aprendices.html#poblacion'">
-                    <div class="stat-icon verde"><i class="fas fa-user-graduate"></i></div>
-                    <h3 style="color:#fff">Total Vulnerable</h3>
-                    <div class="stat-num" id="dashStatTotal" style="color:#fff">0</div>
-                    <p class="stat-desc" style="color:#ccc">General Población</p>
-                </div>
-            </div>
-
-            <!-- Panel estadísticas de población -->
-            <div id="panel-estadisticas-poblacion" class="card" style="display:none; margin-bottom:30px">
-                <div class="card-header">
-                    <h3 class="card-title">Distribución de Población Vulnerable</h3>
-                </div>
-                <div class="pob-chart-grid">
-                    <div>
-                        <div class="pob-stats-grid">
-                            <div class="pob-stat-item" style="border-left:4px solid #a855f7">
-                                <div class="pob-label">MUJER</div>
-                                <div class="pob-num" id="stat-mujer">0</div>
-                            </div>
-                            <div class="pob-stat-item" style="border-left:4px solid #84cc16">
-                                <div class="pob-label">INDÍGENA</div>
-                                <div class="pob-num" id="stat-indigena">0</div>
-                            </div>
-                            <div class="pob-stat-item" style="border-left:4px solid #dc2626">
-                                <div class="pob-label">NARP</div>
-                                <div class="pob-num" id="stat-narp">0</div>
-                            </div>
-                            <div class="pob-stat-item" style="border-left:4px solid #6B8E23">
-                                <div class="pob-label">CAMPESINO</div>
-                                <div class="pob-num" id="stat-campesino">0</div>
-                            </div>
-                            <div class="pob-stat-item" style="border-left:4px solid #ef4444">
-                                <div class="pob-label">LGBTIQ+</div>
-                                <div class="pob-num" id="stat-lgbtiq">0</div>
-                            </div>
-                            <div class="pob-stat-item" style="border-left:4px solid #4A90E2">
-                                <div class="pob-label">DISCAPACIDAD</div>
-                                <div class="pob-num" id="stat-discapacidad">0</div>
-                            </div>
-                        </div>
-                        <div class="pob-total">
-                            <div class="pob-label">TOTAL POBLACIÓN VULNERABLE</div>
-                            <div class="pob-num" id="stat-total-poblacion">0</div>
-                        </div>
+            
+            <div class="dashboard-secondary-grid">
+                <!-- Gráfico de Aprendices -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Estado de Aprendices</h3>
                     </div>
-                    <div class="pob-chart-wrap">
-                        <canvas id="chartPoblacionDash"></canvas>
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="chartAprendices"></canvas>
+                    </div>
+                </div>
+
+                <!-- Panel estadísticas de población -->
+                <div id="panel-estadisticas-poblacion" class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Distribución de Población Vulnerable</h3>
+                    </div>
+                    <div class="pob-chart-grid">
+                        <div>
+                            <div class="pob-stats-grid">
+                                <div class="pob-stat-item" style="border-left:4px solid #a855f7">
+                                    <div class="pob-label">MUJER</div>
+                                    <div class="pob-num" id="stat-mujer">0</div>
+                                </div>
+                                <div class="pob-stat-item" style="border-left:4px solid #84cc16">
+                                    <div class="pob-label">INDÍGENA</div>
+                                    <div class="pob-num" id="stat-indigena">0</div>
+                                </div>
+                                <div class="pob-stat-item" style="border-left:4px solid #dc2626">
+                                    <div class="pob-label">NARP</div>
+                                    <div class="pob-num" id="stat-narp">0</div>
+                                </div>
+                                <div class="pob-stat-item" style="border-left:4px solid #6B8E23">
+                                    <div class="pob-label">CAMPESINO</div>
+                                    <div class="pob-num" id="stat-campesino">0</div>
+                                </div>
+                                <div class="pob-stat-item" style="border-left:4px solid #ef4444">
+                                    <div class="pob-label">LGBTIQ+</div>
+                                    <div class="pob-num" id="stat-lgbtiq">0</div>
+                                </div>
+                                <div class="pob-stat-item" style="border-left:4px solid #4A90E2">
+                                    <div class="pob-label">DISCAPACIDAD</div>
+                                    <div class="pob-num" id="stat-discapacidad">0</div>
+                                </div>
+                            </div>
+                            <div class="pob-total">
+                                <div class="pob-label">TOTAL POBLACIÓN VULNERABLE</div>
+                                <div class="pob-num" id="stat-total-poblacion">0</div>
+                            </div>
+                        </div>
+                        <div class="pob-chart-wrap">
+                            <canvas id="chartPoblacionDash"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
