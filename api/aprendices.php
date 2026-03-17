@@ -263,6 +263,24 @@ try {
             }
         }
 
+        // Si solo se está actualizando el estado, permitir con solo la llave foránea
+        if (count($fields) === 1 && array_key_exists('estado', $data)) {
+            // Actualización simple de estado - solo requiere documento
+            $sql = "UPDATE aprendices SET estado = :estado WHERE documento = :doc";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':estado' => $data['estado'],
+                ':doc' => $documento
+            ]);
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Estado del aprendiz actualizado exitosamente'
+            ]);
+            exit;
+        }
+        
+        // Para otras actualizaciones, mantener la validación completa
         if (empty($fields)) {
             throw new Exception('No se enviaron datos para actualizar');
         }

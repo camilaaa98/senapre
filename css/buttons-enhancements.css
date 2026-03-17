@@ -1,0 +1,526 @@
+/**
+ * Enhanced Buttons CSS - SenApre
+ * Mejoras visuales y responsivas para todos los botones
+ */
+
+/* ── VARIABLES DE BOTONES ────────────────────────────────────────────────── */
+:root {
+    --btn-primary: #39A900;
+    --btn-primary-hover: #2d8600;
+    --btn-secondary: #64748b;
+    --btn-secondary-hover: #475569;
+    --btn-danger: #dc2626;
+    --btn-danger-hover: #b91c1c;
+    --btn-warning: #f59e0b;
+    --btn-warning-hover: #d97706;
+    --btn-info: #0ea5e9;
+    --btn-info-hover: #0284c7;
+    --btn-success: #16a34a;
+    --btn-success-hover: #15803d;
+    --btn-dark: #1f2937;
+    --btn-dark-hover: #111827;
+    --btn-light: #f8fafc;
+    --btn-light-hover: #e2e8f0;
+    
+    --btn-padding-sm: 8px 16px;
+    --btn-padding-md: 12px 24px;
+    --btn-padding-lg: 16px 32px;
+    --btn-font-size-sm: 0.875rem;
+    --btn-font-size-md: 1rem;
+    --btn-font-size-lg: 1.125rem;
+    --btn-radius: 8px;
+    --btn-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --btn-shadow-hover: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ── CLASES BASE DE BOTONES ───────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--btn-padding-md);
+    border: none;
+    border-radius: var(--btn-radius);
+    font-size: var(--btn-font-size-md);
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--btn-shadow);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1.5;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: var(--btn-shadow) !important;
+}
+
+.btn:disabled::before {
+    display: none;
+}
+
+/* ── VARIANTES DE COLOR ──────────────────────────────────────────────────── */
+.btn-primary {
+    background: linear-gradient(135deg, var(--btn-primary) 0%, var(--btn-primary-hover) 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-primary-hover) 0%, var(--btn-primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--btn-secondary) 0%, var(--btn-secondary-hover) 100%);
+    color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-secondary-hover) 0%, var(--btn-secondary) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--btn-danger) 0%, var(--btn-danger-hover) 100%);
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-danger-hover) 0%, var(--btn-danger) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--btn-warning) 0%, var(--btn-warning-hover) 100%);
+    color: white;
+}
+
+.btn-warning:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-warning-hover) 0%, var(--btn-warning) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--btn-info) 0%, var(--btn-info-hover) 100%);
+    color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-info-hover) 0%, var(--btn-info) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--btn-success) 0%, var(--btn-success-hover) 100%);
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-success-hover) 0%, var(--btn-success) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-dark {
+    background: linear-gradient(135deg, var(--btn-dark) 0%, var(--btn-dark-hover) 100%);
+    color: white;
+}
+
+.btn-dark:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-dark-hover) 0%, var(--btn-dark) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-light {
+    background: linear-gradient(135deg, var(--btn-light) 0%, var(--btn-light-hover) 100%);
+    color: var(--btn-dark);
+    border: 1px solid #e2e8f0;
+}
+
+.btn-light:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--btn-light-hover) 0%, var(--btn-light) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+/* ── VARIANTES DE TAMAÑO ────────────────────────────────────────────────── */
+.btn-sm {
+    padding: var(--btn-padding-sm);
+    font-size: var(--btn-font-size-sm);
+    border-radius: 6px;
+}
+
+.btn-md {
+    padding: var(--btn-padding-md);
+    font-size: var(--btn-font-size-md);
+}
+
+.btn-lg {
+    padding: var(--btn-padding-lg);
+    font-size: var(--btn-font-size-lg);
+    border-radius: 10px;
+}
+
+.btn-xl {
+    padding: 20px 40px;
+    font-size: 1.25rem;
+    border-radius: 12px;
+}
+
+/* ── VARIANTES ESPECIALES ────────────────────────────────────────────────── */
+.btn-outline {
+    background: transparent;
+    border: 2px solid currentColor;
+    color: var(--btn-primary);
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: var(--btn-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--btn-primary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+    background: rgba(57, 169, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-rounded {
+    border-radius: 50px;
+}
+
+.btn-square {
+    border-radius: 0;
+}
+
+.btn-pill {
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.875rem;
+}
+
+/* ── BOTONES CON ICONOS ──────────────────────────────────────────────────── */
+.btn-icon {
+    padding: 12px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.btn-icon-sm {
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+.btn-icon-lg {
+    padding: 16px;
+    min-width: 52px;
+    min-height: 52px;
+}
+
+/* ── GRUPOS DE BOTONES ──────────────────────────────────────────────────── */
+.btn-group {
+    display: flex;
+    gap: 0;
+    border-radius: var(--btn-radius);
+    overflow: hidden;
+    box-shadow: var(--btn-shadow);
+}
+
+.btn-group .btn {
+    border-radius: 0;
+    box-shadow: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: var(--btn-radius);
+    border-bottom-left-radius: var(--btn-radius);
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: var(--btn-radius);
+    border-bottom-right-radius: var(--btn-radius);
+    border-right: none;
+}
+
+.btn-group .btn:hover {
+    z-index: 1;
+}
+
+/* ── ESTADOS ESPECIALES ────────────────────────────────────────────────── */
+.btn-loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(57, 169, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(57, 169, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(57, 169, 0, 0); }
+}
+
+/* ── RESPONSIVIDAD ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .btn {
+        padding: var(--btn-padding-sm);
+        font-size: var(--btn-font-size-sm);
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        border-radius: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-group .btn:first-child {
+        border-top-left-radius: var(--btn-radius);
+        border-top-right-radius: var(--btn-radius);
+    }
+    
+    .btn-group .btn:last-child {
+        border-bottom-left-radius: var(--btn-radius);
+        border-bottom-right-radius: var(--btn-radius);
+        border-bottom: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.875rem;
+    }
+    
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+    
+    .btn-xl {
+        padding: 16px 32px;
+        font-size: 1.125rem;
+    }
+}
+
+/* ── ACCESIBILIDAD ───────────────────────────────────────────────────────────── */
+.btn:focus-visible {
+    outline: 2px solid var(--btn-primary);
+    outline-offset: 2px;
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* ── TEMAS ESPECIALES ───────────────────────────────────────────────────── */
+.btn-sena {
+    background: linear-gradient(135deg, #00324D 0%, #005A8F 100%);
+    color: white;
+}
+
+.btn-sena:hover:not(:disabled) {
+    background: linear-gradient(135deg, #005A8F 0%, #00324D 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-excel {
+    background: linear-gradient(135deg, #107C41 0%, #0E6B33 100%);
+    color: white;
+}
+
+.btn-excel:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0E6B33 0%, #107C41 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: white;
+}
+
+.btn-pdf:hover:not(:disabled) {
+    background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--btn-shadow-hover);
+}
+
+/* ── SOBREESCRITURAS ESPECÍFICAS ────────────────────────────────────────── */
+/* Para compatibilidad con clases existentes */
+.btn-primary[style*="background: #00324D"],
+.btn-primary.bg-gray-dark {
+    background: linear-gradient(135deg, #00324D 0%, #005A8F 100%) !important;
+}
+
+.btn-primary.bg-excel {
+    background: linear-gradient(135deg, #107C41 0%, #0E6B33 100%) !important;
+}
+
+.btn-primary.bg-pdf {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%) !important;
+}
+
+/* ── UTILIDADES ───────────────────────────────────────────────────────────── */
+.btn-block {
+    width: 100%;
+    display: flex;
+}
+
+.btn-w-auto {
+    width: auto;
+}
+
+.btn-f-width-auto {
+    width: auto !important;
+}
+
+.btn-no-shadow {
+    box-shadow: none !important;
+}
+
+.btn-no-transform {
+    transform: none !important;
+}
+
+/* ── ESPACIADO Y CONTENEDORES ───────────────────────────────────────────── */
+.btn-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-toolbar-vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.btn-container {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.btn-container-center {
+    justify-content: center;
+}
+
+.btn-container-end {
+    justify-content: flex-end;
+}
+
+.btn-container-between {
+    justify-content: space-between;
+}
+
+/* ── EFECTOS ESPECIALES ────────────────────────────────────────────────── */
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg) translate(-100%, -100%);
+    transition: transform 0.6s;
+}
+
+.btn-shine:hover::before {
+    transform: rotate(45deg) translate(100%, 100%);
+}
+
+.btn-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 10px rgba(57, 169, 0, 0.5); }
+    to { box-shadow: 0 0 20px rgba(57, 169, 0, 0.8); }
+}

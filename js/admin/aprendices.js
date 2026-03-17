@@ -593,6 +593,12 @@ async function guardarAprendiz(e) {
     const docOrig = document.getElementById('aprendizId').value;
     const esEdicion = !!docOrig;
 
+    // Mostrar loading en el botón
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    submitBtn.disabled = true;
+
     const checkedPoblaciones = Array.from(document.querySelectorAll('input[name="poblacion[]"]:checked')).map(cb => cb.value);
 
     const body = {
@@ -616,13 +622,21 @@ async function guardarAprendiz(e) {
         });
         const r = await res.json();
         if (r.success) {
-            mostrarNotificacion(r.message, 'success');
+            const message = esEdicion ? 'Aprendiz actualizado exitosamente' : 'Aprendiz creado exitosamente';
+            mostrarNotificacion(message, 'success');
             cerrarModal();
-            cargarAprendices(paginaActual);
+            await cargarAprendices(paginaActual);
         } else {
-            mostrarNotificacion(r.message, 'error');
+            mostrarNotificacion(r.message || 'Error al guardar aprendiz', 'error');
         }
-    } catch (er) { mostrarNotificacion('Error guardando', 'error'); }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error de conexión al guardar aprendiz', 'error');
+    } finally {
+        // Restaurar el botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 async function eliminarAprendiz(doc) {
@@ -636,9 +650,40 @@ async function eliminarAprendiz(doc) {
 
 async function cambiarEstadoAprendiz(doc, est) {
     try {
-        await fetch(`api/aprendices.php?documento=${doc}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado: est }) });
-        mostrarNotificacion('Estado actualizado', 'success');
-    } catch (e) { mostrarNotificacion('Error', 'error'); }
+        // Mostrar loading
+        const selectElement = event.target;
+        const originalHtml = selectElement.outerHTML;
+        
+        // Deshabilitar el select durante la actualización
+        selectElement.disabled = true;
+        selectElement.innerHTML = `<option><i class="fas fa-spinner fa-spin"></i> Actualizando...</option>`;
+        
+        const response = await fetch(`api/aprendices.php?documento=${doc}`, { 
+            method: 'PUT', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ estado: est }) 
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            mostrarNotificacion(`Estado actualizado a ${est}`, 'success');
+            // Recargar la lista para mostrar los cambios
+            await cargarAprendices(paginaActual);
+        } else {
+            // Restaurar el select original
+            selectElement.outerHTML = originalHtml;
+            mostrarNotificacion(result.message || 'Error al cambiar estado', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error de conexión al cambiar estado', 'error');
+        
+        // Recargar la página en caso de error grave
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+    }
 }
 
 // ========== BIOMETRÍA ROBUSTA ==========
