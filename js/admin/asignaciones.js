@@ -1,359 +1,629 @@
 /**
  * Gestión de Asignaciones - Admin
  * Sistema de asignación con calendario múltiple y horarios automáticos
+ * Aplicando principios SOLID y mejores prácticas
  */
 
-let fichasData = [];
-let instructoresData = [];
-let horariosPorJornada = {
-    'Diurna': { inicio: '06:00', fin: '12:00' },
-    'Diurna - Cerrado': { inicio: '06:00', fin: '12:00' },
-    'Tarde': { inicio: '13:00', fin: '18:00' },
-    'Tarde - Cerrado': { inicio: '13:00', fin: '18:00' },
-    'Noche': { inicio: '18:00', fin: '00:00' },
-    'Noche - Cerrado': { inicio: '18:00', fin: '00:00' },
-    'Nocturna': { inicio: '18:00', fin: '00:00' },
-    'Mixta': { inicio: '06:00', fin: '18:00' },
-    'Fin de semana': { inicio: '08:00', fin: '16:00' }
+// Constants (Single Responsibility)
+const ASSIGNMENT_CONSTANTS = {
+    API_ENDPOINTS: {
+        ASIGNACIONES: 'api/asignaciones.php',
+        INSTRUCTORES: 'api/instructores.php',
+        FICHAS: 'api/fichas.php'
+    },
+    HORARIOS_POR_JORNADA: {
+        'Diurna': { inicio: '06:00', fin: '12:00' },
+        'Diurna - Cerrado': { inicio: '06:00', fin: '12:00' },
+        'Tarde': { inicio: '13:00', fin: '18:00' },
+        'Tarde - Cerrado': { inicio: '13:00', fin: '18:00' },
+        'Noche': { inicio: '18:00', fin: '00:00' },
+        'Noche - Cerrado': { inicio: '18:00', fin: '00:00' },
+        'Nocturna': { inicio: '18:00', fin: '00:00' },
+        'Mixta': { inicio: '06:00', fin: '18:00' },
+        'Fin de semana': { inicio: '08:00', fin: '16:00' }
+    },
+    MESSAGES: {
+        SUCCESS: {
+            CREATED: 'Asignación creada correctamente',
+            UPDATED: 'Asignación actualizada correctamente',
+            DELETED: 'Asignación eliminada correctamente',
+            EXPORTED: 'Archivo exportado correctamente'
+        },
+        ERROR: {
+            GENERIC: 'Error en la operación',
+            NETWORK: 'Error de conexión',
+            VALIDATION: 'Error de validación',
+            NO_DATA: 'No hay datos disponibles'
+        },
+        WARNING: {
+            NO_SELECTION: 'Debe seleccionar instructor y ficha',
+            NO_DATES: 'Debe seleccionar al menos una fecha'
+        }
+    }
 };
-let calendarioFlatpickr = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    cargarAsignaciones();
-    cargarSelects();
-    inicializarCalendario();
-});
-
-function inicializarCalendario() {
-    calendarioFlatpickr = flatpickr("#fechasAsignadas", {
-        mode: "multiple",
-        dateFormat: "Y-m-d",
-        locale: "es",
-        minDate: "today",
-        inline: false,
-        onChange: function (selectedDates, dateStr, instance) {
-            console.log('Fechas seleccionadas:', selectedDates);
-        }
-    });
-}
-
-async function cargarAsignaciones() {
-    try {
-        const response = await fetch('api/asignaciones.php');
-        const result = await response.json();
-
-        if (result.success) {
-            mostrarAsignaciones(result.data);
-        }
-    } catch (error) {
-        console.error('Error:', error);
+// State Management (Single Responsibility)
+class AssignmentState {
+    constructor() {
+        this.fichasData = [];
+        this.instructoresData = [];
+        this.asignacionesData = [];
+        this.calendarioFlatpickr = null;
+        this.currentAssignment = null;
     }
 }
 
-function mostrarAsignaciones(datos) {
-    const tbody = document.getElementById('tablaAsignaciones');
-
-    if (datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 color-muted">No hay asignaciones activas</td></tr>';
-        return;
+// API Service (Single Responsibility)
+class AssignmentAPI {
+    static async fetch(endpoint, options = {}) {
+        try {
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error(`API Error (${endpoint}):`, error);
+            throw error;
+        }
     }
+    
+    static async getAsignaciones() {
+        return this.fetch(ASSIGNMENT_CONSTANTS.API_ENDPOINTS.ASIGNACIONES);
+    }
+    
+    static async getInstructores() {
+        return this.fetch(ASSIGNMENT_CONSTANTS.API_ENDPOINTS.INSTRUCTORES);
+    }
+    
+    static async getFichas() {
+        return this.fetch(ASSIGNMENT_CONSTANTS.API_ENDPOINTS.FICHAS);
+    }
+    
+    static async saveAssignment(data) {
+        return this.fetch(ASSIGNMENT_CONSTANTS.API_ENDPOINTS.ASIGNACIONES, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+    
+    static async deleteAssignment(id) {
+        return this.fetch(`${ASSIGNMENT_CONSTANTS.API_ENDPOINTS.ASIGNACIONES}?id=${id}`, {
+            method: 'DELETE'
+        });
+    }
+}
 
-    // Agrupar asignaciones por instructor y ficha
-    const agrupadas = {};
-    datos.forEach(a => {
-        const key = `${a.id_usuario}_${a.numero_ficha}`;
-        if (!agrupadas[key]) {
-            agrupadas[key] = {
-                ...a,
-                fechas: []
+// Notification Service (Single Responsibility)
+class NotificationService {
+    static show(message, type = 'success') {
+        try {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notif => notif.remove());
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Add to DOM
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutNotification 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 4000);
+            
+            // Click to close manually
+            notification.addEventListener('click', () => {
+                notification.style.animation = 'slideOutNotification 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            });
+            
+        } catch (error) {
+            console.error('Error mostrando notificación:', error);
+            alert(message); // Fallback
+        }
+    }
+}
+
+// Validation Service (Single Responsibility)
+class ValidationService {
+    static validateAssignment(data) {
+        const errors = [];
+        
+        if (!data.id_instructor) {
+            errors.push('Debe seleccionar un instructor');
+        }
+        
+        if (!data.id_ficha) {
+            errors.push('Debe seleccionar una ficha');
+        }
+        
+        if (!data.fechas || data.fechas.length === 0) {
+            errors.push('Debe seleccionar al menos una fecha');
+        }
+        
+        return {
+            isValid: errors.length === 0,
+            errors
+        };
+    }
+}
+
+// Export Service (Single Responsibility)
+class ExportService {
+    static async exportToExcel(data, filename = 'asignaciones_senapre') {
+        try {
+            if (!data || data.length === 0) {
+                NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NO_DATA, 'warning');
+                return;
+            }
+            
+            if (typeof XLSX === 'undefined') {
+                throw new Error('Librería XLSX no disponible');
+            }
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Asignaciones');
+            XLSX.writeFile(wb, filename + '.xlsx');
+            
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.SUCCESS.EXPORTED, 'success');
+        } catch (error) {
+            console.error('Error exportando Excel:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+        }
+    }
+    
+    static async exportToPDF(data, filename = 'asignaciones_senapre') {
+        try {
+            if (!data || data.length === 0) {
+                NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NO_DATA, 'warning');
+                return;
+            }
+            
+            if (typeof jsPDF === 'undefined') {
+                throw new Error('Librería jsPDF no disponible');
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configuración del documento
+            doc.setFontSize(16);
+            doc.text('Reporte de Asignaciones - SenApre', 20, 20);
+            
+            // Fecha de generación
+            doc.setFontSize(10);
+            doc.text(`Generado: ${new Date().toLocaleString('es-CO')}`, 20, 30);
+            
+            // Tabla simplificada
+            doc.setFontSize(12);
+            let y = 50;
+            
+            data.slice(0, 10).forEach((assignment, index) => {
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                doc.text(`Ficha: ${assignment.ficha || 'N/A'}`, 20, y);
+                doc.text(`Instructor: ${assignment.instructor || 'N/A'}`, 20, y + 8);
+                doc.text(`Fechas: ${assignment.fechas || 'N/A'}`, 20, y + 16);
+                y += 30;
+            });
+            
+            doc.save(filename + '.pdf');
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.SUCCESS.EXPORTED, 'success');
+        } catch (error) {
+            console.error('Error exportando PDF:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+        }
+    }
+    
+    static async exportToCSV(data, filename = 'asignaciones_senapre') {
+        try {
+            if (!data || data.length === 0) {
+                NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NO_DATA, 'warning');
+                return;
+            }
+            
+            const headers = Object.keys(data[0] || {});
+            const csvContent = [
+                headers.join(','),
+                ...data.map(row => 
+                    headers.map(header => {
+                        const value = row[header] || '';
+                        const escaped = String(value).replace(/"/g, '""');
+                        return `"${escaped}"`;
+                    }).join(',')
+                )
+            ].join('\n');
+            
+            const blob = new Blob(['\ufeff' + csvContent], { 
+                type: 'text/csv;charset=utf-8;' 
+            });
+            
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename + '.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.SUCCESS.EXPORTED, 'success');
+        } catch (error) {
+            console.error('Error exportando CSV:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+        }
+    }
+}
+
+// Main Assignment Controller (Single Responsibility)
+class AssignmentController {
+    constructor() {
+        this.state = new AssignmentState();
+        this.init();
+    }
+    
+    async init() {
+        try {
+            await this.loadInitialData();
+            this.initializeCalendar();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('Error initializing AssignmentController:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+        }
+    }
+    
+    async loadInitialData() {
+        try {
+            const [asignacionesResponse, instructoresResponse, fichasResponse] = await Promise.all([
+                AssignmentAPI.getAsignaciones(),
+                AssignmentAPI.getInstructores(),
+                AssignmentAPI.getFichas()
+            ]);
+            
+            if (asignacionesResponse.success) {
+                this.state.asignacionesData = asignacionesResponse.data;
+                this.renderAsignaciones();
+            }
+            
+            if (instructoresResponse.success) {
+                this.state.instructoresData = instructoresResponse.data;
+                this.populateInstructorSelect();
+            }
+            
+            if (fichasResponse.success) {
+                this.state.fichasData = fichasResponse.data;
+                this.populateFichaSelect();
+            }
+            
+        } catch (error) {
+            console.error('Error loading initial data:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NETWORK, 'error');
+        }
+    }
+    
+    initializeCalendar() {
+        try {
+            this.state.calendarioFlatpickr = flatpickr("#fechasAsignadas", {
+                mode: "multiple",
+                dateFormat: "Y-m-d",
+                locale: "es",
+                minDate: "today",
+                inline: false,
+                onChange: (selectedDates, dateStr, instance) => {
+                    console.log('Fechas seleccionadas:', selectedDates);
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing calendar:', error);
+        }
+    }
+    
+    setupEventListeners() {
+        // Search filter
+        const searchInput = document.getElementById('filtroSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.filterAsignaciones(e.target.value);
+            });
+        }
+        
+        // Date filter
+        const dateFilter = document.getElementById('filtroFecha');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', (e) => {
+                this.filterAsignacionesByDate(e.target.value);
+            });
+        }
+    }
+    
+    populateInstructorSelect() {
+        const select = document.getElementById('selectInstructor');
+        if (!select) return;
+        
+        const options = this.state.instructoresData.map(instructor => 
+            `<option value="${instructor.id_usuario}">${instructor.nombre} ${instructor.apellido}</option>`
+        ).join('');
+        
+        select.innerHTML = '<option value="">Seleccione un instructor...</option>' + options;
+    }
+    
+    populateFichaSelect() {
+        const select = document.getElementById('selectFicha');
+        if (!select) return;
+        
+        const options = this.state.fichasData.map(ficha => 
+            `<option value="${ficha.numero_ficha}">${ficha.numero_ficha} - ${ficha.nombre_programa}</option>`
+        ).join('');
+        
+        select.innerHTML = '<option value="">Seleccione una ficha...</option>' + options;
+    }
+    
+    renderAsignaciones(asignaciones = this.state.asignacionesData) {
+        const tbody = document.getElementById('tablaAsignaciones');
+        if (!tbody) return;
+        
+        if (!asignaciones || asignaciones.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center; padding: 30px;">
+                        <i class="fas fa-calendar-times" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px; display: block;"></i>
+                        No hay asignaciones registradas
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        const rows = asignaciones.map(assignment => `
+            <tr>
+                <td>${assignment.ficha || 'N/A'}</td>
+                <td>${assignment.instructor || 'N/A'}</td>
+                <td>${assignment.fechas || 'N/A'}</td>
+                <td>${assignment.horario || 'N/A'}</td>
+                <td>
+                    <button onclick="assignmentController.editAssignment(${assignment.id})" class="btn-action edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="assignmentController.deleteAssignment(${assignment.id})" class="btn-action delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+        
+        tbody.innerHTML = rows;
+    }
+    
+    filterAsignaciones(searchTerm) {
+        const filtered = this.state.asignacionesData.filter(assignment => 
+            assignment.ficha?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            assignment.instructor?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        this.renderAsignaciones(filtered);
+    }
+    
+    filterAsignacionesByDate(date) {
+        if (!date) {
+            this.renderAsignaciones();
+            return;
+        }
+        
+        const filtered = this.state.asignacionesData.filter(assignment => 
+            assignment.fechas && assignment.fechas.includes(date)
+        );
+        this.renderAsignaciones(filtered);
+    }
+    
+    async saveAssignment(event) {
+        event.preventDefault();
+        
+        try {
+            const formData = new FormData(event.target);
+            const data = {
+                id_instructor: formData.get('id_instructor') || document.getElementById('selectInstructor').value,
+                id_ficha: formData.get('id_ficha') || document.getElementById('selectFicha').value,
+                fechas: this.state.calendarioFlatpickr.selectedDates.map(date => 
+                    date.toISOString().split('T')[0]
+                )
             };
+            
+            // Validation
+            const validation = ValidationService.validateAssignment(data);
+            if (!validation.isValid) {
+                validation.errors.forEach(error => {
+                    NotificationService.show(error, 'warning');
+                });
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            submitBtn.disabled = true;
+            
+            // Save assignment
+            const response = await AssignmentAPI.saveAssignment(data);
+            
+            if (response.success) {
+                NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.SUCCESS.CREATED, 'success');
+                this.loadInitialData(); // Reload data
+                this.closeModal();
+            } else {
+                NotificationService.show(response.message || ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Error saving assignment:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NETWORK, 'error');
+        } finally {
+            // Restore button
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Asignación';
+                submitBtn.disabled = false;
+            }
         }
-        agrupadas[key].fechas.push(a.dias_formacion);
-    });
-
-    tbody.innerHTML = Object.values(agrupadas).map(a => `
-        <tr class="table-row-divider">
-            <td class="td-mono">${a.numero_ficha}</td>
-            <td>${a.nombre_instructor || 'N/A'}</td>
-            <td><span class="badge badge-info">${a.fechas.length} fecha(s)</span></td>
-            <td><span class="td-mono">${a.hora_inicio} - ${a.hora_fin}</span></td>
-            <td class="btn-action-container">
-                <button onclick="verDetalles('${a.id_usuario}', '${a.numero_ficha}')" class="btn-action btn-action-blue" title="Ver detalles">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button onclick="eliminarAsignaciones('${a.id_usuario}', '${a.numero_ficha}')" class="btn-action btn-action-red" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-async function cargarSelects() {
-    try {
-        // Cargar Instructores
-        const respInst = await fetch('api/usuarios.php?rol=instructor&limit=-1');
-        const resInst = await respInst.json();
-
-        const selectInst = document.getElementById('selectInstructor');
-        if (resInst.success && resInst.data.length > 0) {
-            instructoresData = resInst.data; // Guardar para validación
-            selectInst.innerHTML = '<option value="">Seleccione...</option>' +
-                resInst.data.map(u => `<option value="${u.id_usuario}">${u.nombre} ${u.apellido}</option>`).join('');
-        } else {
-            instructoresData = [];
-            selectInst.innerHTML = '<option value="">No hay instructores disponibles</option>';
-        }
-
-        // Cargar Fichas (TODAS las del sistema)
-        const respFicha = await fetch('api/fichas.php?limit=-1');
-        const resFicha = await respFicha.json();
-
-        const selectFicha = document.getElementById('selectFicha');
-        if (resFicha.success && resFicha.data.length > 0) {
-            fichasData = resFicha.data;
-            selectFicha.innerHTML = '<option value="">Seleccione...</option>' +
-                resFicha.data.map(f => `<option value="${f.numero_ficha}">${f.numero_ficha} - ${f.nombre_programa}</option>`).join('');
-        } else {
-            selectFicha.innerHTML = '<option value="">No hay fichas disponibles</option>';
-        }
-    } catch (error) {
-        console.error('Error cargando selects:', error);
     }
-}
-
-function cargarHorarioFicha() {
-    const fichaSeleccionada = document.getElementById('selectFicha').value;
-    const ficha = fichasData.find(f => f.numero_ficha == fichaSeleccionada);
-
-    if (ficha && ficha.jornada) {
-        const horario = horariosPorJornada[ficha.jornada];
-
-        document.getElementById('jornadaInfo').textContent = ficha.jornada;
-
-        if (horario) {
+    
+    async deleteAssignment(id) {
+        if (!confirm('¿Está seguro de eliminar esta asignación?')) {
+            return;
+        }
+        
+        try {
+            const response = await AssignmentAPI.deleteAssignment(id);
+            
+            if (response.success) {
+                NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.SUCCESS.DELETED, 'success');
+                this.loadInitialData(); // Reload data
+            } else {
+                NotificationService.show(response.message || ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.GENERIC, 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting assignment:', error);
+            NotificationService.show(ASSIGNMENT_CONSTANTS.MESSAGES.ERROR.NETWORK, 'error');
+        }
+    }
+    
+    editAssignment(id) {
+        const assignment = this.state.asignacionesData.find(a => a.id === id);
+        if (!assignment) return;
+        
+        this.state.currentAssignment = assignment;
+        
+        // Populate form
+        document.getElementById('selectInstructor').value = assignment.id_instructor || '';
+        document.getElementById('selectFicha').value = assignment.id_ficha || '';
+        
+        // Set dates
+        if (assignment.fechas && this.state.calendarioFlatpickr) {
+            const dates = assignment.fechas.split(',').map(date => new Date(date));
+            this.state.calendarioFlatpickr.setDate(dates);
+        }
+        
+        // Load schedule info
+        this.cargarHorarioFicha();
+        
+        // Show modal
+        this.openModal();
+    }
+    
+    cargarHorarioFicha() {
+        const fichaSelect = document.getElementById('selectFicha');
+        const selectedFicha = this.state.fichasData.find(f => 
+            f.numero_ficha === fichaSelect.value
+        );
+        
+        if (selectedFicha) {
+            const jornada = selectedFicha.jornada || 'Diurna';
+            const horario = ASSIGNMENT_CONSTANTS.HORARIOS_POR_JORNADA[jornada] || 
+                           ASSIGNMENT_CONSTANTS.HORARIOS_POR_JORNADA['Diurna'];
+            
+            document.getElementById('jornadaInfo').textContent = jornada;
             document.getElementById('horaInfo').textContent = `${horario.inicio} - ${horario.fin}`;
         } else {
-            document.getElementById('horaInfo').textContent = '';
+            document.getElementById('jornadaInfo').textContent = '-';
+            document.getElementById('horaInfo').textContent = '-';
         }
-    } else {
-        document.getElementById('jornadaInfo').textContent = '-';
-        document.getElementById('horaInfo').textContent = '';
+    }
+    
+    openModal() {
+        const modal = document.getElementById('modalAsignacion');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    closeModal() {
+        const modal = document.getElementById('modalAsignacion');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Reset form
+            document.getElementById('formAsignacion').reset();
+            if (this.state.calendarioFlatpickr) {
+                this.state.calendarioFlatpickr.clear();
+            }
+            
+            // Reset schedule info
+            document.getElementById('jornadaInfo').textContent = '-';
+            document.getElementById('horaInfo').textContent = '-';
+            
+            this.state.currentAssignment = null;
+        }
     }
 }
 
+// Global instance (Dependency Injection)
+let assignmentController;
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    assignmentController = new AssignmentController();
+});
+
+// Global functions for backward compatibility
 function nuevaAsignacion() {
-    console.log('Abriendo modal de nueva asignación...');
-    const form = document.getElementById('formAsignacion');
-    if (form) form.reset();
-
-    if (calendarioFlatpickr) {
-        calendarioFlatpickr.clear();
-    }
-
-    const jornadaInfo = document.getElementById('jornadaInfo');
-    const horaInfo = document.getElementById('horaInfo');
-    if (jornadaInfo) jornadaInfo.textContent = '-';
-    if (horaInfo) horaInfo.textContent = '';
-
-    const modal = document.getElementById('modalAsignacion');
-    if (modal) {
-        modal.style.display = 'flex';
-        console.log('Modal abierto.');
-    } else {
-        console.error('No se encontró el modal con ID modalAsignacion');
-        alert('Error: No se pudo abrir el formulario de asignación.');
-    }
+    assignmentController.openModal();
 }
 
 function cerrarModal() {
-    document.getElementById('modalAsignacion').style.display = 'none';
+    assignmentController.closeModal();
 }
 
-async function guardarAsignacion(event) {
-    event.preventDefault();
-
-    const fichaSeleccionada = document.getElementById('selectFicha').value;
-    const instructorSeleccionado = document.getElementById('selectInstructor').value;
-
-    if (!instructorSeleccionado || !fichaSeleccionada) {
-        alert('Debe seleccionar instructor y ficha');
-        return;
-    }
-
-    // Validar estado del instructor
-    const instructor = instructoresData.find(i => i.id_usuario == instructorSeleccionado);
-    if (instructor) {
-        const estadoNorm = String(instructor.estado).toLowerCase().trim();
-        if (estadoNorm === 'inactivo' || estadoNorm === '0' || estadoNorm === 'false') {
-            mostrarNotificacion(`No se puede asignar fichas a un instructor INACTIVO (${instructor.nombre} ${instructor.apellido})`, 'error');
-            return;
-        }
-    }
-
-    const fechasSeleccionadas = calendarioFlatpickr.selectedDates;
-    if (fechasSeleccionadas.length === 0) {
-        alert('Debe seleccionar al menos una fecha');
-        return;
-    }
-
-    // Obtener horario de la ficha o usar valores por defecto
-    const ficha = fichasData.find(f => f.numero_ficha == fichaSeleccionada);
-    let horario = { inicio: '06:00', fin: '18:00' }; // Valores por defecto
-
-    if (ficha && ficha.jornada && horariosPorJornada[ficha.jornada]) {
-        horario = horariosPorJornada[ficha.jornada];
-    }
-
-    const data = {
-        id_usuario: instructorSeleccionado,
-        numero_ficha: fichaSeleccionada,
-        fechas: fechasSeleccionadas.map(fecha => {
-            const year = fecha.getFullYear();
-            const month = String(fecha.getMonth() + 1).padStart(2, '0');
-            const day = String(fecha.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }),
-        hora_inicio: horario.inicio,
-        hora_fin: horario.fin
-    };
-
-    try {
-        const response = await fetch('api/asignaciones.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert('Asignación creada con éxito');
-            cerrarModal();
-            cargarAsignaciones();
-        } else {
-            alert('Error: ' + (result.message || 'No se pudo crear la asignación'));
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al guardar asignación');
-    }
+function guardarAsignacion(event) {
+    assignmentController.saveAssignment(event);
 }
 
-async function eliminarAsignaciones(idUsuario, numeroFicha) {
-    if (!confirm('¿Está seguro de eliminar todas las asignaciones de este instructor en esta ficha?')) return;
-
-    try {
-        const response = await fetch(`api/asignaciones.php?id_usuario=${idUsuario}&numero_ficha=${numeroFicha}`, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
-
-        if (result.success) {
-            mostrarNotificacion('Asignaciones eliminadas', 'success');
-            cargarAsignaciones();
-        } else {
-            mostrarNotificacion(result.message || 'Error al eliminar', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        mostrarNotificacion('Error al eliminar asignaciones', 'error');
-    }
+function cargarHorarioFicha() {
+    assignmentController.cargarHorarioFicha();
 }
 
-async function exportarAsignaciones() {
-    try {
-        mostrarNotificacion('Generando reporte...', 'info');
-
-        // La API de asignaciones actualmente devuelve TODO, así que no necesitamos limit=-1
-        // Pero si en el futuro se pagina, habría que ajustarlo.
-        const response = await fetch('api/asignaciones.php');
-        const result = await response.json();
-
-        if (!result.success || !result.data || result.data.length === 0) {
-            mostrarNotificacion('No hay datos para exportar', 'warning');
-            return;
-        }
-
-        let table = `
-            <table border="1">
-                <thead>
-                    <tr class="export-header">
-                        <th>Ficha</th>
-                        <th>Programa</th>
-                        <th>Jornada</th>
-                        <th>Instructor</th>
-                        <th>Fecha</th>
-                        <th>Horario</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        result.data.forEach(a => {
-            table += `
-                <tr>
-                    <td>${a.numero_ficha}</td>
-                    <td>${a.nombre_programa}</td>
-                    <td>${a.jornada}</td>
-                    <td>${a.nombre_instructor}</td>
-                    <td>${a.dias_formacion}</td>
-                    <td>${a.hora_inicio} - ${a.hora_fin}</td>
-                </tr>
-            `;
-        });
-
-        table += '</tbody></table>';
-
-        const blob = new Blob(['\uFEFF' + table], { type: 'application/vnd.ms-excel;charset=utf-8' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Asignaciones_${new Date().toISOString().split('T')[0]}.xls`;
-        link.click();
-
-        mostrarNotificacion('Archivo exportado exitosamente', 'success');
-    } catch (error) {
-        console.error('Error exportando:', error);
-        mostrarNotificacion('Error al exportar datos', 'error');
-    }
+function exportarExcel() {
+    ExportService.exportToExcel(assignmentController.state.asignacionesData);
 }
 
-async function exportarPDF() {
-    try {
-        mostrarNotificacion('Preparando PDF...', 'info');
-        const response = await fetch('api/asignaciones.php');
-        const result = await response.json();
+function exportarPDF() {
+    ExportService.exportToPDF(assignmentController.state.asignacionesData);
+}
 
-        if (!result.success || !result.data || result.data.length === 0) {
-            mostrarNotificacion('No hay datos para exportar', 'warning');
-            return;
-        }
-
-        // Crear una ventana temporal para impresión/PDF
-        const printWindow = window.open('', '_blank');
-        const content = `
-            <html>
-            <head>
-                <title>Reporte de Asignaciones - SenApre</title>
-                <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; }
-                    h1 { color: #00324D; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 10px; }
-                    th { background-color: #f2f2f2; color: #333; }
-                    .header-logo { text-align: center; margin-bottom: 20px; }
-                </style>
-            </head>
-            <body>
-                <h1>SISTEMA SENAPRE</h1>
-                <h3>Reporte de Asignación de Instructores</h3>
-                <p>Fecha de generación: ${new Date().toLocaleString()}</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>FICHA</th>
-                            <th>PROGRAMA</th>
-                            <th>INSTRUCTOR</th>
+function exportarCSV() {
+    ExportService.exportToCSV(assignmentController.state.asignacionesData);
+}
                             <th>FECHA</th>
                             <th>JORNADA</th>
                             <th>HORARIO</th>
