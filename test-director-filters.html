@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Filtros Director - SenApre</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #00324D 0%, #005A8F 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .test-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+        
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-loading {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .test-content {
+            padding: 20px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .result-success {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            color: #166534;
+        }
+        
+        .result-error {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .summary-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .summary-label {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Testing de Filtros</h1>
+            <p>Panel del Director - SenApre</p>
+        </div>
+        
+        <div class="content">
+            <div class="test-section">
+                <div class="test-header">
+                    <h3 class="test-title">🚀 Ejecutar Todos los Tests</h3>
+                    <span class="test-status status-pending" id="main-status">PENDIENTE</span>
+                </div>
+                <div class="test-content">
+                    <button class="test-button" onclick="runAllTests()">
+                        <span id="run-button-text">🧪 Ejecutar Todos los Tests</span>
+                    </button>
+                    
+                    <div class="summary" id="summary" style="display: none;">
+                        <h3>📊 Resumen de Resultados</h3>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-number" id="total-tests">0</div>
+                                <div class="summary-label">Total Tests</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="passed-tests" style="color: #16a34a;">0</div>
+                                <div class="summary-label">✅ Pasados</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="failed-tests" style="color: #dc2626;">0</div>
+                                <div class="summary-label">❌ Fallidos</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="success-rate">0%</div>
+                                <div class="summary-label">📈 Tasa de Éxito</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="test-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const testCases = [
+            {
+                name: 'API Reportes - Endpoint Principal',
+                url: 'api/reportes.php',
+                description: 'Verificar que el endpoint principal devuelva todos los campos esperados'
+            },
+            {
+                name: 'API Reportes - Filtro por Ficha',
+                url: 'api/reportes.php?ficha=123456',
+                description: 'Verificar filtrado por número de ficha'
+            },
+            {
+                name: 'API Reportes - Filtro por Población Mujer',
+                url: 'api/reportes.php?tabla_poblacion=mujer',
+                description: 'Verificar filtrado por población vulnerable (mujer)'
+            },
+            {
+                name: 'API Reportes - Filtro por Población Indígena',
+                url: 'api/reportes.php?tabla_poblacion=indigena',
+                description: 'Verificar filtrado por población vulnerable (indígena)'
+            },
+            {
+                name: 'API Reportes - Filtro por Población NARP',
+                url: 'api/reportes.php?tabla_poblacion=narp',
+                description: 'Verificar filtrado por población vulnerable (NARP)'
+            },
+            {
+                name: 'API Reportes - Filtro por Población Campesino',
+                url: 'api/reportes.php?tabla_poblacion=campesino',
+                description: 'Verificar filtrado por población vulnerable (campesino)'
+            },
+            {
+                name: 'API Reportes - Filtro por Población LGBTIQ+',
+                url: 'api/reportes.php?tabla_poblacion=lgbtiq',
+                description: 'Verificar filtrado por población vulnerable (LGBTIQ+)'
+            },
+            {
+                name: 'API Reportes - Filtro por Población Discapacidad',
+                url: 'api/reportes.php?tabla_poblacion=discapacidad',
+                description: 'Verificar filtrado por población vulnerable (discapacidad)'
+            }
+        ];
+
+        let testResults = [];
+
+        function createTestElements() {
+            const container = document.getElementById('test-container');
+            
+            testCases.forEach((testCase, index) => {
+                const testSection = document.createElement('div');
+                testSection.className = 'test-section';
+                testSection.innerHTML = `
+                    <div class="test-header">
+                        <h3 class="test-title">${testCase.name}</h3>
+                        <span class="test-status status-pending" id="status-${index}">PENDIENTE</span>
+                    </div>
+                    <div class="test-content">
+                        <p><strong>Descripción:</strong> ${testCase.description}</p>
+                        <p><strong>URL:</strong> <code>${testCase.url}</code></p>
+                        <button class="test-button" onclick="runTest(${index})">
+                            🧪 Ejecutar Test
+                        </button>
+                        <div id="result-${index}" style="display: none;"></div>
+                    </div>
+                `;
+                container.appendChild(testSection);
+            });
+        }
+
+        async function runTest(index) {
+            const testCase = testCases[index];
+            const statusEl = document.getElementById(`status-${index}`);
+            const resultEl = document.getElementById(`result-${index}`);
+            const button = event.target;
+            
+            // Actualizar UI
+            statusEl.className = 'test-status status-loading';
+            statusEl.textContent = 'EJECUTANDO';
+            button.disabled = true;
+            button.innerHTML = '<span class="loading-spinner"></span> Ejecutando...';
+            
+            try {
+                const startTime = performance.now();
+                const response = await fetch(testCase.url);
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                const data = await response.json();
+                
+                // Verificar respuesta
+                const isSuccess = response.ok && data.success;
+                
+                // Actualizar estado
+                statusEl.className = `test-status status-${isSuccess ? 'pass' : 'fail'}`;
+                statusEl.textContent = isSuccess ? 'PASS' : 'FAIL';
+                
+                // Mostrar resultado
+                resultEl.className = `test-result ${isSuccess ? 'result-success' : 'result-error'}`;
+                resultEl.style.display = 'block';
+                
+                let resultText = `Status: ${response.status} ${response.statusText}\n`;
+                resultText += `Response Time: ${responseTime}ms\n`;
+                resultText += `Success: ${data.success}\n\n`;
+                resultText += `Response Data:\n${JSON.stringify(data, null, 2)}`;
+                
+                resultEl.textContent = resultText;
+                
+                // Guardar resultado
+                testResults[index] = {
+                    ...testCase,
+                    status: isSuccess ? 'PASS' : 'FAIL',
+                    responseTime,
+                    data
+                };
+                
+            } catch (error) {
+                // Actualizar estado
+                statusEl.className = 'test-status status-fail';
+                statusEl.textContent = 'ERROR';
+                
+                // Mostrar error
+                resultEl.className = 'test-result result-error';
+                resultEl.style.display = 'block';
+                resultEl.textContent = `Error: ${error.message}`;
+                
+                // Guardar resultado
+                testResults[index] = {
+                    ...testCase,
+                    status: 'ERROR',
+                    error: error.message
+                };
+            } finally {
+                // Restaurar botón
+                button.disabled = false;
+                button.innerHTML = '🧪 Ejecutar Test';
+            }
+        }
+
+        async function runAllTests() {
+            const mainStatus = document.getElementById('main-status');
+            const runButton = document.getElementById('run-button-text');
+            
+            mainStatus.className = 'test-status status-loading';
+            mainStatus.textContent = 'EJECUTANDO';
+            runButton.innerHTML = '<span class="loading-spinner"></span> Ejecutando Todos...';
+            
+            testResults = [];
+            
+            for (let i = 0; i < testCases.length; i++) {
+                await runTest(i);
+                // Pequeña pausa entre tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Actualizar resumen
+            updateSummary();
+            
+            mainStatus.className = 'test-status status-pass';
+            mainStatus.textContent = 'COMPLETADO';
+            runButton.innerHTML = '🧪 Ejecutar Todos los Tests';
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            const totalTests = testResults.length;
+            const passedTests = testResults.filter(r => r.status === 'PASS').length;
+            const failedTests = testResults.filter(r => r.status === 'FAIL' || r.status === 'ERROR').length;
+            const successRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+            
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passedTests;
+            document.getElementById('failed-tests').textContent = failedTests;
+            document.getElementById('success-rate').textContent = `${successRate}%`;
+            
+            summary.style.display = 'block';
+            
+            // Verificación específica de filtros
+            verifyFilters();
+        }
+
+        function verifyFilters() {
+            const mainReport = testResults.find(r => r.url === 'api/reportes.php');
+            if (mainReport && mainReport.data && mainReport.data.success) {
+                const resumen = mainReport.data.data.resumen;
+                
+                console.log('📈 Métricas Principales:');
+                console.log(`   👥 Aprendices: ${resumen.aprendices || 0}`);
+                console.log(`   📚 Fichas: ${resumen.fichas || 0}`);
+                console.log(`   👨‍🏫 Usuarios: ${resumen.usuarios || 0}`);
+                console.log(`   🎯 Programas: ${resumen.programas || 0}`);
+                
+                console.log('\n🌍 Población Vulnerable:');
+                const poblacionFields = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
+                poblacionFields.forEach(field => {
+                    const count = resumen[field] || 0;
+                    console.log(`   ${field.toUpperCase()}: ${count}`);
+                });
+                
+                console.log(`   TOTAL VULNERABLES: ${resumen.total_vulnerables || 0}`);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            createTestElements();
+        });
+    </script>
+</body>
+</html>

@@ -48,16 +48,21 @@ try {
         }
     }
 
-    // 1. Totales Simples con Filtrado de Ámbito
+    // 1. Totales Simples con Filtrado de Ámbito y Estado LECTIVA
     $totalAprendices = 0;
-    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM aprendices $where");
+    $stmt = $conn->prepare("SELECT COUNT(*) as total FROM aprendices $whereA AND estado = 'LECTIVA'");
     $stmt->execute($params);
     $totalAprendices = $stmt->fetch()['total'];
 
-    // 1.1 Desglose de Aprendices por Estado (para el resumen)
-    $stmt = $conn->prepare("SELECT estado, COUNT(*) as cantidad FROM aprendices $where GROUP BY estado");
+    // 1.1 Desglose de Aprendices por Estado (solo LECTIVA para el resumen)
+    $stmt = $conn->prepare("SELECT estado, COUNT(*) as cantidad FROM aprendices $whereA GROUP BY estado");
     $stmt->execute($params);
     $aprendicesDetalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Filtrar para mostrar solo LECTIVA en el detalle
+    $aprendicesDetalle = array_filter($aprendicesDetalle, function($est) {
+        return $est['estado'] === 'LECTIVA';
+    });
 
     $totalFichas = 0;
     if (!empty($ficha)) {
@@ -106,14 +111,47 @@ try {
     
     // 4. Aprendices por Estado (ya definido arriba)
     
-    // 5. Fichas por Programa (Top 8)
+    // 5. Estadísticas de Población Vulnerable (desglose individual)
+    $detalleVulnerables = [];
+    $totalVulnerables = 0;
+    
+    try {
+        // Contar población vulnerable individual
+        $poblacionQueries = [
+            'mujer' => "SELECT COUNT(*) as total FROM aprendices WHERE genero = 'Femenino' $whereA",
+            'indigena' => "SELECT COUNT(*) as total FROM aprendices WHERE pertenece_pueblo_indigena = 'Si' $whereA",
+            'narp' => "SELECT COUNT(*) as total FROM aprendices WHERE pertenece_narp = 'Si' $whereA",
+            'campesino' => "SELECT COUNT(*) as total FROM aprendices WHERE pertenece_zona_rural = 'Si' $whereA",
+            'lgbtiq' => "SELECT COUNT(*) as total FROM aprendices WHERE identificacion_lgbtiq = 'Si' $whereA",
+            'discapacidad' => "SELECT COUNT(*) as total FROM aprendices WHERE tiene_discapacidad = 'Si' $whereA"
+        ];
+        
+        foreach ($poblacionQueries as $tipo => $query) {
+            $count = safeQuery($conn, $query, $params);
+            $detalleVulnerables[$tipo] = $count;
+            $totalVulnerables += $count;
+        }
+    } catch (Exception $e) {
+        // En caso de error, dejar valores en 0
+        $detalleVulnerables = [
+            'mujer' => 0,
+            'indigena' => 0,
+            'narp' => 0,
+            'campesino' => 0,
+            'lgbtiq' => 0,
+            'discapacidad' => 0
+        ];
+        $totalVulnerables = 0;
+    }
+    
+    // 6. Fichas por Programa (Top 8)
     $fichasPorPrograma = [];
     try {
         $stmtF = $conn->query("SELECT nombre_programa, COUNT(*) as cantidad FROM fichas GROUP BY nombre_programa ORDER BY cantidad DESC LIMIT 8");
         $fichasPorPrograma = $stmtF->fetchAll(PDO::FETCH_ASSOC);
     } catch(Exception $e) {}
 
-    // 6. Tendencia de Asistencias (Últimos 7 días)
+    // 7. Tendencia de Asistencias (Últimos 7 días)
     $asistenciasRecientes = [];
     try {
         $stmtA = $conn->query("SELECT fecha, COUNT(*) as cantidad FROM asistencias GROUP BY fecha ORDER BY fecha DESC LIMIT 7");
