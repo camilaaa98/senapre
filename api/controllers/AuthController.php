@@ -29,6 +29,17 @@ class AuthController {
 
             // Validar estado
             $estadoValido = ($usuario['estado'] == 1 || $usuario['estado'] === '1' || strtolower($usuario['estado']) === 'activo');
+            
+            // Si es vocero, verificar adicionalmente que tenga credenciales activas
+            if ($usuario['rol'] === 'vocero') {
+                $credencialesVoceroActivas = isset($usuario['credenciales_vocero_activas']) ? 
+                    ($usuario['credenciales_vocero_activas'] == 1 || $usuario['credenciales_vocero_activas'] === true || strtolower($usuario['credenciales_vocero_activas']) === 'true') : 
+                    false;
+                
+                if (!$credencialesVoceroActivas) {
+                    return $this->response(401, 'Credenciales de vocero inactivas. Contacte al administrador.');
+                }
+            }
 
             if (!$estadoValido) {
                 return $this->response(401, 'Usuario inactivo');
