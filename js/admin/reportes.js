@@ -14,17 +14,35 @@ function getStyleColor(variable) {
 // Funciones de Exportación
 async function exportarReporteGeneral(formato) {
     try {
-        // Mostrar loading
+        // Validar que tenemos un botón válido
+        if (!event || !event.target) {
+            showNotification('Error: No se pudo identificar el botón', 'error');
+            return;
+        }
+        
         const btn = event.target;
         const originalText = btn.innerHTML;
+        
+        // Mostrar loading
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
         btn.disabled = true;
 
         // Obtener datos del reporte
         const response = await fetch('api/reportes.php?export=true&format=' + formato);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const result = await response.json();
 
         if (result.success) {
+            // Validar que hay datos
+            if (!result.data || !Array.isArray(result.data) || result.data.length === 0) {
+                showNotification('No hay datos disponibles para exportar', 'warning');
+                return;
+            }
+            
             // Generar archivo según formato
             if (formato === 'excel') {
                 exportToExcel(result.data, 'reporte_general_senapre');
@@ -32,90 +50,216 @@ async function exportarReporteGeneral(formato) {
                 exportToPDF(result.data, 'reporte_general_senapre');
             } else if (formato === 'csv') {
                 exportToCSV(result.data, 'reporte_general_senapre');
+            } else {
+                showNotification('Formato no soportado', 'error');
+                return;
             }
             
             // Mostrar éxito
             showNotification('Reporte exportado correctamente', 'success');
         } else {
-            showNotification('Error al exportar reporte', 'error');
+            showNotification(result.message || 'Error al exportar reporte', 'error');
         }
     } catch (error) {
         console.error('Error exportando reporte:', error);
-        showNotification('Error de conexión al exportar', 'error');
+        
+        // Mensajes de error específicos
+        let errorMessage = 'Error al exportar reporte';
+        if (error.name === 'TypeError') {
+            errorMessage = 'Error de conexión con el servidor';
+        } else if (error.name === 'NetworkError') {
+            errorMessage = 'Error de red. Verifique su conexión';
+        }
+        
+        showNotification(errorMessage, 'error');
     } finally {
         // Restaurar botón
-        const btn = event.target;
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if (event && event.target) {
+            const btn = event.target;
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
 }
 
 // Función para exportar a Excel
 function exportToExcel(data, filename) {
-    // Implementación simplificada para Excel
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    XLSX.writeFile(wb, filename + '.xlsx');
+    try {
+        // Validar datos
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            showNotification('No hay datos para exportar', 'warning');
+            return;
+        }
+
+        // Verificar si XLSX está disponible
+        if (typeof XLSX === 'undefined') {
+            showNotification('Librería XLSX no disponible', 'error');
+            return;
+        }
+
+        // Crear worksheet
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Reporte General');
+        XLSX.writeFile(wb, filename + '.xlsx');
+        
+        showNotification('Excel exportado correctamente', 'success');
+    } catch (error) {
+        console.error('Error exportando Excel:', error);
+        showNotification('Error al exportar Excel', 'error');
+    }
 }
 
 // Función para exportar a PDF
 function exportToPDF(data, filename) {
-    // Implementación simplificada para PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Agregar contenido
-    doc.setFontSize(12);
-    doc.text('Reporte General - SenApre', 20, 20);
-    
-    // Agregar tabla
-    let y = 40;
-    data.forEach((row, index) => {
-        Object.entries(row).forEach(([key, value]) => {
-            doc.text(`${key}: ${value}`, 20, y);
-            y += 10;
-        });
-        y += 10;
-    });
-    
-    doc.save(filename + '.pdf');
+    try {
+        // Validar datos
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            showNotification('No hay datos para exportar', 'warning');
+            return;
+        }
+
+        // Verificar si jsPDF está disponible
+        if (typeof jsPDF === 'undefined') {
+            showNotification('Librería jsPDF no disponible', 'error');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Configuración del documento
+        doc.setFontSize(16);
+        doc.text('Reporte General - SenApre', 20, 20);
+        
+        // Fecha de generación
+        doc.setFontSize(10);
+        doc.text(`Generado: ${new Date().toLocaleString('es-CO')}`, 20, 30);
+        
+        // Agregar tabla
+        doc.setFontSize(12);
+        let y = 50;
+        
+        // Encabezados
+        if (data.length > 0) {
+            const headers = Object.keys(data[0]);
+            headers.forEach((header, index) => {
+                doc.text(`${header}:`, 20, y);
+                y += 8;
+            });
+            
+            // Datos
+            data.slice(0, 10).forEach((row, index) => {
+                if (y > 250) { // Nueva página si se excede
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                Object.entries(row).forEach(([key, value]) => {
+                    const text = `${value || 'N/A'}`;
+                    doc.text(text, 25, y);
+                    y += 8;
+                });
+                y += 5;
+            });
+        }
+        
+        doc.save(filename + '.pdf');
+        showNotification('PDF exportado correctamente', 'success');
+    } catch (error) {
+        console.error('Error exportando PDF:', error);
+        showNotification('Error al exportar PDF', 'error');
+    }
 }
 
 // Función para exportar a CSV
 function exportToCSV(data, filename) {
-    // Convertir a CSV
-    const headers = Object.keys(data[0] || {});
-    const csvContent = [
-        headers.join(','),
-        ...data.map(row => headers.map(header => row[header]).join(','))
-    ].join('\n');
-    
-    // Descargar archivo
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename + '.csv';
-    link.click();
+    try {
+        // Validar datos
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            showNotification('No hay datos para exportar', 'warning');
+            return;
+        }
+
+        // Convertir a CSV
+        const headers = Object.keys(data[0] || {});
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => 
+                headers.map(header => {
+                    const value = row[header] || '';
+                    // Escapar comillas y comas
+                    const escaped = String(value).replace(/"/g, '""');
+                    return `"${escaped}"`;
+                }).join(',')
+            )
+        ].join('\n');
+        
+        // Crear y descargar archivo
+        const blob = new Blob(['\ufeff' + csvContent], { 
+            type: 'text/csv;charset=utf-8;' 
+        });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename + '.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification('CSV exportado correctamente', 'success');
+    } catch (error) {
+        console.error('Error exportando CSV:', error);
+        showNotification('Error al exportar CSV', 'error');
+    }
 }
 
 // Función para mostrar notificaciones
 function showNotification(message, type) {
-    // Crear elemento de notificación
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
-        <span>${message}</span>
-    `;
-    
-    // Agregar al DOM
-    document.body.appendChild(notification);
-    
-    // Remover después de 3 segundos
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+    try {
+        // Remover notificaciones existentes
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notif => notif.remove());
+        
+        // Crear elemento de notificación
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        // Agregar al DOM
+        document.body.appendChild(notification);
+        
+        // Auto-remover después de 4 segundos
+        setTimeout(() => {
+            notification.style.animation = 'slideOutNotification 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, 4000);
+        
+        // Click para cerrar manualmente
+        notification.addEventListener('click', () => {
+            notification.style.animation = 'slideOutNotification 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        });
+        
+    } catch (error) {
+        console.error('Error mostrando notificación:', error);
+        // Fallback a alert
+        alert(message);
+    }
 }
 
 async function cargarReportes() {
