@@ -85,6 +85,14 @@ function mostrarProgramas(programas) {
 
 async function cambiarNivelPrograma(nombrePrograma, nuevoNivel) {
     try {
+        // Mostrar loading
+        const selectElement = event.target;
+        const originalHtml = selectElement.outerHTML;
+        
+        // Deshabilitar el select durante la actualización
+        selectElement.disabled = true;
+        selectElement.innerHTML = `<option><i class="fas fa-spinner fa-spin"></i> Actualizando...</option>`;
+        
         const response = await fetch('api/programas.php', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -97,15 +105,24 @@ async function cambiarNivelPrograma(nombrePrograma, nuevoNivel) {
         const result = await response.json();
 
         if (result.success) {
-            mostrarNotificacion('Nivel de formación actualizado', 'success');
+            // Mostrar notificación específica
+            mostrarNotificacion(`Todos los programas del nivel ${nuevoNivel} han sido actualizados`, 'success');
+            
+            // Recargar la tabla para mostrar los cambios
+            await cargarProgramas();
         } else {
-            mostrarNotificacion(result.message, 'error');
-            cargarProgramas(); // Revertir
+            // Restaurar el select original
+            selectElement.outerHTML = originalHtml;
+            mostrarNotificacion(result.message || 'Error al actualizar nivel', 'error');
         }
     } catch (error) {
         console.error('Error:', error);
-        mostrarNotificacion('Error al actualizar nivel', 'error');
-        cargarProgramas();
+        mostrarNotificacion('Error de conexión al actualizar nivel', 'error');
+        
+        // Recargar la página en caso de error grave
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
     }
 }
 
@@ -218,6 +235,12 @@ async function guardarPrograma(event) {
     };
 
     try {
+        // Mostrar loading en el botón
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        submitBtn.disabled = true;
+
         const url = 'api/programas.php';
         const method = editMode ? 'PUT' : 'POST';
 
@@ -230,15 +253,31 @@ async function guardarPrograma(event) {
         const result = await response.json();
 
         if (result.success) {
-            mostrarNotificacion(editMode ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente', 'success');
+            const message = editMode ? 'Programa actualizado exitosamente' : 'Programa creado exitosamente';
+            
+            // Si se está actualizando el nivel, horario o tipo, mostrar mensaje específico
+            if (editMode && (formData.nivel_formacion || formData.hora_entrada || formData.hora_salida)) {
+                const nivelActual = document.querySelector(`#nivelFormacion option[value="${formData.nivel_formacion}"]`).textContent;
+                mostrarNotificacion(`Todos los programas del nivel ${nivelActual} han sido actualizados`, 'success');
+            } else {
+                mostrarNotificacion(message, 'success');
+            }
+            
             cerrarModal();
-            cargarProgramas();
+            await cargarProgramas();
         } else {
             mostrarNotificacion(result.message, 'error');
         }
     } catch (error) {
         console.error('Error:', error);
         mostrarNotificacion('Error al guardar programa', 'error');
+    } finally {
+        // Restaurar el botón
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = editMode ? '<i class="fas fa-save"></i> Actualizar' : '<i class="fas fa-save"></i> Guardar';
+            submitBtn.disabled = false;
+        }
     }
 }
 

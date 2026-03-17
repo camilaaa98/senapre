@@ -124,43 +124,87 @@ try {
             throw new Exception('Nombre de programa requerido para actualizar');
         }
 
-        $fields = [];
-        $params = [':nombre' => $data['nombre_programa']];
+        // Si se actualiza el nivel, horario o tipo, actualizar todos los programas del mismo nivel
+        if (isset($data['nivel_formacion']) || isset($data['hora_entrada']) || isset($data['hora_salida']) || isset($data['tipo_oferta'])) {
+            
+            $fields = [];
+            $params = [':nombre' => $data['nombre_programa']];
+            
+            if (isset($data['nivel_formacion'])) {
+                $fields[] = "nivel_formacion = :nivel";
+                $params[':nivel'] = $data['nivel_formacion'];
+            }
+            if (isset($data['hora_entrada'])) {
+                $fields[] = "hora_entrada = :entrada";
+                $params[':entrada'] = $data['hora_entrada'];
+            }
+            if (isset($data['hora_salida'])) {
+                $fields[] = "hora_salida = :salida";
+                $params[':salida'] = $data['hora_salida'];
+            }
+            if (isset($data['tipo_oferta'])) {
+                $fields[] = "tipo_oferta = :tipo";
+                $params[':tipo'] = $data['tipo_oferta'];
+            }
+            if (isset($data['estado'])) {
+                $fields[] = "estado = :estado";
+                $params[':estado'] = $data['estado'];
+            }
 
-        if (isset($data['nivel_formacion'])) {
-            $fields[] = "nivel_formacion = :nivel";
-            $params[':nivel'] = $data['nivel_formacion'];
-        }
-        if (isset($data['hora_entrada'])) {
-            $fields[] = "hora_entrada = :entrada";
-            $params[':entrada'] = $data['hora_entrada'];
-        }
-        if (isset($data['hora_salida'])) {
-            $fields[] = "hora_salida = :salida";
-            $params[':salida'] = $data['hora_salida'];
-        }
-        if (isset($data['tipo_oferta'])) {
-            $fields[] = "tipo_oferta = :tipo";
-            $params[':tipo'] = $data['tipo_oferta'];
-        }
-        if (isset($data['estado'])) {
-            $fields[] = "estado = :estado";
-            $params[':estado'] = $data['estado'];
-        }
+            if (empty($fields)) {
+                throw new Exception('No se enviaron campos para actualizar');
+            }
 
-        if (empty($fields)) {
-            throw new Exception('No se enviaron campos para actualizar');
+            // Actualizar todos los programas del mismo nivel
+            $sql = "UPDATE programas_formacion SET " . implode(', ', $fields) . " WHERE nivel_formacion = (SELECT nivel_formacion FROM programas_formacion WHERE nombre_programa = :nombre LIMIT 1)";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Todos los programas del nivel ' . $data['nivel_formacion'] . ' han sido actualizados exitosamente'
+            ]);
+            exit;
+        } else {
+            // Actualización normal de un solo programa
+            $fields = [];
+            $params = [':nombre' => $data['nombre_programa']];
+
+            if (isset($data['nivel_formacion'])) {
+                $fields[] = "nivel_formacion = :nivel";
+                $params[':nivel'] = $data['nivel_formacion'];
+            }
+            if (isset($data['hora_entrada'])) {
+                $fields[] = "hora_entrada = :entrada";
+                $params[':entrada'] = $data['hora_entrada'];
+            }
+            if (isset($data['hora_salida'])) {
+                $fields[] = "hora_salida = :salida";
+                $params[':salida'] = $data['hora_salida'];
+            }
+            if (isset($data['tipo_oferta'])) {
+                $fields[] = "tipo_oferta = :tipo";
+                $params[':tipo'] = $data['tipo_oferta'];
+            }
+            if (isset($data['estado'])) {
+                $fields[] = "estado = :estado";
+                $params[':estado'] = $data['estado'];
+            }
+
+            if (empty($fields)) {
+                throw new Exception('No se enviaron campos para actualizar');
+            }
+
+            $sql = "UPDATE programas_formacion SET " . implode(', ', $fields) . " WHERE nombre_programa = :nombre";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Programa actualizado exitosamente'
+            ]);
+            exit;
         }
-
-        $sql = "UPDATE programas_formacion SET " . implode(', ', $fields) . " WHERE nombre_programa = :nombre";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute($params);
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'Programa actualizado exitosamente'
-        ]);
-        exit;
     }
     
     // DELETE - Eliminar programa
