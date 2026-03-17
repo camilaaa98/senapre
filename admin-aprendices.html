@@ -109,8 +109,7 @@
                             aprendices matriculados</p>
                     </div>
                     <div class="header-actions">
-                        <button onclick="window.location.href='admin-dashboard.html'" class="btn-primary"
-                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                        <button onclick="window.location.href='admin-dashboard.html'" class="btn-primary bg-gray-dark f-width-auto p-15">
                             <i class="fas fa-arrow-left"></i> Volver
                         </button>
                     </div>
@@ -154,12 +153,10 @@
                             <button onclick="nuevoAprendiz()" class="btn-primary btn-moderate">
                                 <i class="fas fa-plus"></i> Agregar Aprendiz
                             </button>
-                            <button onclick="exportarAprendicesPDF()" class="btn-primary btn-moderate"
-                                style="background: #ef4444;">
+                            <button onclick="exportarAprendicesPDF()" class="btn-primary btn-moderate bg-red">
                                 <i class="fas fa-file-pdf"></i> Exportar PDF
                             </button>
-                            <button onclick="exportarAprendicesExcel()" class="btn-primary btn-moderate"
-                                style="background: #16a34a;">
+                            <button onclick="exportarAprendicesExcel()" class="btn-primary btn-moderate bg-success">
                                 <i class="fas fa-file-excel"></i> Exportar Excel
                             </button>
                         </div>
@@ -198,8 +195,7 @@
                         <p class="content-description">Estadísticas por categorías de vulnerabilidad</p>
                     </div>
                     <div class="header-actions">
-                        <button onclick="mostrarSeccion(event, 'lista')" class="btn-primary"
-                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                        <button onclick="mostrarSeccion(event, 'lista')" class="btn-primary bg-gray-dark f-width-auto p-15">
                             <i class="fas fa-arrow-left"></i> Volver a Lista
                         </button>
                     </div>
@@ -207,7 +203,7 @@
                 <div class="chart-section-grid">
                     <!-- Tarjetas de Estadística -->
                     <div class="card">
-                        <div class="card-header" style="display: flex; justify-content: center; align-items: center;">
+                        <div class="card-header flex-center">
                             <h3 class="card-title">DISTRIBUCIÓN POR TIPO DE POBLACIÓN</h3>
 
                         </div>
@@ -255,28 +251,25 @@
                                     <p id="count-discapacidad">0</p>
                                 </div>
                             </div>
-                            <div class="stat-card" onclick="mostrarGestionPoblacion()"
-                                style="background: #39A900; color: white;">
+                            <div class="stat-card bg-sena" onclick="mostrarGestionPoblacion()">
                                 <div class="stat-icon"><i class="fas fa-plus-circle"></i></div>
                                 <div class="stat-info">
                                     <h3>AGREGAR</h3>
-                                    <p style="font-size: 0.9rem; font-weight: normal;">Gestionar Tipos</p>
+                                    <p class="p-normal">Gestionar Tipos</p>
                                 </div>
                             </div>
-                            <div class="stat-card" onclick="mostrarModalVoceroEnfoque()"
-                                style="background: #2563eb; color: white;">
+                            <div class="stat-card bg-blue" onclick="mostrarModalVoceroEnfoque()">
                                 <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
                                 <div class="stat-info">
                                     <h3>VOCERO</h3>
-                                    <p style="font-size: 0.9rem; font-weight: normal;">ENFOQUE DIFERENCIAL</p>
+                                    <p class="p-normal">ENFOQUE DIFERENCIAL</p>
                                 </div>
                             </div>
-                            <div class="stat-card" onclick="mostrarModalRepresentantes()"
-                                style="background: #ea580c; color: white;">
+                            <div class="stat-card bg-orange" onclick="mostrarModalRepresentantes()">
                                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                                 <div class="stat-info">
                                     <h3>REPRESENTANTES</h3>
-                                    <p style="font-size: 0.9rem; font-weight: normal;">DIURNA / MIXTA</p>
+                                    <p class="p-normal">DIURNA / MIXTA</p>
                                 </div>
                             </div>
                         </div>
@@ -284,7 +277,7 @@
 
                     <!-- Gráfica -->
                     <div class="chart-container-wrapper">
-                        <div class="card-header" style="width: 100%; text-align: center; margin-bottom: 10px;">
+                        <div class="card-header w-100 text-center mb-10">
                             <h3 class="card-title">Gráfica de Distribución</h3>
                         </div>
                         <div class="chart-canvas-container">
@@ -296,17 +289,14 @@
                 </div>
 
                 <!-- Nueva Tabla de Detalles para Población -->
-                <div class="card" style="margin-top: 20px;">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card mt-20">
+                    <div class="card-header flex-between">
                         <h3 class="card-title" id="poblacion-detalle-titulo">Detalle de Aprendices</h3>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="abrirModalAnexarPoblacion()" class="btn-primary"
-                                style="padding: 8px 15px; font-size: 0.9rem; background-color: #3b82f6;">
+                        <div class="d-flex gap-10">
+                            <button onclick="abrirModalAnexarPoblacion()" class="btn-primary p-15 f-width-auto bg-blue">
                                 <i class="fas fa-plus"></i> Anexar Aprendiz
                             </button>
-                            <button onclick="descargarPDFPoblacion()" class="btn-primary"
-                                style="padding: 8px 15px; font-size: 0.9rem; background-color: #ef4444;">
+                            <button onclick="descargarPDFPoblacion()" class="btn-primary p-15 f-width-auto bg-red">
                                 <i class="fas fa-file-pdf"></i> PDF
                             </button>
                         </div>
@@ -345,8 +335,7 @@
                             Discapacidad</p>
                     </div>
                     <div class="header-actions">
-                        <button onclick="mostrarSeccion(event, 'poblacion')" class="btn-primary"
-                            style="background: #64748b; width: auto; padding: 10px 20px;">
+                        <button onclick="mostrarSeccion(event, 'poblacion')" class="btn-primary bg-gray-dark f-width-auto p-15">
                             <i class="fas fa-arrow-left"></i> Volver a Estadísticas
                         </button>
                     </div>
@@ -417,12 +406,10 @@
             <!-- SECCIÓN: EXCUSAS -->
             <div id="seccion-excusas" class="content-section" style="display:none;">
                 <div class="card">
-                    <div class="card-header"
-                        style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-header flex-between">
                         <h3 class="card-title">Gestión de Excusas</h3>
                         <div class="header-actions">
-                            <button onclick="cargarExcusasPendientes()" class="btn-icon" title="Actualizar"
-                                style="background: none; border: none; cursor: pointer; color: #39A900; font-size: 1.2rem;">
+                            <button onclick="cargarExcusasPendientes()" class="btn-icon color-sena cursor-pointer" title="Actualizar">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
@@ -679,10 +666,8 @@
                         </div>
                     </div>
 
-                    <div class="modal-footer"
-                        style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                        <button type="button" onclick="cerrarModal()" class="btn-primary"
-                            style="background: #666;">Cancelar</button>
+                    <div class="modal-footer d-flex gap-10 mt-20 justify-end">
+                        <button type="button" onclick="cerrarModal()" class="btn-primary bg-gray-dark">Cancelar</button>
                         <button type="submit" class="btn-primary">Guardar</button>
                     </div>
             </form>

@@ -50,17 +50,19 @@ class Database {
             }
 
             if ($database_url) {
+                // Producción o Local con DATABASE_URL (Postgres)
                 // Producción o Local con DATABASE_URL (PostgreSQL)
                 $parsed = parse_url($database_url);
-                $host    = $parsed['host'];
+                // var_dump($parsed); // Temporarily commented out but can be used
+                $host    = $parsed['host'] ?? 'localhost';
                 $port    = $parsed['port'] ?? 5432;
-                $db      = ltrim($parsed['path'], '/');
-                $user    = $parsed['user'];
-                $pass    = $parsed['pass'];
+                $db      = ltrim($parsed['path'] ?? '', '/');
+                $user    = $parsed['user'] ?? '';
+                $pass    = $parsed['pass'] ?? '';
 
                 $dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
                 if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
-                    $dsn = "pgsql:host=$host;port=$port;dbname=$db"; // Quitar SSL para local
+                    $dsn = "pgsql:host=$host;port=$port;dbname=$db"; // Sin SSL para local
                 }
 
                 $this->conn = new PDO($dsn, $user, $pass, [

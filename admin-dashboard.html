@@ -9,6 +9,7 @@
     <link rel="icon" href="assets/img/logosena.png" type="image/png">
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
     <link rel="stylesheet" href="css/admin.css?v=2.0.2">
+    <link rel="stylesheet" href="css/admin-dashboard-professional.css?v=1.0.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -110,48 +111,64 @@
             <!-- Botón Volver (roles específicos) -->
 
             <!-- Tarjetas Admin (Director/Admin/Liderazgo) -->
-            <div id="dashboard-admin-cards" class="admin-stats-grid">
+            <div id="dashboard-admin-cards" class="admin-main-stats-grid">
                 <!-- Usuarios -->
-                <div class="stat-card verde" onclick="window.location.href = 'admin-usuarios.html'">
-                    <div class="stat-icon verde"><i class="fas fa-users"></i></div>
+                <div class="admin-stat-card" onclick="window.location.href = 'admin-usuarios.html'">
+                    <div class="admin-stat-icon admin-users">
+                        <i class="fas fa-users"></i>
+                    </div>
                     <h3>Usuarios</h3>
-                    <div class="stat-num" id="dashTotalUsuarios">--</div>
-                    <div class="stat-detail-grid">
-                        <span class="detail-item"><i class="fas fa-check-circle color-success"></i> Activos: <strong
-                                id="dashUsuariosActivos">0</strong></span>
-                        <span class="detail-item"><i class="fas fa-times-circle color-error"></i> Inactivos: <strong
-                                id="dashUsuariosInactivos">0</strong></span>
+                    <div class="admin-stat-num" id="dashTotalUsuarios">--</div>
+                    <div class="admin-stat-detail">
+                        <span class="admin-detail-item admin-active">
+                            <i class="fas fa-check-circle"></i> Activos: <strong id="dashUsuariosActivos">0</strong>
+                        </span>
+                        <span class="admin-detail-item admin-inactive">
+                            <i class="fas fa-times-circle"></i> Inactivos: <strong id="dashUsuariosInactivos">0</strong>
+                        </span>
                     </div>
                 </div>
 
                 <!-- Aprendices -->
-                <div class="stat-card azul" onclick="window.location.href = 'admin-aprendices.html'">
-                    <div class="stat-icon azul"><i class="fas fa-user-graduate"></i></div>
+                <div class="admin-stat-card" onclick="window.location.href = 'admin-aprendices.html'">
+                    <div class="admin-stat-icon admin-students">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
                     <h3>Aprendices</h3>
-                    <div class="stat-num" id="dashTotalAprendices">--</div>
-                    <div class="stat-detail-list" id="dashAprendicesEstados">
+                    <div class="admin-stat-num" id="dashTotalAprendices">--</div>
+                    <div class="admin-stat-detail" id="dashAprendicesEstados">
                         <small>Cargando estados...</small>
                     </div>
                 </div>
 
                 <!-- Voceros -->
-                <div class="stat-card lila" onclick="window.location.href = 'admin-fichas.html'">
-                    <div class="stat-icon lila"><i class="fas fa-bullhorn"></i></div>
+                <div class="admin-stat-card" onclick="window.location.href = 'admin-fichas.html'">
+                    <div class="admin-stat-icon admin-speakers">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
                     <h3>Voceros</h3>
-                    <div class="stat-num" id="dashTotalVoceros">--</div>
-                    <div class="stat-detail-grid">
-                        <span class="detail-item">Principales: <strong id="dashVocerosPrincipales">0</strong></span>
-                        <span class="detail-item">Suplentes: <strong id="dashVocerosSuplentes">0</strong></span>
-                        <span class="detail-item">Enfoque: <strong id="dashVocerosEnfoque">0</strong></span>
+                    <div class="admin-stat-num" id="dashTotalVoceros">--</div>
+                    <div class="admin-stat-detail">
+                        <span class="admin-detail-item">
+                            <i class="fas fa-star"></i> Principales: <strong id="dashVocerosPrincipales">0</strong>
+                        </span>
+                        <span class="admin-detail-item">
+                            <i class="fas fa-user-friends"></i> Suplentes: <strong id="dashVocerosSuplentes">0</strong>
+                        </span>
+                        <span class="admin-detail-item">
+                            <i class="fas fa-crosshairs"></i> Enfoque: <strong id="dashVocerosEnfoque">0</strong>
+                        </span>
                     </div>
                 </div>
 
                 <!-- Fichas -->
-                <div class="stat-card verde" onclick="window.location.href = 'admin-fichas.html'">
-                    <div class="stat-icon verde"><i class="fas fa-chalkboard"></i></div>
+                <div class="admin-stat-card" onclick="window.location.href = 'admin-fichas.html'">
+                    <div class="admin-stat-icon admin-courses">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
                     <h3>Fichas</h3>
-                    <div class="stat-num" id="dashTotalFichas">--</div>
-                    <p class="stat-desc">Programas activos en el sistema</p>
+                    <div class="admin-stat-num" id="dashTotalFichas">--</div>
+                    <p class="admin-stat-desc">Programas activos en el sistema</p>
                 </div>
             </div>
             
@@ -161,7 +178,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Estado de Aprendices</h3>
                     </div>
-                    <div class="chart-container" style="position: relative; height: 300px;">
+                    <div class="chart-responsive-container">
                         <canvas id="chartAprendices"></canvas>
                     </div>
                 </div>
@@ -174,27 +191,27 @@
                     <div class="pob-chart-grid">
                         <div>
                             <div class="pob-stats-grid">
-                                <div class="pob-stat-item" style="border-left:4px solid #a855f7">
+                                <div class="pob-stat-item pob-mujer">
                                     <div class="pob-label">MUJER</div>
                                     <div class="pob-num" id="stat-mujer">0</div>
                                 </div>
-                                <div class="pob-stat-item" style="border-left:4px solid #84cc16">
+                                <div class="pob-stat-item pob-indigena">
                                     <div class="pob-label">INDÍGENA</div>
                                     <div class="pob-num" id="stat-indigena">0</div>
                                 </div>
-                                <div class="pob-stat-item" style="border-left:4px solid #dc2626">
+                                <div class="pob-stat-item pob-narp">
                                     <div class="pob-label">NARP</div>
                                     <div class="pob-num" id="stat-narp">0</div>
                                 </div>
-                                <div class="pob-stat-item" style="border-left:4px solid #6B8E23">
+                                <div class="pob-stat-item pob-campesino">
                                     <div class="pob-label">CAMPESINO</div>
                                     <div class="pob-num" id="stat-campesino">0</div>
                                 </div>
-                                <div class="pob-stat-item" style="border-left:4px solid #ef4444">
+                                <div class="pob-stat-item pob-lgbtiq">
                                     <div class="pob-label">LGBTIQ+</div>
                                     <div class="pob-num" id="stat-lgbtiq">0</div>
                                 </div>
-                                <div class="pob-stat-item" style="border-left:4px solid #4A90E2">
+                                <div class="pob-stat-item pob-discapacidad">
                                     <div class="pob-label">DISCAPACIDAD</div>
                                     <div class="pob-num" id="stat-discapacidad">0</div>
                                 </div>

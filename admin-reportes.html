@@ -7,9 +7,14 @@
     <title>Reportes - SenApre</title>
     <link rel="stylesheet" href="css/main.css?v=2.0.2">
     <link rel="stylesheet" href="css/admin.css?v=2.0.2">
+    <link rel="stylesheet" href="css/admin-dashboard-professional.css?v=1.0.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- XLSX para Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -104,35 +109,49 @@
             </div>
 
             <!-- Cards Resumen -->
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size: 2rem; color: #39A900; margin-bottom: 10px;"><i
-                            class="fas fa-user-graduate"></i></div>
-                    <h3 style="margin: 0; color: #666;">Total Aprendices</h3>
-                    <div id="totalAprendices" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+            <div class="grid-report-summary">
+                <div class="card report-stat-card">
+                    <div class="report-stat-icon color-sena"><i class="fas fa-user-graduate"></i></div>
+                    <h3 class="report-stat-label">Total Aprendices</h3>
+                    <div id="totalAprendices" class="report-stat-value">0</div>
                 </div>
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size: 2rem; color: #00324D; margin-bottom: 10px;"><i class="fas fa-chalkboard"></i>
-                    </div>
-                    <h3 style="margin: 0; color: #666;">Total Fichas</h3>
-                    <div id="totalFichas" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                <div class="card report-stat-card">
+                    <div class="report-stat-icon color-sena-dark"><i class="fas fa-chalkboard"></i></div>
+                    <h3 class="report-stat-label">Total Fichas</h3>
+                    <div id="totalFichas" class="report-stat-value">0</div>
                 </div>
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size: 2rem; color: #fc7323; margin-bottom: 10px;"><i
-                            class="fas fa-chalkboard-teacher"></i></div>
-                    <h3 style="margin: 0; color: #666;">Instructores</h3>
-                    <div id="totalInstructores" style="font-size: 2.5rem; font-weight: bold; color: #333;">0</div>
+                <div class="card report-stat-card">
+                    <div class="report-stat-icon color-orange"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h3 class="report-stat-label">Instructores</h3>
+                    <div id="totalInstructores" class="report-stat-value">0</div>
+                </div>
+            </div>
+
+            <!-- Botones de Exportación -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">Exportar Reportes</h3>
+                </div>
+                <div class="admin-export-buttons-group" style="justify-content: center; padding: 20px;">
+                    <button onclick="exportarReporteGeneral('excel')" class="admin-export-btn excel">
+                        <i class="fas fa-file-excel"></i> Reporte General Excel
+                    </button>
+                    <button onclick="exportarReporteGeneral('pdf')" class="admin-export-btn">
+                        <i class="fas fa-file-pdf"></i> Reporte General PDF
+                    </button>
+                    <button onclick="exportarReporteGeneral('csv')" class="admin-export-btn csv">
+                        <i class="fas fa-file-csv"></i> Reporte General CSV
+                    </button>
                 </div>
             </div>
 
             <!-- Gráficas -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+            <div class="grid-report-charts">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Aprendices por Estado</h3>
                     </div>
-                    <div style="height: 300px; position: relative;">
+                    <div class="chart-responsive-container">
                         <canvas id="chartEstados"></canvas>
                     </div>
                 </div>
@@ -140,7 +159,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Fichas por Programa (Top 8)</h3>
                     </div>
-                    <div style="height: 300px; position: relative;">
+                    <div class="chart-responsive-container">
                         <canvas id="chartProgramas"></canvas>
                     </div>
                 </div>

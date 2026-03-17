@@ -104,18 +104,20 @@ try {
 
     $totalProgramas = safeQuery($conn, "SELECT COUNT(*) as total FROM programas_formacion");
     
-    // 4. Aprendices por Estado (para la gráfica)
-    // Ya agrupamos arriba en $aprendicesDetalle
+    // 4. Aprendices por Estado (ya definido arriba)
     
-    $detalleVulnerables = [];
-    $totalVulnerables = 0;
+    // 5. Fichas por Programa (Top 8)
+    $fichasPorPrograma = [];
     try {
-        $tablasPob = ['mujer', 'indigena', 'narp', 'campesino', 'lgbtiq', 'discapacidad'];
-        foreach($tablasPob as $t) {
-            $count = safeQuery($conn, "SELECT COUNT(*) as total FROM $t $where");
-            $detalleVulnerables[$t] = $count;
-            $totalVulnerables += $count;
-        }
+        $stmtF = $conn->query("SELECT nombre_programa, COUNT(*) as cantidad FROM fichas GROUP BY nombre_programa ORDER BY cantidad DESC LIMIT 8");
+        $fichasPorPrograma = $stmtF->fetchAll(PDO::FETCH_ASSOC);
+    } catch(Exception $e) {}
+
+    // 6. Tendencia de Asistencias (Últimos 7 días)
+    $asistenciasRecientes = [];
+    try {
+        $stmtA = $conn->query("SELECT fecha, COUNT(*) as cantidad FROM asistencias GROUP BY fecha ORDER BY fecha DESC LIMIT 7");
+        $asistenciasRecientes = array_reverse($stmtA->fetchAll(PDO::FETCH_ASSOC));
     } catch(Exception $e) {}
 
     echo json_encode([

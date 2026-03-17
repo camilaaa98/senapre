@@ -40,7 +40,7 @@ try {
                     FROM aprendices a
                     LEFT JOIN biometria_aprendices b ON a.documento = b.documento
                     WHERE a.numero_ficha = :ficha
-                    AND a.estado = 'EN FORMACION'
+                    AND (a.estado = 'LECTIVA' OR a.estado = 'EN FORMACION')
                     AND a.documento NOT IN (
                         SELECT documento_aprendiz
                         FROM asistencias
