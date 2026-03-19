@@ -29,19 +29,26 @@ class Database {
 
             // Si no hay variable de entorno, intentar cargar desde archivo .env (Desarrollo Local)
             if (!$database_url) {
-                $env_path = __DIR__ . '/../../.env';
-                if (file_exists($env_path)) {
-                    $lines = @file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                    if ($lines) {
-                        foreach ($lines as $line) {
-                            if (strpos(trim($line), '#') === 0) continue;
-                            $parts = explode('=', $line, 2);
-                            if (count($parts) === 2) {
-                                list($name, $value) = $parts;
-                                if (trim($name) == 'DATABASE_URL') {
-                                    $database_url = trim($value);
-                                    putenv("DATABASE_URL=$database_url");
-                                    break;
+                // Priorizar .env.local para trabajar con Supabase local
+                $env_files = [
+                    __DIR__ . '/../../.env.local',
+                    __DIR__ . '/../../.env'
+                ];
+                
+                foreach ($env_files as $env_path) {
+                    if (file_exists($env_path)) {
+                        $lines = @file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                        if ($lines) {
+                            foreach ($lines as $line) {
+                                if (strpos(trim($line), '#') === 0) continue;
+                                $parts = explode('=', $line, 2);
+                                if (count($parts) === 2) {
+                                    list($name, $value) = $parts;
+                                    if (trim($name) == 'DATABASE_URL') {
+                                        $database_url = trim($value);
+                                        putenv("DATABASE_URL=$database_url");
+                                        break 2; // Salir de ambos loops
+                                    }
                                 }
                             }
                         }

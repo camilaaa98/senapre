@@ -17,12 +17,26 @@ const BiometriaLider = {
         if (!this.video) return;
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            // Inicializar control de cámara
+            await CameraControl.init();
+            
+            // Obtener stream con la cámara óptima
+            const stream = await CameraControl.getInitialStream();
             this.video.srcObject = stream;
+            
             this.isActive = true;
             this.startScanning();
+            
+            console.log("Biometría inicializada con control de cámara");
         } catch (e) {
             console.error("No se pudo acceder a la cámara:", e);
+            
+            // Mostrar error específico
+            const feedback = document.getElementById('scan-feedback');
+            if (feedback) {
+                feedback.textContent = "ERROR: No se pudo acceder a la cámara";
+                feedback.style.color = "#ef4444";
+            }
         }
     },
 
@@ -208,21 +222,44 @@ const BiometriaLider = {
         }
 
         try {
-            // Utilizamos el motor real de reconocimiento
+            // Utilizamos el motor real de reconocimiento facial
             const result = await identificarPersona(this.video);
 
             if (result.success && result.match && result.data) {
                 const doc = result.data.documento;
+                const confianza = result.score || 0.8;
                 
                 // Verificar si pertenece a los líderes de la reunión
-                if (typeof leaders !== 'undefined') {
+                if (typeof leaders !== 'undefined' && leaders.length > 0) {
                     const isLeader = leaders.find(l => String(l.documento) === String(doc));
+                    
                     if (!isLeader) {
                         if (feedback) {
                             feedback.textContent = "NO ES LÍDER CONVOCADO";
                             feedback.style.color = "#f59e0b";
                             setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
-                            setTimeout(() => { if(feedback.textContent === "NO ES LÍDER CONVOCADO") feedback.textContent = "BUSCANDO LÍDER..."; }, 2500);
+                        }
+                        this.isProcessing = false;
+                        return;
+                    }
+                    
+                    // Verificar que tenga registro facial activo
+                    if (!isLeader.tiene_registro_facial || isLeader.estado_biometrico !== 'registrado') {
+                        if (feedback) {
+                            feedback.textContent = "SIN REGISTRO FACIAL";
+                            feedback.style.color = "#ef4444";
+                            setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
+                        }
+                        this.isProcessing = false;
+                        return;
+                    }
+                    
+                    // Verificar si ya registró asistencia
+                    if (isLeader.asistencia_registrada) {
+                        if (feedback) {
+                            feedback.textContent = "ASISTENCIA YA REGISTRADA";
+                            feedback.style.color = "#f59e0b";
+                            setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
                         }
                         this.isProcessing = false;
                         return;
@@ -230,22 +267,36 @@ const BiometriaLider = {
                 }
 
                 if (feedback) {
-                    feedback.textContent = "¡COINCIDENCIA ENCONTRADA!";
+                    feedback.textContent = "¡LÍDER RECONOCIDO!";
                     feedback.style.color = "#6ee47b";
-                    setTimeout(() => { if(feedback.textContent === "¡COINCIDENCIA ENCONTRADA!") feedback.textContent = "BUSCANDO LÍDER..."; }, 3000);
+                    setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 3000);
                 }
 
-                console.log("Coincidencia Biométrica: " + (result.score || doc));
-                this.onDetected(doc);
+                console.log("Líder reconocido: " + (result.data.name || doc) + " (Confianza: " + confianza + ")");
+                
+                // Enviar datos completos del reconocimiento
+                this.onDetected({
+                    documento: doc,
+                    nombre: result.data.name || isLeader?.nombre_completo,
+                    confianza: confianza,
+                    metodo: 'biometrico_facial',
+                    timestamp: new Date().toISOString()
+                });
+                
             } else if (result.success && !result.match && result.mensaje !== 'Buscando rostros...') {
                  if (feedback) {
                      feedback.textContent = "ROSTRO DESCONOCIDO";
                      feedback.style.color = "#ef4444";
-                     setTimeout(() => { if(feedback.textContent === "ROSTRO DESCONOCIDO") feedback.textContent = "BUSCANDO LÍDER..."; }, 2500);
+                     setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
                  }
             }
         } catch (error) {
              console.error('Error durante el escaneo facial:', error);
+             if (feedback) {
+                 feedback.textContent = "ERROR EN ESCÁNER";
+                 feedback.style.color = "#ef4444";
+                 setTimeout(() => feedback.textContent = "BUSCANDO LÍDER...", 2500);
+             }
         } finally {
             this.isProcessing = false;
         }

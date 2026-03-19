@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficio Autorización Vocero - SENA</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .oficio-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border: 2px solid #0066cc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 20px;
+        }
+        
+        .logos {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-left {
+            width: 120px;
+            height: 80px;
+            background: #0066cc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        
+        .logo-right {
+            width: 120px;
+            height: 80px;
+            background: #28a745;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066cc;
+            text-transform: uppercase;
+            margin: 20px 0;
+        }
+        
+        .content {
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .info-table th,
+        .info-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .info-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .vocero-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .vocero-principal {
+            border-left-color: #28a745;
+        }
+        
+        .vocero-suplente {
+            border-left-color: #ffc107;
+        }
+        
+        .authorization-section {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .signature-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #333;
+            width: 300px;
+            margin: 60px auto 10px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .stamp {
+            border: 2px dashed #0066cc;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            transform: rotate(-15deg);
+        }
+        
+        @media print {
+            body { background: white; }
+            .oficio-container { box-shadow: none; border: 2px solid #0066cc; }
+        }
+    </style>
+</head>
+<body>
+    <div class="oficio-container">
+        <!-- CABECERA CON LOGOS -->
+        <div class="header">
+            <div class="logos">
+                <div class="logo-left">
+                    SERVICIO NACIONAL DE APRENDIZAJE<br>SENA
+                </div>
+                <div class="logo-right">
+                    SenApre<br>Sistema de Gestión
+                </div>
+            </div>
+            <div class="title">
+                OFICIO DE AUTORIZACIÓN DE ASISTENCIA<br>
+                VOCERO DE GRUPO - REUNIÓN DE PARTICIPACIÓN
+            </div>
+        </div>
+
+        <!-- CONTENIDO DEL OFICIO -->
+        <div class="content">
+            <p><strong>Fecha:</strong> <span id="fecha">25 de marzo de 2026</span></p>
+            <p><strong>Para:</strong> Coordinación de Bienestar</p>
+            <p><strong>De:</strong> <span id="instructor-nombre">CARLOS GARCÍA</span> - Instructor Líder</p>
+            <p><strong>Asunto:</strong> Autorización de Asistencia de Vocero a Reunión</p>
+            <br>
+            
+            <p>Reciba un cordial saludo.</p>
+            
+            <p>Por medio de la presente, se solicita autorización para la asistencia del vocero del grupo a la reunión programada, de acuerdo con la siguiente información:</p>
+            
+            <!-- TABLA DE INFORMACIÓN DE LA REUNIÓN -->
+            <table class="info-table">
+                <tr>
+                    <th>REUNIÓN</th>
+                    <td>Reunión Mensual de Voceros y Representantes</td>
+                </tr>
+                <tr>
+                    <th>FECHA</th>
+                    <td>25 de marzo de 2026</td>
+                </tr>
+                <tr>
+                    <th>HORA</th>
+                    <td>2:00 PM</td>
+                </tr>
+                <tr>
+                    <th>LUGAR</th>
+                    <td>Auditorio Principal - SENA Teleinformática</td>
+                </tr>
+                <tr>
+                    <th>FICHA</th>
+                    <td>2559099</td>
+                </tr>
+            </table>
+
+            <!-- INFORMACIÓN DE VOCEROS -->
+            <h3 style="color: #0066cc; margin-top: 30px;">VOCEROS DESIGNADOS</h3>
+            
+            <div class="vocero-item vocero-principal">
+                <h4 style="margin: 0; color: #28a745;">🎭 VOCERO PRINCIPAL</h4>
+                <p><strong>Nombre:</strong> ANA MARÍA LÓPEZ</p>
+                <p><strong>Documento:</strong> 1087654321</p>
+                <p><strong>Estado:</strong> <span id="estado-principal">PENDIENTE DE AUTORIZACIÓN</span></p>
+            </div>
+            
+            <div class="vocero-item vocero-suplente">
+                <h4 style="margin: 0; color: #ffc107;">🔄 VOCERO SUPLENTE</h4>
+                <p><strong>Nombre:</strong> LUIS FERNANDO TORRES</p>
+                <p><strong>Documento:</strong> 1098765432</p>
+                <p><strong>Estado:</strong> <span id="estado-suplente">EN ESPERA (SI EL PRINCIPAL NO ASISTE)</span></p>
+            </div>
+
+            <!-- SECCIÓN DE AUTORIZACIÓN -->
+            <div class="authorization-section">
+                <h3 style="color: #0066cc; margin-top: 0;">📋 AUTORIZACIÓN REQUERIDA</h3>
+                <p><strong>REGLA DE ASISTENCIA:</strong></p>
+                <ul>
+                    <li>✅ El <strong>Vocero Principal</strong> tiene prioridad de asistencia</li>
+                    <li>🔄 El <strong>Vocero Suplente</strong> solo asiste si el Principal NO puede</li>
+                    <li>⚠️ <strong>SOLO UNO</strong> de los dos puede recibir autorización</li>
+                    <li>📚 El aprendiz debe estar al día con sus compromisos formativos</li>
+                </ul>
+                
+                <p><strong>DECISIÓN DEL INSTRUCTOR:</strong></p>
+                <div style="background: white; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                    <p style="margin: 0;">
+                        <strong>✅ AUTORIZO</strong> la asistencia del vocero: 
+                        <span style="color: #28a745; font-weight: bold;">[SELECCIONAR UNO]</span>
+                    </p>
+                    <p style="margin: 10px 0 0 0;">
+                        <input type="radio" name="vocero-autorizado" id="autorizar-principal" style="margin-right: 8px;">
+                        <label for="autorizar-principal">ANA MARÍA LÓPEZ (Vocero Principal)</label><br>
+                        <input type="radio" name="vocero-autorizado" id="autorizar-suplente" style="margin-right: 8px;">
+                        <label for="autorizar-suplente">LUIS FERNANDO TORRES (Vocero Suplente)</label>
+                    </p>
+                </div>
+            </div>
+
+            <!-- COMPROMISO DEL INSTRUCTOR -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                <h4 style="margin: 0; color: #0066cc;">📝 COMPROMISO</h4>
+                <p>Como instructor líder, confirmo que:</p>
+                <ul>
+                    <li>El vocero autorizado está al día con sus actividades formativas</li>
+                    <li>No tiene ninguna sanción o impedimento para asistir</li>
+                    <li>Se le permitirá hacer uso del tiempo necesario para la reunión</li>
+                    <li>Se le apoyará en la recuperación de actividades académicas</li>
+                </ul>
+            </div>
+
+            <p>Agradezco de antemano su atención y colaboración en este proceso de participación estudiantil.</p>
+            
+            <p>Atentamente,</p>
+        </div>
+
+        <!-- SECCIÓN DE FIRMA -->
+        <div class="signature-section">
+            <div class="signature-line"></div>
+            <p><strong>CARLOS GARCÍA</strong></p>
+            <p>Instructor Líder</p>
+            <p>Ficha 2559099</p>
+            <p>SENA - Centro de Teleinformática y Producción Industrial</p>
+            
+            <!-- SELLO DIGITAL -->
+            <div class="stamp">
+                SENA<br>TELEINFORMÁTICA<br>OFICIO<br>AUTORIZADO
+            </div>
+        </div>
+
+        <!-- PIE DE PÁGINA -->
+        <div class="footer">
+            <p>Servicio Nacional de Aprendizaje - SENA</p>
+            <p>Centro de Teleinformática y Producción Industrial</p>
+            <p>Sistema de Gestión SenApre - Oficio No. <span id="numero-oficio">2026-03-25-001</span></p>
+            <p>Generado el: <span id="fecha-generacion">25 de marzo de 2026 - 10:50 AM</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Actualizar fecha actual
+        document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-CO', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        document.getElementById('fecha-generacion').textContent = new Date().toLocaleString('es-CO');
+        
+        // Generar número de oficio único
+        const fecha = new Date();
+        const numeroOficio = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}-001`;
+        document.getElementById('numero-oficio').textContent = numeroOficio;
+        
+        // Manejar selección de vocero
+        document.querySelectorAll('input[name="vocero-autorizado"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.id === 'autorizar-principal') {
+                    document.getElementById('estado-principal').textContent = '✅ AUTORIZADO PARA ASISTIR';
+                    document.getElementById('estado-principal').style.color = '#28a745';
+                    document.getElementById('estado-suplente').textContent = '❌ NO ASISTIRÁ (EL PRINCIPAL ASISTE)';
+                    document.getElementById('estado-suplente').style.color = '#dc3545';
+                } else {
+                    document.getElementById('estado-principal').textContent = '❌ NO ASISTIRÁ (AUTORIZADO SUPLENTE)';
+                    document.getElementById('estado-principal').style.color = '#dc3545';
+                    document.getElementById('estado-suplente').textContent = '✅ AUTORIZADO PARA ASISTIR';
+                    document.getElementById('estado-suplente').style.color = '#28a745';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

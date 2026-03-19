@@ -142,10 +142,10 @@ try {
         // Usar documento como ID de usuario
         $id_usuario = $data['documento'];
         
-        // Generar contraseña automática si no se proporciona
+        // Generar contraseña automática (usar documento por defecto para no complicarnos)
         $password = isset($data['password']) && !empty($data['password']) 
             ? $data['password'] 
-            : substr(str_replace('@', '', $data['correo']), 0, 8); // Primeros 8 caracteres del correo
+            : $id_usuario; 
         
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
         

@@ -1,0 +1,7 @@
+{
+    "name": "senapre/senapre",
+    "description": "Sistema SenApre - Importación de datos",
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.29"
+    }
+}

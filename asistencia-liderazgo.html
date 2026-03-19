@@ -83,12 +83,16 @@
     </div>
 
     <script src="js/main.js"></script>
-    <script src="js/liderazgo/biometria-lider.js"></script>
+    <script src="https://unpkg.com/@vladmandic/human@3.3.5/dist/human.js" crossorigin="anonymous"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const meetingId = urlParams.get('id');
         let leaders = [];
         let attendance = [];
+
+        let human = null;
+        let streamBiometria = null;
+        let detectionActiva = false;
 
         async function init() {
             if (!meetingId) {
@@ -99,93 +103,484 @@
 
             await cargarDatos();
             
-            // Iniciar Biometría
-            BiometriaLider.init('webcam', 'bio-points');
+            // Inicializar Human.js para reconocimiento facial
+            try {
+                await inicializarHuman();
+                await iniciarCamaraBiometrica();
+                console.log('Sistema biométrico iniciado correctamente');
+            } catch (error) {
+                console.error('Error iniciando biometría:', error);
+                showNotification('error', 'Error iniciando sistema de reconocimiento facial');
+            }
             
-            document.addEventListener('faceDetected', async (e) => {
-                const id = e.detail.id;
-                await registrarAsistencia(id);
+            // Manejar cambio de página (limpiar recursos)
+            window.addEventListener('beforeunload', () => {
+                detenerCamaraBiometrica();
             });
         }
 
-        async function cargarDatos() {
-            const [resM, resL, resA] = await Promise.all([
-                fetch('api/liderazgo.php?action=getReuniones').then(r => r.json()),
-                fetch('api/liderazgo.php?action=getLideres&filtro=todos').then(r => r.json()),
-                fetch(`api/liderazgo.php?action=getReunionAsistencia&id=${meetingId}`).then(r => r.json())
-            ]);
+        /**
+         * Inicializar Human.js
+         */
+        async function inicializarHuman() {
+            if (!human) {
+                human = new Human.Human({
+                    backend: 'webgl',
+                    modelBasePath: 'https://cdn.jsdelivr.net/npm/@vladmandic/human@3.3.5/models',
+                    face: {
+                        enabled: true,
+                        detector: { enabled: true, maxDetected: 5 },
+                        mesh: { enabled: true },
+                        embedding: { enabled: true },
+                    }
+                });
+                await human.load();
+            }
+        }
 
-            if (resM.success) {
-                const meet = resM.data.find(m => m.id == meetingId);
-                if (meet) {
-                    document.getElementById('meet-title').textContent = meet.titulo;
-                    document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora} | ${meet.lugar}`;
+        /**
+         * Iniciar cámara biométrica
+         */
+        async function iniciarCamaraBiometrica() {
+            try {
+                const constraints = {
+                    video: { 
+                        facingMode: 'user', 
+                        width: { ideal: 640 }, 
+                        height: { ideal: 480 } 
+                    }
+                };
+
+                streamBiometria = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('webcam');
+                video.srcObject = streamBiometria;
+
+                detectionActiva = true;
+                detectarRostrosLoop();
+
+            } catch (error) {
+                console.error('Error cámara:', error);
+                document.getElementById('scan-feedback').textContent = 'Error: No se pudo acceder a la cámara';
+            }
+        }
+
+        /**
+         * Loop de detección de rostros
+         */
+        async function detectarRostrosLoop() {
+            if (!detectionActiva) return;
+
+            const video = document.getElementById('webcam');
+            const feedback = document.getElementById('scan-feedback');
+
+            try {
+                if (video.readyState === 4) {
+                    feedback.textContent = 'Buscando rostros...';
+                    feedback.style.color = 'var(--lid-accent)';
+
+                    const result = await human.detect(video);
+
+                    if (result.face && result.face.length > 0) {
+                        feedback.textContent = 'Rostro detectado - Verificando...';
+                        feedback.style.color = '#f59e0b';
+
+                        // Procesar cada rostro detectado
+                        for (const face of result.face) {
+                            if (face.embedding && face.embedding.length > 0) {
+                                await identificarLider(face.embedding);
+                            }
+                        }
+                    }
                 }
+            } catch (error) {
+                console.error('Error en detección:', error);
             }
 
-            if (resL.success) {
-                let list = resL.data;
-                // REGLA: En la reunión ID=2 (o según lo pida el usuario), solo lideres principales y representantes
-                if (meetingId == "2") {
-                    list = list.filter(l => l.tipo === 'Vocero Principal' || l.tipo === 'Representante');
+            // Continuar el loop
+            if (detectionActiva) {
+                requestAnimationFrame(detectarRostrosLoop);
+            }
+        }
+
+        /**
+         * Identificar líder usando api/biometria.php
+         */
+        async function identificarLider(embedding) {
+            try {
+                const response = await fetch('api/biometria.php?action=identificar_lideres', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        embedding: embedding,
+                        reunion_id: meetingId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.match) {
+                    const lider = result.data;
+                    
+                    // Verificar si ya tiene asistencia
+                    const liderEnLista = leaders.find(l => l.documento === lider.documento);
+                    if (liderEnLista && liderEnLista.asistencia_registrada) {
+                        document.getElementById('scan-feedback').textContent = `${lider.nombre} ${lider.apellido} - Ya registrado`;
+                        document.getElementById('scan-feedback').style.color = '#3b82f6';
+                        return;
+                    }
+
+                    // Mostrar detección
+                    document.getElementById('recent-detection').innerHTML = `
+                        <i class="fas fa-user-check" style="font-size:1.5rem; color:#10b981;"></i>
+                        <div>
+                            <div style="font-weight:600;">${lider.nombre} ${lider.apellido}</div>
+                            <div style="font-size:0.8rem; color:var(--lid-text-muted);">Similitud: ${(lider.similitud * 100).toFixed(1)}%</div>
+                        </div>
+                    `;
+
+                    // Registrar asistencia
+                    await registrarAsistenciaBiometrica(lider);
+
+                    // Pausar detección brevemente
+                    detectionActiva = false;
+                    setTimeout(() => {
+                        detectionActiva = true;
+                        detectarRostrosLoop();
+                    }, 2000);
                 }
+
+            } catch (error) {
+                console.error('Error identificando:', error);
+            }
+        }
+
+        /**
+         * Registrar asistencia biométrica
+         */
+        async function registrarAsistenciaBiometrica(liderData) {
+            try {
+                document.getElementById('scan-feedback').textContent = 'Registrando asistencia...';
+                document.getElementById('scan-feedback').style.color = '#f59e0b';
+
+                const response = await fetch('api/lideres-biometrico.php?action=registrarAsistencia', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reunion_id: meetingId,
+                        documento: liderData.documento,
+                        metodo: 'biometrico_facial',
+                        confianza: liderData.similitud
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('scan-feedback').textContent = `✓ Asistencia registrada: ${result.nombre}`;
+                    document.getElementById('scan-feedback').style.color = '#10b981';
+                    
+                    showNotification('success', `Asistencia registrada: ${result.nombre}`);
+                    await cargarDatos();
+                } else {
+                    throw new Error(result.error || 'Error registrando');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('scan-feedback').textContent = 'Error registrando asistencia';
+                document.getElementById('scan-feedback').style.color = '#ef4444';
+            }
+        }
+
+        /**
+         * Detener cámara biométrica
+         */
+        function detenerCamaraBiometrica() {
+            detectionActiva = false;
+            if (streamBiometria) {
+                streamBiometria.getTracks().forEach(track => track.stop());
+                streamBiometria = null;
+            }
+        }
+
+        async function cargarDatos() {
+            try {
+                // Cargar datos de la reunión
+                const resM = await fetch('api/liderazgo.php?action=getReuniones').then(r => r.json());
                 
-                leaders = list;
-                attendance = resA.success ? resA.data : [];
-                renderLista();
-                updateCounter();
+                // Cargar líderes con datos biométricos
+                const resL = await fetch(`api/lideres-biometrico.php?action=lideresReunion&reunion_id=${meetingId}`).then(r => r.json());
+                
+                // Cargar asistencia registrada
+                const resA = await fetch(`api/lideres-biometrico.php?action=asistenciaReunion&reunion_id=${meetingId}`).then(r => r.json());
+
+                if (resM.success) {
+                    const meet = resM.data.find(m => m.id == meetingId);
+                    if (meet) {
+                        document.getElementById('meet-title').textContent = meet.titulo;
+                        document.getElementById('meet-date').textContent = `${meet.fecha} | ${meet.hora} | ${meet.lugar}`;
+                    }
+                }
+
+                if (resL.success) {
+                    leaders = resL.lideres;
+                    
+                    // Marcar líderes que ya tienen asistencia registrada
+                    if (resA.success) {
+                        const asistenciaMap = {};
+                        resA.asistencia.forEach(a => {
+                            asistenciaMap[a.aprendiz_documento] = a;
+                        });
+                        
+                        leaders.forEach(leader => {
+                            leader.asistencia_registrada = !!asistenciaMap[leader.documento];
+                            if (leader.asistencia_registrada) {
+                                leader.hora_asistencia = asistenciaMap[leader.documento].hora_entrada;
+                            }
+                        });
+                    }
+                    
+                    attendance = resA.success ? resA.asistencia : [];
+                    renderLista();
+                    updateCounter();
+                    
+                    console.log(`Líderes cargados: ${leaders.length}`);
+                    console.log(`Con registro facial: ${leaders.filter(l => l.tiene_registro_facial).length}`);
+                    console.log(`Asistencia registrada: ${attendance.length}`);
+                }
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('list-container').innerHTML = 
+                    '<p style="text-align:center; color:#ef4444;">Error cargando datos de la reunión</p>';
             }
         }
 
         function renderLista() {
             const container = document.getElementById('list-container');
-            const asisMap = {};
-            attendance.forEach(a => asisMap[a.id_aprendiz] = a);
-
+            
             container.innerHTML = leaders.map(l => {
-                const asis = asisMap[l.documento];
-                const isPresent = asis && asis.estado === 'asistio';
-                const isAbsent = asis && asis.estado === 'ausente';
+                // Estado de asistencia
+                const isPresent = l.asistencia_registrada;
+                const hasFacial = l.tiene_registro_facial && l.estado_biometrico === 'registrado';
+                
+                // Iconos y colores según estado
+                let statusIcon, statusColor, statusText, borderColor;
+                
+                if (isPresent) {
+                    statusIcon = 'fa-check-circle';
+                    statusColor = '#10b981';
+                    statusText = `ASISTIÓ - ${l.hora_asistencia || ''}`;
+                    borderColor = 'border-l-green-500';
+                } else if (hasFacial) {
+                    statusIcon = 'fa-clock';
+                    statusColor = '#f59e0b';
+                    statusText = 'PENDIENTE - Listo para reconocimiento';
+                    borderColor = 'border-l-yellow-500';
+                } else {
+                    statusIcon = 'fa-exclamation-triangle';
+                    statusColor = '#ef4444';
+                    statusText = 'SIN REGISTRO FACIAL';
+                    borderColor = 'border-l-red-500';
+                }
                 
                 return `
-                <div class="glass-card" style="margin-bottom:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; border-left:5px solid ${isPresent ? 'var(--lid-primary)' : (isAbsent ? '#ef4444' : '#cbd5e1')};">
-                    <div>
-                        <div style="font-weight:700; font-size:0.95rem;">${l.nombre} ${l.apellido}</div>
-                        <div style="font-size:0.75rem; color:var(--lid-text-muted);">${l.tipo} | Ficha: ${l.detalle}</div>
+                    <div class="glass-card ${borderColor}" style="margin-bottom:10px; padding:15px; transition:all 0.3s;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <!-- Foto o Avatar -->
+                            <div style="width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--lid-primary),var(--lid-secondary)); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.2rem;">
+                                ${l.foto_url ? `<img src="${l.foto_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` : l.nombres.charAt(0)}
+                            </div>
+                            
+                            <!-- Información -->
+                            <div style="flex:1;">
+                                <div style="font-weight:600; color:var(--lid-text-primary);">${l.nombre_completo}</div>
+                                <div style="font-size:0.85rem; color:var(--lid-text-muted);">${l.tipo_liderazgo} | Ficha: ${l.ficha || 'N/A'}</div>
+                                <div style="font-size:0.8rem; color:${statusColor}; margin-top:5px;">
+                                    <i class="fas ${statusIcon}" style="margin-right:5px;"></i>${statusText}
+                                </div>
+                            </div>
+                            
+                            <!-- Estado biométrico -->
+                            <div style="text-align:center;">
+                                <div style="width:40px; height:40px; border-radius:50%; background:${isPresent ? '#10b981' : hasFacial ? '#f59e0b' : '#ef4444'}20; display:flex; align-items:center; justify-content:center; margin-bottom:5px;">
+                                    <i class="fas ${hasFacial ? 'fa-face-smile' : 'fa-face-meh'}" style="color:${isPresent ? '#10b981' : hasFacial ? '#f59e0b' : '#ef4444'};"></i>
+                                </div>
+                                <div style="font-size:0.7rem; color:var(--lid-text-muted);">
+                                    ${hasFacial ? 'Biométrico' : 'Sin registro'}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="registrarAsistencia('${l.documento}', 'asistio')" class="btn-lid" style="padding:5px 10px; background:${isPresent ? 'var(--lid-primary)' : 'white'}; color:${isPresent ? 'white' : 'var(--lid-text)'}; border:1px solid #cbd5e1;">P</button>
-                        <button onclick="registrarAsistencia('${l.documento}', 'ausente')" class="btn-lid" style="padding:5px 10px; background:${isAbsent ? '#ef4444' : 'white'}; color:${isAbsent ? 'white' : 'var(--lid-text)'}; border:1px solid #cbd5e1;">A</button>
-                    </div>
-                </div>`;
+                `;
             }).join('');
         }
-
-        async function registrarAsistencia(id, estado = 'asistio') {
-            const leader = leaders.find(l => l.documento === id);
-            if (!leader) return;
-
-            // Visual feedback biometria
-            if (estado === 'asistio' && event && event.type !== 'click') {
-                const recent = document.getElementById('recent-detection');
-                recent.style.background = '#dcfce7';
-                recent.innerHTML = `
-                    <i class="fas fa-check-circle" style="font-size:1.5rem; color:var(--lid-primary);"></i>
-                    <div>
-                        <div style="font-weight:700;">${leader.nombre}</div>
-                        <div style="font-size:0.75rem;">Detectado como ${leader.tipo}</div>
-                    </div>`;
-                setTimeout(() => recent.style.background = '#f1f5f9', 2000);
-            }
-
+                
+                async function registrarAsistencia(detectionData) {
             try {
-                const res = await fetch('api/liderazgo.php?action=registrarAsistencia', {
+                const documento = detectionData.documento;
+                const nombre = detectionData.nombre;
+                const confianza = detectionData.confianza;
+                const metodo = detectionData.metodo || 'biometrico_facial';
+                
+                // Mostrar feedback inmediato
+                const feedback = document.getElementById('recent-detection');
+                feedback.innerHTML = `
+                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; color:var(--lid-primary);"></i>
+                    <div>
+                        <div style="font-weight:600;">${nombre}</div>
+                        <div style="font-size:0.8rem; color:var(--lid-text-muted);">Registrando asistencia...</div>
+                    </div>
+                `;
+                
+                // Enviar a la API
+                const response = await fetch('api/lideres-biometrico.php?action=registrarAsistencia', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id_reunion: meetingId, id_aprendiz: id, estado })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        reunion_id: meetingId,
+                        documento: documento,
+                        metodo: metodo,
+                        confianza: confianza
+                    })
                 });
-                const data = await res.json();
-                if (data.success) {
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Actualizar UI
+                    feedback.innerHTML = `
+                        <i class="fas fa-check-circle" style="font-size:1.5rem; color:#10b981;"></i>
+                        <div>
+                            <div style="font-weight:600; color:#10b981;">${result.nombre}</div>
+                            <div style="font-size:0.8rem; color:var(--lid-text-muted);">Asistencia registrada - ${result.hora}</div>
+                        </div>
+                    `;
+                    
+                    // Actualizar lista y contadores
+                    await cargarDatos();
+                    
+                    // Mostrar notificación
+                    showNotification('success', `Asistencia registrada: ${result.nombre}`);
+                    
+                } else {
+                    throw new Error(result.error || 'Error registrando asistencia');
+                }
+                
+            } catch (error) {
+                console.error('Error registrando asistencia:', error);
+                
+                const feedback = document.getElementById('recent-detection');
+                feedback.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="font-size:1.5rem; color:#ef4444;"></i>
+                    <div>
+                        <div style="font-weight:600; color:#ef4444;">Error</div>
+                        <div style="font-size:0.8rem; color:var(--lid-text-muted);">${error.message}</div>
+                    </div>
+                `;
+                
+                showNotification('error', error.message);
+            }
+        }
+
+        function updateCounter() {
+            const total = leaders.length;
+            const present = leaders.filter(l => l.asistencia_registrada).length;
+            const absent = total - present;
+            
+            document.getElementById('count-total').textContent = total;
+            document.getElementById('count-present').textContent = present;
+            document.getElementById('count-absent').textContent = absent;
+        }
+
+        function showNotification(type, message) {
+            // Crear notificación flotante
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            `;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}" style="margin-right:8px;"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function updateCounter() {
+            const total = leaders.length;
+            const present = leaders.filter(l => l.asistencia_registrada).length;
+            const absent = total - present;
+            
+            document.getElementById('count-total').textContent = total;
+            document.getElementById('count-present').textContent = present;
+            document.getElementById('count-absent').textContent = absent;
+        }
+
+        function showNotification(type, message) {
+            // Crear notificación flotante
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'};
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            `;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'}" style="margin-right:8px;"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function finalizar() {
+            if (confirm('¿Finalizar la toma de asistencia?')) {
+                // Limpiar recursos de cámara
+                detenerCamaraBiometrica();
+                
+                window.location.href = 'liderazgo.html';
+            }
+        }
+
+        function generarReportePDF() {
+            // Implementar generación de PDF
+            alert('Generando reporte PDF...');
+        }
+
+    </script>
+</body>
+</html>
                     await refreshAttendance();
                 }
             } catch (e) {

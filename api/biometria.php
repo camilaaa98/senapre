@@ -42,8 +42,15 @@ try {
         
         if ($embeddingBlob === false) throw new Exception('Embedding inválido');
         
-        $tabla = ($tipo === 'usuario') ? 'biometria_usuarios' : 'biometria_aprendices';
-        $campoId = ($tipo === 'usuario') ? 'id_usuario' : 'documento';
+        $tabla = match($tipo) {
+            'usuario' => 'biometria_usuarios',
+            'lider' => 'biometria_lideres',
+            default => 'biometria_aprendices'
+        };
+        $campoId = match($tipo) {
+            'usuario' => 'id_usuario',
+            default => 'documento'
+        };
         
         $sqlCheck = "SELECT id_biometria FROM $tabla WHERE $campoId = :id";
         $stmtCheck = $conn->prepare($sqlCheck);
@@ -71,8 +78,15 @@ try {
         
         if (empty($tipo) || empty($id)) throw new Exception('Faltan parámetros');
         
-        $tabla = ($tipo === 'usuario') ? 'biometria_usuarios' : 'biometria_aprendices';
-        $campoId = ($tipo === 'usuario') ? 'id_usuario' : 'documento';
+        $tabla = match($tipo) {
+            'usuario' => 'biometria_usuarios',
+            'lider' => 'biometria_lideres',
+            default => 'biometria_aprendices'
+        };
+        $campoId = match($tipo) {
+            'usuario' => 'id_usuario',
+            default => 'documento'
+        };
         
         $sql = "SELECT embedding_facial FROM $tabla WHERE $campoId = :id";
         $stmt = $conn->prepare($sql);
@@ -98,8 +112,15 @@ try {
     if ($action === 'estado' && $method === 'GET') {
         $tipo = $_GET['tipo'] ?? '';
         $id = $_GET['id'] ?? '';
-        $tabla = ($tipo === 'usuario') ? 'biometria_usuarios' : 'biometria_aprendices';
-        $campoId = ($tipo === 'usuario') ? 'id_usuario' : 'documento';
+        $tabla = match($tipo) {
+            'usuario' => 'biometria_usuarios',
+            'lider' => 'biometria_lideres',
+            default => 'biometria_aprendices'
+        };
+        $campoId = match($tipo) {
+            'usuario' => 'id_usuario',
+            default => 'documento'
+        };
         
         $sql = "SELECT COUNT(*) as count FROM $tabla WHERE $campoId = :id";
         $stmt = $conn->prepare($sql);
@@ -114,8 +135,15 @@ try {
         $tipo = $data['tipo'];
         $embeddingInput = $data['embedding'];
         
-        $tabla = ($tipo === 'usuario') ? 'biometria_usuarios' : 'biometria_aprendices';
-        $campoId = ($tipo === 'usuario') ? 'id_usuario' : 'documento';
+        $tabla = match($tipo) {
+            'usuario' => 'biometria_usuarios',
+            'lider' => 'biometria_lideres',
+            default => 'biometria_aprendices'
+        };
+        $campoId = match($tipo) {
+            'usuario' => 'id_usuario',
+            default => 'documento'
+        };
         
         $sql = "SELECT embedding_facial FROM $tabla WHERE $campoId = :id";
         $stmt = $conn->prepare($sql);
@@ -194,11 +222,77 @@ try {
         exit;
     }
 
+    // ==================== IDENTIFICAR LÍDERES (1:N) ====================
+    if ($action === 'identificar_lideres' && $method === 'POST') {
+        $embeddingInput = $data['embedding'];
+        $reunionId = $data['reunion_id'] ?? null;
+        
+        $normInput = 0;
+        foreach ($embeddingInput as $v) $normInput += $v * $v;
+        $normInput = sqrt($normInput);
+        if ($normInput == 0) throw new Exception('Embedding inválido');
+
+        // Buscar en líderes biométricos
+        $sql = "SELECT b.documento, b.embedding_facial, a.nombre, a.apellido, a.tipo_poblacion as tipo_liderazgo, a.numero_ficha as ficha 
+                FROM biometria_lideres b
+                INNER JOIN aprendices a ON b.documento = a.documento
+                WHERE a.estado = 'LECTIVA' 
+                AND (a.tipo_liderazgo IS NOT NULL AND a.tipo_liderazgo != '')";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        
+        while ($row = $stmt->fetch()) {
+            $blob = $row['embedding_facial'];
+            if (is_resource($blob)) $blob = stream_get_contents($blob);
+            
+            $embeddingStored = array_values(unpack('f*', $blob));
+            if (count($embeddingStored) !== count($embeddingInput)) continue;
+            
+            $similitud = calcularSimilitudCoseno($embeddingInput, $embeddingStored);
+            
+            if ($similitud >= 0.85) {
+                // Verificar si el líder está convocado a la reunión
+                $perteneceReunion = true;
+                if ($reunionId) {
+                    $checkStmt = $conn->prepare("SELECT 1 FROM reunion_lideres WHERE id_reunion = :reunion AND id_lider = (SELECT id FROM aprendices WHERE numero_documento = :documento)");
+                    $checkStmt->execute([':reunion' => $reunionId, ':documento' => $row['documento']]);
+                    $perteneceReunion = $checkStmt->fetch() ? true : false;
+                }
+                
+                echo json_encode([
+                    'success' => true,
+                    'match' => true,
+                    'data' => [
+                        'documento' => $row['documento'],
+                        'nombre' => $row['nombres'],
+                        'apellido' => $row['apellidos'],
+                        'tipo_liderazgo' => $row['tipo_liderazgo'],
+                        'ficha' => $row['ficha'],
+                        'similitud' => $similitud
+                    ],
+                    'pertenece_reunion' => $perteneceReunion
+                ]);
+                exit;
+            }
+        }
+        
+        echo json_encode(['success' => true, 'match' => false]);
+        exit;
+    }
+
     if ($action === 'eliminar') {
         $id = $_GET['id'] ?? '';
         $tipo = $_GET['tipo'] ?? '';
-        $tabla = ($tipo === 'usuario') ? 'biometria_usuarios' : 'biometria_aprendices';
-        $campoId = ($tipo === 'usuario') ? 'id_usuario' : 'documento';
+        $tabla = match($tipo) {
+            'usuario' => 'biometria_usuarios',
+            'lider' => 'biometria_lideres',
+            default => 'biometria_aprendices'
+        };
+        $campoId = match($tipo) {
+            'usuario' => 'id_usuario',
+            default => 'documento'
+        };
         $stmt = $conn->prepare("DELETE FROM $tabla WHERE $campoId = :id");
         $stmt->execute([':id' => $id]);
         echo json_encode(['success' => true]);

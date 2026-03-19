@@ -45,10 +45,8 @@ try {
         if (!empty($estado)) {
             $where[] = "a.estado = :estado";
             $params[':estado'] = $estado;
-        } else {
-            // Por defecto, solo mostrar aprendices en estado LECTIVA para asistencia
-            $where[] = "a.estado = 'LECTIVA'";
         }
+        // Eliminado el default LECTIVA para permitir ver todos los estados en el panel del director
 
         if (!empty($tabla_poblacion)) {
             // Validar que la tabla sea una de las permitidas para evitar inyecciones

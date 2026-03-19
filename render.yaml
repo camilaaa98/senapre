@@ -1,9 +1,25 @@
+# Render Blueprint - SENAPRE Deployment
+# Este archivo configura automáticamente el Servicio Web y la Base de Datos
 services:
+  # 1. El Servicio Web (Tu aplicación PHP)
   - type: web
-    name: senapre
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
+    name: senapre-app
+    runtime: docker # Usamos el Dockerfile existente
+    plan: free # Puedes cambiarlo a 'starter' para evitar que se suspenda por inactividad
+    region: oregon # Misma región de la base de datos para baja latencia
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: senapre-db
+          property: connectionString
+      # O usa el que me pasaste manualmente si ya la creaste:
+      # - key: DATABASE_URL
+      #   value: postgresql://senapre_user:ypyErYpqCpzXm0Kf15b19dPD7cqNAIr6@dpg-d6td2m4r85hc73f80dhg-a.oregon-postgres.render.com/senapre
+
+databases:
+  # 2. La Base de Datos PostgreSQL
+  - name: senapre-db
+    databaseName: senapre
+    user: senapre_user
+    plan: free # Plan gratuito (disponible hasta el 17 de abril según mencionaste)
+    region: oregon
