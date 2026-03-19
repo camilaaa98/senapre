@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS asignacion_instructores (
 CREATE TABLE IF NOT EXISTS asistencias (
     id_asistencia SERIAL PRIMARY KEY,
     documento_aprendiz TEXT NOT NULL,
-    numero_ficha TEXT NOT NULL,
+    numero_ficha INTEGER NOT NULL,
     fecha DATE NOT NULL,
     estado TEXT NOT NULL DEFAULT 'Presente',
     observaciones TEXT,
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS asistencias_backup (
 -- Horarios de formación
 CREATE TABLE IF NOT EXISTS horarios_formacion (
     id SERIAL PRIMARY KEY,
-    numero_ficha TEXT NOT NULL,
+    numero_ficha INTEGER NOT NULL,
     id_instructor INTEGER NOT NULL,
     dia_semana INTEGER NOT NULL,
     hora_inicio TIME NOT NULL,
